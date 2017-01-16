@@ -1,0 +1,41 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <!--item name="colorPrimaryDark">@color/colorPrimaryDark</item-->
+        <item name="colorAccent">@color/colorAccent</item>
+        <!--item name="android:textColor">@color/colorText</item-->
+        <!--item name="android:textColorSecondary">@color/colorText</item>
+        <item name="android:textColorPrimary">@color/colorText</item-->
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar">
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+    </style>
+
+    <style name="AppTheme.Toolbar" parent="AppTheme">
+        <!--item name="colorControlNormal">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorAccent</item-->
+        <item name="android:textColorSecondary">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.CheckBox" parent="AppTheme">
+        <item name="colorControlNormal">@color/colorBorder</item>   <!-- border color -->
+        <item name="colorControlActivated">@color/colorAccent</item> <!-- activated color -->
+    </style>
+
+    <style name="AlertDialogCustom" parent="@android:style/Theme.Dialog">
+    </style>
+
+
+</resources>
