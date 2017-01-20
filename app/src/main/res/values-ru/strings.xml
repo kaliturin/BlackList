@@ -46,4 +46,17 @@
     <string name="hidden">Скрытый</string>
     <string name="action_search">Поиск</string>
 
+    <string name="starts_with">Начинается на:</string>
+    <string name="ends_with">Заканчивается на:</string>
+    <string name="empty_sms">Нет текста</string>
+    <string name="contact_name">Имя контакта</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="add_another">Добавить ещё</string>
+
+    <string-array name="phone_metadata">
+        <item>Равняется:</item>
+        <item>Начинается на:</item>
+        <item>Заканчивается на:</item>
+    </string-array>
+
 </resources>

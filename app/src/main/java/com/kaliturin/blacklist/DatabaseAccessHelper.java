@@ -104,6 +104,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             static final String ID = "_id";
             static final String TIME = "time";
             static final String CALLER = "caller";
+            static final String NUMBER = "number";
             static final String TEXT = "text";
         }
 
@@ -114,6 +115,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             Column.ID + " INTEGER PRIMARY KEY NOT NULL, " +
                             Column.TIME + " INTEGER NOT NULL, " +
                             Column.CALLER + " TEXT NOT NULL, " +
+                            Column.NUMBER + " TEXT, " +
                             Column.TEXT + " TEXT " +
                             ")";
 
@@ -137,12 +139,14 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         public final long id;
         public final long time;
         public final String caller;
+        public final String number;
         public final String text;
 
-        public JournalRecord(long id, long time, @NonNull String caller, String text) {
+        public JournalRecord(long id, long time, @NonNull String caller, String number, String text) {
             this.id = id;
             this.time = time;
             this.caller = caller;
+            this.number = number;
             this.text = text;
         }
     }
@@ -152,6 +156,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         private final int ID;
         private final int TIME;
         private final int CALLER;
+        private final int NUMBER;
         private final int TEXT;
 
         public JournalRecordCursorWrapper(Cursor cursor) {
@@ -160,6 +165,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             ID = cursor.getColumnIndex(JournalTable.Column.ID);
             TIME = cursor.getColumnIndex(JournalTable.Column.TIME);
             CALLER = cursor.getColumnIndex(JournalTable.Column.CALLER);
+            NUMBER = cursor.getColumnIndex(JournalTable.Column.NUMBER);
             TEXT = cursor.getColumnIndex(JournalTable.Column.TEXT);
         }
 
@@ -167,8 +173,10 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             long id = getLong(ID);
             long time = getLong(TIME);
             String caller = getString(CALLER);
+            // TODO:
+//            String number = getString(NUMBER);
             String text = getString(TEXT);
-            return new JournalRecord(id, time, caller, text);
+            return new JournalRecord(id, time, caller, null, text);
         }
     }
 
@@ -255,12 +263,17 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             static final String SELECT_BY_NUMBER =
                     "SELECT * " +
                             " FROM " + ContactNumberTable.NAME +
-                            " WHERE " + Column.NUMBER + " = ? ";
+                            " WHERE " + Column.NUMBER + " = ? OR " +
+                            " ? LIKE " + Column.NUMBER + "||'%' OR " +
+                            " ? LIKE '%'||" + Column.NUMBER;
         }
     }
 
     // ContactsNumber table item
     public static class ContactNumber {
+        public static final String STARTS_WITH = "starts_with:";
+        public static final String ENDS_WITH = ":ends_with";
+
         public final long id;
         public final String number;
         public final long contactId;
@@ -343,7 +356,9 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
                 ContactNumberTable.Statement.SELECT_BY_NUMBER,
-                new String[]{number});
+                new String[]{number,
+                        ContactNumber.STARTS_WITH + number,
+                        number + ContactNumber.ENDS_WITH});
 
         return (validate(cursor) ? new ContactNumberCursorWrapper(cursor) : null);
     }
@@ -432,9 +447,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                 if(cursor != null) {
                     do {
                         ContactNumber number = cursor.getNumber();
-                        if (!name.equals(number.number)) {
-                            numbers.add(number.number);
-                        }
+                        numbers.add(number.number);
                     } while (cursor.moveToNext());
                     cursor.close();
                 }
@@ -505,6 +518,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return db.insert(ContactTable.NAME, null, values);
     }
 
+    // TODO: remove flags
     // Adds contact
     public long addContact(@NonNull String name, int type, int flags, @NonNull List<String> numbers) {
         SQLiteDatabase db = getWritableDatabase();

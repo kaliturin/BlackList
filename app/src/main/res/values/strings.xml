@@ -46,7 +46,17 @@
     <string name="hidden">Private</string>
     <string name="action_search">Search</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="starts_with">Starts with:</string>
+    <string name="ends_with">Ends with:</string>
+    <string name="empty_sms">No text</string>
+    <string name="contact_name">Contact name</string>
+    <string name="phone_number">Phone number</string>
+    <string name="add_another">Add another</string>
+
+    <string-array name="phone_metadata">
+        <item>Equals to:</item>
+        <item>Starts with:</item>
+        <item>Ends with:</item>
+    </string-array>
 
 </resources>

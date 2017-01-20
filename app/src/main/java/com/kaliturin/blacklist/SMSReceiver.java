@@ -135,12 +135,16 @@ public class SMSReceiver extends BroadcastReceiver {
         return messages;
     }
 
-    private String getSMSMessageBody(SmsMessage[] messages) {
+    private String getSMSMessageBody(Context context, SmsMessage[] messages) {
         StringBuilder smsBody = new StringBuilder();
         for (SmsMessage message : messages) {
             smsBody.append(message.getMessageBody());
         }
-        return smsBody.toString();
+        String body = smsBody.toString();
+        if(body.isEmpty()) {
+            body = context.getString(R.string.empty_sms);
+        }
+        return body;
     }
 
     private String getContactName(List<Contact> contacts, String number) {
@@ -183,7 +187,7 @@ public class SMSReceiver extends BroadcastReceiver {
         if(number.equals(name)) {
             number = null;
         }
-        String text = getSMSMessageBody(messages);
+        String text = getSMSMessageBody(context, messages);
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
         db.addJournalRecord(System.currentTimeMillis(), name, number, text);
     }

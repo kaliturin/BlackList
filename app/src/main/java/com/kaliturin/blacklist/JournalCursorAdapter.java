@@ -14,6 +14,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecord;
+import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecordCursorWrapper;
+
 /**
  * Journal data cursor adapter
  */
@@ -49,14 +52,13 @@ public class JournalCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // get cursor wrapper
-        DatabaseAccessHelper.JournalRecordCursorWrapper cursorWrapper =
-                (DatabaseAccessHelper.JournalRecordCursorWrapper) cursor;
+        JournalRecordCursorWrapper cursorWrapper = (JournalRecordCursorWrapper) cursor;
         // get journal item
-        DatabaseAccessHelper.JournalRecord item = cursorWrapper.getJournalRecord();
+        JournalRecord item = cursorWrapper.getJournalRecord();
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with new model
-        viewHolder.setModel(item);
+        viewHolder.setModel(context, item);
     }
 
     @Override
@@ -106,6 +108,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         private CheckableLinearLayout row;
         private ImageView icon;
         private TextView sender;
+        private TextView number;
         private TextView text;
         private TextView date;
         private TextView time;
@@ -115,31 +118,37 @@ public class JournalCursorAdapter extends CursorAdapter {
             this((CheckableLinearLayout) row,
                     (ImageView) row.findViewById(R.id.icon),
                     (TextView) row.findViewById(R.id.sender),
+                    (TextView) row.findViewById(R.id.number),
                     (TextView) row.findViewById(R.id.text),
                     (TextView) row.findViewById(R.id.date),
                     (TextView) row.findViewById(R.id.time),
                     (CheckBox) row.findViewById(R.id.cb));
         }
 
-        ViewHolder(CheckableLinearLayout row,
-                ImageView icon, TextView sender,
-                   TextView text, TextView date,
-                   TextView time, CheckBox cb) {
+        ViewHolder(CheckableLinearLayout row, ImageView icon, TextView sender,
+                   TextView number, TextView text, TextView date, TextView time, CheckBox cb) {
             this.row = row;
             this.itemId = 0;
             this.icon = icon;
             this.sender = sender;
+            this.number = number;
             this.text = text;
             this.date = date;
             this.time = time;
             this.cb = cb;
         }
 
-        private void setModel(DatabaseAccessHelper.JournalRecord item) {
+        private void setModel(Context context, JournalRecord item) {
             itemId = (int) item.id;
             date.setText(dateFormat.format(toDate(item.time)));
             time.setText(timeFormat.format(toDate(item.time)));
-            sender.setText(item.caller);
+            sender.setText(Utils.translateNumberMetadata(context, item.caller));
+            number.setText(Utils.translateNumberMetadata(context, item.number));
+            if(number.getText().length() > 0) {
+                number.setVisibility(View.VISIBLE);
+            } else {
+                number.setVisibility(View.GONE);
+            }
             if (item.text != null) {
                 icon.setImageResource(android.R.drawable.sym_action_email);
                 text.setText(item.text);

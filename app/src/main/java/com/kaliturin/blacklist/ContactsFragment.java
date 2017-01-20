@@ -1,5 +1,6 @@
 package com.kaliturin.blacklist;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -170,7 +171,10 @@ public class ContactsFragment extends Fragment {
                 addContactsMenuFragment.setArguments(arguments);
                 // open the dialog activity with the fragment
                 String title = getString(R.string.add_contact);
-                DialogActivity.open(getActivity(), title, addContactsMenuFragment);
+                Activity activity = getActivity();
+                if(activity != null) {
+                    DialogActivity.open(activity, title, addContactsMenuFragment);
+                }
                 return true;
             }
         });

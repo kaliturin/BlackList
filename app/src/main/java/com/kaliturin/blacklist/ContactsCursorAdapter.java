@@ -54,7 +54,7 @@ public class ContactsCursorAdapter extends CursorAdapter {
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with the new contact
-        viewHolder.setModel(contact);
+        viewHolder.setModel(context, contact);
     }
 
     @Override
@@ -139,23 +139,26 @@ public class ContactsCursorAdapter extends CursorAdapter {
             this.cb = cb;
         }
 
-        private void setModel(Contact contact) {
+        private void setModel(Context context, Contact contact) {
             itemId = (int) contact.id;
-            name.setText(contact.name);
+
+            name.setText(Utils.translateNumberMetadata(context, contact.name));
 
             numbers.setText("");
             int size = contact.numbers.size();
             for (int i = 0; i < size; i++) {
                 String number = contact.numbers.get(i);
-                if (!contact.name.equals(number)) {
-                    numbers.append(number);
-                    if (i < size - 1) {
-                        numbers.append("\n");
-                    }
+
+                // if there is just 1 number and it equals to contact name - don't show it
+                if (size == 1 && contact.name.equals(number)) break;
+
+                numbers.append(Utils.translateNumberMetadata(context, number));
+                if (i < size - 1) {
+                    numbers.append("\n");
                 }
             }
 
-            if (numbers.getText().toString().isEmpty()) {
+            if (numbers.getText().length() == 0) {
                 numbers.setVisibility(View.GONE);
             } else {
                 numbers.setVisibility(View.VISIBLE);

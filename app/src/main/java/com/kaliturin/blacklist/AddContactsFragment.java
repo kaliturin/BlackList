@@ -97,7 +97,7 @@ public class AddContactsFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        getActivity().finish();
+                        finishActivity(Activity.RESULT_CANCELED);
                     }
                 });
 
