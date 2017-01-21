@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import com.kaliturin.blacklist.DatabaseAccessHelper.ContactSource;
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
+import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +21,9 @@ import java.util.List;
 public class ContactsCursorAdapter extends CursorAdapter {
     private IdentifiersContainer checkedItems = new IdentifiersContainer(0);
     private View.OnClickListener outerOnClickListener = null;
+    private View.OnLongClickListener outerOnLongClickListener = null;
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
+    private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
 
     ContactsCursorAdapter(Context context) {
         super(context, null, 0);
@@ -38,8 +41,9 @@ public class ContactsCursorAdapter extends CursorAdapter {
         // add view holder to the row
         view.setTag(viewHolder);
 
-        // on click listener for the row and checkbox (which is inside the row)
+        // on click listeners for the row and checkbox (which is inside the row)
         view.setOnClickListener(rowOnClickListener);
+        view.setOnLongClickListener(rowOnLongClickListener);
 
         return view;
     }
@@ -67,6 +71,10 @@ public class ContactsCursorAdapter extends CursorAdapter {
 
     void setOnClickListener(View.OnClickListener onClickListener) {
         this.outerOnClickListener = onClickListener;
+    }
+
+    void setOnLongClickListener(View.OnLongClickListener onLongClickListener) {
+        this.outerOnLongClickListener = onLongClickListener;
     }
 
     // Returns checked items container
@@ -116,6 +124,22 @@ public class ContactsCursorAdapter extends CursorAdapter {
         }
     }
 
+    // Row on long click listener
+    private class RowOnLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(View view) {
+            if(outerOnLongClickListener != null) {
+                return outerOnLongClickListener.onLongClick(view);
+            }
+            return false;
+        }
+    }
+
+    public int getContactId(View row) {
+        ViewHolder viewHolder = (ViewHolder) row.getTag();
+        return viewHolder.itemId;
+    }
+
     // View holder improves scroll performance
     private class ViewHolder {
         private StringBuilder sb = new StringBuilder();
@@ -143,22 +167,32 @@ public class ContactsCursorAdapter extends CursorAdapter {
 
         private void setModel(Context context, Contact contact) {
             itemId = (int) contact.id;
+            boolean oneNumberEquals = false;
 
             // show contact name
-            nameTextView.setText(Utils.translateNumberMetadata(context, contact.name));
+            String name = contact.name;
+            final int size = contact.numbers.size();
+            if (size == 1) {
+                ContactNumber number = contact.numbers.get(0);
+                if (contact.name.equals(number.number)) {
+                    // there is just 1 number and it equals to the contact name
+                    // add number type title before the contact name
+                    name = getNumberTypeTitle(context, number.type) + name;
+                    oneNumberEquals = true;
+                }
+            }
+            nameTextView.setText(name);
 
             // show contact numbers
             sb.setLength(0);
-            int size = contact.numbers.size();
-            for (int i = 0; i < size; i++) {
-                String number = contact.numbers.get(i);
-
-                // if there is just 1 number and it equals to contact name - don't show it
-                if (size == 1 && contact.name.equals(number)) break;
-
-                sb.append(Utils.translateNumberMetadata(context, number));
-                if (i < size - 1) {
-                    sb.append("\n");
+            if(!oneNumberEquals) {
+                for (int i = 0; i < size; i++) {
+                    ContactNumber number = contact.numbers.get(i);
+                    sb.append(getNumberTypeTitle(context, number.type));
+                    sb.append(number.number);
+                    if (i < size - 1) {
+                        sb.append("\n");
+                    }
                 }
             }
             numbersTextView.setText(sb.toString());
@@ -187,5 +221,15 @@ public class ContactsCursorAdapter extends CursorAdapter {
             checkBox.setChecked(checked);
             rowView.setChecked(checked);
         }
+    }
+
+    private String getNumberTypeTitle(Context context, int type) {
+        switch (type) {
+            case ContactNumber.TYPE_STARTS:
+                return context.getString(R.string.starts_with);
+            case ContactNumber.TYPE_ENDS:
+                return context.getString(R.string.ends_with);
+        }
+        return "";
     }
 }

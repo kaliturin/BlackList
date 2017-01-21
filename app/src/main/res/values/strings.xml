@@ -52,6 +52,7 @@
     <string name="contact_name">Contact name (not necessary)</string>
     <string name="phone_number">Phone number</string>
     <string name="add_another">Add another</string>
+    <string name="unnamed">Unnamed</string>
 
     <string-array name="phone_metadata">
         <item>Equals to:</item>

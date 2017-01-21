@@ -143,11 +143,12 @@ public class JournalCursorAdapter extends CursorAdapter {
             itemId = (int) item.id;
             dateTextView.setText(dateFormat.format(toDate(item.time)));
             timeTextView.setText(timeFormat.format(toDate(item.time)));
-            senderTextView.setText(Utils.translateNumberMetadata(context, item.caller));
+
+            senderTextView.setText(item.caller);
 
             if(item.number != null &&
                     !item.caller.equals(item.number)) {
-                numberTextView.setText(Utils.translateNumberMetadata(context, item.number));
+                numberTextView.setText(item.number);
                 numberTextView.setVisibility(View.VISIBLE);
             } else {
                 numberTextView.setText("");

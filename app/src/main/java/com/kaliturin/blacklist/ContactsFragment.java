@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 /**
  * Contacts fragment (black/white list)
@@ -30,6 +31,7 @@ public class ContactsFragment extends Fragment {
     private ContactsCursorAdapter cursorAdapter = null;
     private SnackBarCustom snackBar = null;
     private int contactType = 0;
+    private String itemsFilter = null;
 
     public ContactsFragment() {
         // Required empty public constructor
@@ -89,6 +91,8 @@ public class ContactsFragment extends Fragment {
 
         // cursor adapter
         cursorAdapter = new ContactsCursorAdapter(getContext());
+
+        // on row click listener
         cursorAdapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +101,17 @@ public class ContactsFragment extends Fragment {
                 } else {
                     snackBar.dismiss();
                 }
+            }
+        });
+
+        // on row long click listener (receives clicked row)
+        cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // get contact id from row
+                int contactId = cursorAdapter.getContactId(v);
+                Toast.makeText(getContext(), "" + contactId, Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
 
@@ -206,11 +221,12 @@ public class ContactsFragment extends Fragment {
 
     // Deletes checked items
     private void deleteCheckedItems() {
-        getLoaderManager().restartLoader(0, null, newLoader(null, true));
+        getLoaderManager().restartLoader(0, null, newLoader(itemsFilter, true));
     }
 
     // Reloads items
     private void reloadItems(String itemsFilter) {
+        this.itemsFilter = itemsFilter;
         dismissSnackBar();
         getLoaderManager().restartLoader(0, null, newLoader(itemsFilter, false));
     }
@@ -243,7 +259,7 @@ public class ContactsFragment extends Fragment {
         public Cursor loadInBackground() {
             DatabaseAccessHelper dao = DatabaseAccessHelper.getInstance(getContext());
             if (deletingItems != null) {
-                dao.deleteContacts(contactType, deletingItems);
+                dao.deleteContacts(contactType, deletingItems, itemsFilter);
             }
             return dao.getContacts(contactType, itemsFilter);
         }

@@ -26,6 +26,7 @@ import android.widget.Toast;
 public class JournalFragment extends Fragment {
     private JournalCursorAdapter cursorAdapter = null;
     private SnackBarCustom snackBar = null;
+    private String itemsFilter = null;
 
     public JournalFragment() {
         // Required empty public constructor
@@ -168,11 +169,12 @@ public class JournalFragment extends Fragment {
 
     // Deletes all checked items
     private void deleteCheckedItems() {
-        getLoaderManager().restartLoader(0, null, newLoader(null, true));
+        getLoaderManager().restartLoader(0, null, newLoader(itemsFilter, true));
     }
 
     // Reloads items
     private void reloadItems(String itemsFilter) {
+        this.itemsFilter = itemsFilter;
         dismissSnackBar();
         getLoaderManager().restartLoader(0, null, newLoader(itemsFilter, false));
     }
@@ -203,7 +205,7 @@ public class JournalFragment extends Fragment {
         public Cursor loadInBackground() {
             DatabaseAccessHelper dao = DatabaseAccessHelper.getInstance(getContext());
             if (deletingItems != null) {
-                dao.deleteJournalRecords(deletingItems);
+                dao.deleteJournalRecords(deletingItems, itemsFilter);
             }
             return dao.getJournalRecords(itemsFilter);
         }

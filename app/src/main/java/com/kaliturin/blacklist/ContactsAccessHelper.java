@@ -1,6 +1,5 @@
 package com.kaliturin.blacklist;
 
-import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,7 +8,6 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CallLog.Calls;
-import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.support.annotation.NonNull;
@@ -22,6 +20,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
+import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
 import com.kaliturin.blacklist.DatabaseAccessHelper.ContactSource;
 
 /**
@@ -114,12 +113,14 @@ public class ContactsAccessHelper {
         public Contact getContact(boolean withNumbers) {
             long id = getLong(ID);
             String name = getString(NAME);
-            List<String> numbers = new LinkedList<>();
+            List<ContactNumber> numbers = new LinkedList<>();
             if(withNumbers) {
                 ContactNumberCursorWrapper cursor = getContactNumbers(id);
                 if(cursor != null) {
                     do {
-                        numbers.add(cursor.getNumber());
+                        ContactNumber number = new ContactNumber(cursor.getPosition(),
+                                cursor.getNumber(), id);
+                        numbers.add(number);
                     } while (cursor.moveToNext());
                     cursor.close();
                 }
@@ -286,8 +287,8 @@ public class ContactsAccessHelper {
             long id = getLong(ID);
             String name = getString(PERSON);
             String number = getString(ADDRESS);
-            List<String> numbers = new LinkedList<>();
-            numbers.add(number);
+            List<ContactNumber> numbers = new LinkedList<>();
+            numbers.add(new ContactNumber(0, number, id));
 
             return new Contact(id, name, 0, numbers);
         }
@@ -358,8 +359,8 @@ public class ContactsAccessHelper {
             long id = getLong(ID);
             String number = getString(NUMBER);
             String name = getString(NAME);
-            List<String> numbers = new LinkedList<>();
-            numbers.add(number);
+            List<ContactNumber> numbers = new LinkedList<>();
+            numbers.add(new ContactNumber(0, number, id));
             if(name == null) {
                 name = number;
             }

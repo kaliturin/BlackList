@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.sqlite.util.StringUtils;
 
@@ -68,6 +69,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
 
 //----------------------------------------------------------------
 
+    // Closes cursor if it is empty and returns false
     private boolean validate(Cursor cursor) {
         if(cursor == null || cursor.isClosed()) return false;
         if(cursor.getCount() == 0) {
@@ -77,22 +79,43 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    private static class CommonStatement {
-        //  creates IN part of "WHERE" clause
-        static @NonNull String IN_CLAUSE(String prefix, boolean all, List<String> items, String suffix) {
+    // Common statements
+    private static class Common {
+        /** Creates 'IN part' of 'WHERE' clause.
+         *  If "all" is true - includes all items, except of specified in list.
+         *  Else includes all items specified in list.
+         */
+        static @Nullable String getInClause(String column, boolean all, List<String> items) {
             if(all)  {
                 if(items.isEmpty()) {
                     // include all items
-                    return "";
+                    return null;
                 } else {
                     // include all items except of specified
                     String args = StringUtils.join(items, ", ");
-                    return prefix + " NOT IN ( " + args + " )" + suffix;
+                    return column + " NOT IN ( " + args + " ) ";
                 }
             }
             // include all specified items
             String args = StringUtils.join(items, ", ");
-            return prefix + " IN ( " + args + " )" + suffix;
+            return column + " IN ( " + args + " ) ";
+        }
+
+        /** Creates 'LIKE part' of 'WHERE' clause */
+        static @Nullable String getLikeClause(String column, String filter) {
+            return (filter == null ? null :
+                    column + " LIKE '%" + filter + "%' ");
+        }
+
+        /** Concatenates passed clauses with 'AND' operator */
+        static String concatClauses(List<String> clauses) {
+            StringBuilder sb = new StringBuilder();
+            for(String clause : clauses) {
+                if(TextUtils.isEmpty(clause)) continue;
+                if(sb.length() > 0) sb.append(" AND ");
+                sb.append(clause);
+            }
+            return sb.toString();
         }
     }
 
@@ -142,7 +165,8 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         public final String number;
         public final String text;
 
-        public JournalRecord(long id, long time, @NonNull String caller, String number, String text) {
+        public JournalRecord(long id, long time, @NonNull String caller,
+                             String number, String text) {
             this.id = id;
             this.time = time;
             this.caller = caller;
@@ -173,10 +197,9 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             long id = getLong(ID);
             long time = getLong(TIME);
             String caller = getString(CALLER);
-            // TODO:
-//            String number = getString(NUMBER);
+            String number = getString(NUMBER);
             String text = getString(TEXT);
-            return new JournalRecord(id, time, caller, null, text);
+            return new JournalRecord(id, time, caller, number, text);
         }
     }
 
@@ -202,29 +225,32 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return (validate(cursor) ? new JournalRecordCursorWrapper(cursor) : null);
     }
 
-    // Deletes all records specified in container
-    public int deleteJournalRecords(IdentifiersContainer contactIds) {
+    // Deletes all records specified in container and fit to filter
+    public int deleteJournalRecords(IdentifiersContainer contactIds, @Nullable String filter) {
         if(contactIds.isEmpty()) return 0;
 
         boolean all = contactIds.isFull();
         List<String> ids = contactIds.getIdentifiers(new LinkedList<String>());
 
-        // If "all" is true - deletes all items, excluding specified in list.
-        // Else deletes all items specified in list.
+        // build 'WHERE' clause
+        List<String> clauses = new LinkedList<>();
+        clauses.add(Common.getLikeClause(JournalTable.Column.CALLER, filter));
+        clauses.add(Common.getInClause(JournalTable.Column.ID, all, ids));
+        String clause = Common.concatClauses(clauses);
+
+        // delete records
         SQLiteDatabase db = getWritableDatabase();
-        return db.delete(JournalTable.NAME,
-                CommonStatement.IN_CLAUSE(JournalTable.Column.ID, all, ids, ""),
-                null);
+        return db.delete(JournalTable.NAME, clause, null);
     }
 
     // Writes journal record
-    public long addJournalRecord(long time, @NonNull String caller, String number, String text) {
+    public long addJournalRecord(long time, @NonNull String caller,
+                                 String number, String text) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(JournalTable.Column.TIME, time);
         values.put(JournalTable.Column.CALLER, caller);
-        // TODO: add number
-        //values.put(JournalTable.Column.NUMBER, number);
+        values.put(JournalTable.Column.NUMBER, number);
         values.put(JournalTable.Column.TEXT, text);
         return db.insert(JournalTable.NAME, null, values);
     }
@@ -238,6 +264,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         static class Column {
             static final String ID = "_id";
             static final String NUMBER = "number";
+            static final String TYPE = "type";
             static final String CONTACT_ID = "contact_id";
         }
 
@@ -247,6 +274,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             "(" +
                             Column.ID + " INTEGER PRIMARY KEY NOT NULL, " +
                             Column.NUMBER + " TEXT NOT NULL, " +
+                            Column.TYPE + " INTEGER NOT NULL, " +
                             Column.CONTACT_ID + " INTEGER NOT NULL, " +
                             "FOREIGN KEY(" + Column.CONTACT_ID + ") REFERENCES " +
                             ContactTable.NAME + "(" + ContactTable.Column.ID + ")" +
@@ -263,24 +291,35 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             static final String SELECT_BY_NUMBER =
                     "SELECT * " +
                             " FROM " + ContactNumberTable.NAME +
-                            " WHERE " + Column.NUMBER + " = ? OR " +
-                            " ? LIKE " + Column.NUMBER + "||'%' OR " +
-                            " ? LIKE '%'||" + Column.NUMBER;
+                            " WHERE (" +
+                            Column.TYPE + " = " +  ContactNumber.TYPE_EQUALS + " AND " +
+                            " ? = " + Column.NUMBER + ") OR (" +
+                            Column.TYPE + " = " +  ContactNumber.TYPE_STARTS + " AND " +
+                            " ? LIKE " + Column.NUMBER + "||'%') OR (" +
+                            Column.TYPE + " = " +  ContactNumber.TYPE_ENDS + " AND " +
+                            " ? LIKE '%'||" + Column.NUMBER + ")";
         }
     }
 
     // ContactsNumber table item
     public static class ContactNumber {
-        public static final String STARTS_WITH = "starts_with:";
-        public static final String ENDS_WITH = ":ends_with";
+        public static final int TYPE_EQUALS = 0;
+        public static final int TYPE_STARTS = 1;
+        public static final int TYPE_ENDS = 2;
 
         public final long id;
         public final String number;
+        public final int type;
         public final long contactId;
 
         public ContactNumber(long id, @NonNull String number, long contactId) {
+            this(id, number, TYPE_EQUALS, contactId);
+        }
+
+        public ContactNumber(long id, @NonNull String number, int type, long contactId) {
             this.id = id;
             this.number = number;
+            this.type = type;
             this.contactId = contactId;
         }
     }
@@ -289,6 +328,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     public class ContactNumberCursorWrapper extends CursorWrapper {
         private final int ID;
         private final int NUMBER;
+        private final int TYPE;
         private final int CONTACT_ID;
 
         public ContactNumberCursorWrapper(Cursor cursor) {
@@ -296,27 +336,30 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
             ID = cursor.getColumnIndex(ContactNumberTable.Column.ID);
             NUMBER = cursor.getColumnIndex(ContactNumberTable.Column.NUMBER);
+            TYPE = cursor.getColumnIndex(ContactNumberTable.Column.TYPE);
             CONTACT_ID = cursor.getColumnIndex(ContactNumberTable.Column.CONTACT_ID);
         }
 
         public ContactNumber getNumber() {
             long id = getLong(ID);
             String number = getString(NUMBER);
+            int type = getInt(TYPE);
             long contactId = getLong(CONTACT_ID);
-            return new ContactNumber(id, number, contactId);
+            return new ContactNumber(id, number, type, contactId);
         }
     }
 
     // Adds number
-    public long addNumber(long contactId, @NonNull String number) {
+    public long addNumber(long contactId, @NonNull String number, int type) {
         // try to find existed number for this contact
         ContactNumberCursorWrapper cursor = getNumberByContactId(contactId);
         if(cursor != null) {
             try {
                 do {
-                    ContactNumber n = cursor.getNumber();
-                    if (n.number.equals(number)) {
-                        return n.id;
+                    ContactNumber contactNumber = cursor.getNumber();
+                    if (contactNumber.type == type &&
+                        contactNumber.number.equals(number)) {
+                        return contactNumber.id;
                     }
                 } while (cursor.moveToNext());
             } finally {
@@ -327,11 +370,12 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(ContactNumberTable.Column.NUMBER, number);
+        values.put(ContactNumberTable.Column.TYPE, type);
         values.put(ContactNumberTable.Column.CONTACT_ID, contactId);
         return db.insert(ContactNumberTable.NAME, null, values);
     }
 
-    // Deletes number by contact id
+    // Deletes number(s) by contact id
     public int deleteNumberByContractId(long contactId) {
         SQLiteDatabase db = getWritableDatabase();
         return db.delete(ContactNumberTable.NAME,
@@ -339,7 +383,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                 new String[]{String.valueOf(contactId)});
     }
 
-    // Selects number by contact id
+    // Selects number(s) by contact id
     public @Nullable
     ContactNumberCursorWrapper getNumberByContactId(long contactId) {
         SQLiteDatabase db = getReadableDatabase();
@@ -356,9 +400,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
                 ContactNumberTable.Statement.SELECT_BY_NUMBER,
-                new String[]{number,
-                        ContactNumber.STARTS_WITH + number,
-                        number + ContactNumber.ENDS_WITH});
+                new String[]{number, number, number});
 
         return (validate(cursor) ? new ContactNumberCursorWrapper(cursor) : null);
     }
@@ -436,13 +478,12 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             String name = getString(NAME);
             int type = getInt(TYPE);
 
-            List<String> numbers = new LinkedList<>();
+            List<ContactNumber> numbers = new LinkedList<>();
             if(withNumbers) {
                 ContactNumberCursorWrapper cursor = getNumberByContactId(id);
                 if(cursor != null) {
                     do {
-                        ContactNumber number = cursor.getNumber();
-                        numbers.add(number.number);
+                        numbers.add(cursor.getNumber());
                     } while (cursor.moveToNext());
                     cursor.close();
                 }
@@ -513,15 +554,15 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Adds contact
-    public long addContact(@NonNull String name, int type, @NonNull List<String> numbers) {
+    public long addContact(@NonNull String name, int type, @NonNull List<ContactNumber> numbers) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         long contactId;
         try {
             contactId = addContact(name, type);
             if(contactId >= 0) {
-                for (String number : numbers) {
-                    if (addNumber(contactId, number) == -1) {
+                for (ContactNumber number : numbers) {
+                    if (addNumber(contactId, number.number, number.type) == -1) {
                         return -1;
                     }
                 }
@@ -535,19 +576,22 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Deletes all contacts specified in container with specified type
-    public int deleteContacts(int contactType, IdentifiersContainer contactIds) {
+    public int deleteContacts(int type, IdentifiersContainer contactIds, @Nullable  String filter) {
         if(contactIds.isEmpty()) return 0;
 
         boolean all = contactIds.isFull();
         List<String> ids = contactIds.getIdentifiers(new LinkedList<String>());
 
-        // If "all" is true - deletes all contacts, excluding specified in list.
-        // Else deletes all contacts specified in list.
+        // build 'WHERE' clause
+        List<String> clauses = new LinkedList<>();
+        clauses.add(ContactTable.Column.TYPE  + " = " + type);
+        clauses.add(Common.getLikeClause(ContactTable.Column.NAME, filter));
+        clauses.add(Common.getInClause(ContactTable.Column.ID, all, ids));
+        String clause = Common.concatClauses(clauses);
+
+        // delete contacts
         SQLiteDatabase db = getWritableDatabase();
-        return db.delete(ContactTable.NAME,
-                ContactTable.Column.TYPE  + " = " + contactType +
-                CommonStatement.IN_CLAUSE(" AND " + ContactTable.Column.ID, all, ids, ""),
-                null);
+        return db.delete(ContactTable.NAME, clause, null);
     }
 
 //----------------------------------------------------------------
@@ -560,9 +604,9 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         public final long id;
         public final String name;
         public final int type;
-        public final List<String> numbers;
+        public final List<ContactNumber> numbers;
 
-        Contact(long id, @NonNull String name, int type, @NonNull List<String> numbers) {
+        Contact(long id, @NonNull String name, int type, @NonNull List<ContactNumber> numbers) {
             this.id = id;
             this.name = name;
             this.type = type;
@@ -577,7 +621,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
 
 //----------------------------------------------------------------
 
-    // Returns contact numbers from BD
+    // Returns contact numbers
     private List<ContactNumber> getContactNumbers(@NonNull String number) {
         List<ContactNumber> list = new LinkedList<>();
         ContactNumberCursorWrapper cursor = getNumberByValue(number);
@@ -591,7 +635,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // Returns contacts by contact numbers from DB
+    // Returns contacts by contact numbers
     private List<Contact> getContacts(@NonNull List<ContactNumber> numbers) {
         List<Contact> list = new LinkedList<>();
         for(ContactNumber number : numbers) {
@@ -605,7 +649,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // Returns contacts by contact number from DB
+    // Returns contacts by contact number
     public List<Contact> getContacts(@NonNull String number) {
         List<ContactNumber> numbers = getContactNumbers(number);
         return getContacts(numbers);

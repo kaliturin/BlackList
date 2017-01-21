@@ -52,6 +52,7 @@
     <string name="contact_name">Имя контакта (не обязательно)</string>
     <string name="phone_number">Номер телефона</string>
     <string name="add_another">Добавить ещё</string>
+    <string name="unnamed">Безымянный</string>
 
     <string-array name="phone_metadata">
         <item>Равняется:</item>

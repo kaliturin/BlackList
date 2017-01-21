@@ -99,13 +99,14 @@ public class AddContactManualFragment extends Fragment {
         if(parent == null) return;
 
         // get list of contact phones
-        List<String> numbers = new LinkedList<>();
+        List<ContactNumber> numbers = new LinkedList<>();
         LinearLayout phonesListLayout = (LinearLayout) parent.findViewById(R.id.layout_phones_list);
         for(int i=0; i<phonesListLayout.getChildCount(); i++) {
             View row = phonesListLayout.getChildAt(i);
-            String number = getPhoneNumberWithMetadata(row);
+            String number = getNumber(row);
             if(!number.isEmpty()) {
-                numbers.add(number);
+                int type = getNumberType(row);
+                numbers.add(new ContactNumber(i, number, type, 0));
             }
         }
 
@@ -113,11 +114,16 @@ public class AddContactManualFragment extends Fragment {
         if(numbers.isEmpty()) return;
 
         // get contact name
-        EditText nameEdit = (EditText) parent.findViewById(R.id.edit_name);
-        String name = nameEdit.getText().toString().trim();
+        String name = getName(parent);
         if(name.isEmpty()) {
-            // if name isn't defined - get the first number as a name
-            name = numbers.get(0);
+            // if name isn't defined
+            if(numbers.size() == 1) {
+                // if a single number - get it as a name
+                name = numbers.get(0).number;
+            } else {
+                // get default name
+                name = getContext().getString(R.string.unnamed);
+            }
         }
 
         // save contact
@@ -125,21 +131,26 @@ public class AddContactManualFragment extends Fragment {
         db.addContact(name, contactType, numbers);
     }
 
-    // Returns phone number with metadata from the passed row
-    private String getPhoneNumberWithMetadata(View row) {
-        Spinner metadataSpinner = (Spinner) row.findViewById(R.id.spinner_metadata);
+    private String getName(View parent) {
+        EditText nameEdit = (EditText) parent.findViewById(R.id.edit_name);
+        return nameEdit.getText().toString().trim();
+    }
+
+    private String getNumber(View row) {
         EditText phoneEditText = (EditText) row.findViewById(R.id.edit_text_phone);
-        String number = phoneEditText.getText().toString().trim();
-        if(!number.isEmpty()) {
-            switch (metadataSpinner.getSelectedItemPosition()) {
-                case 1:
-                    return ContactNumber.STARTS_WITH + number;
-                case 2:
-                    return number + ContactNumber.ENDS_WITH;
-            }
+        return phoneEditText.getText().toString().trim();
+    }
+
+    private int getNumberType(View row) {
+        Spinner metadataSpinner = (Spinner) row.findViewById(R.id.spinner_metadata);
+        switch (metadataSpinner.getSelectedItemPosition()) {
+            case 1:
+                return ContactNumber.TYPE_STARTS;
+            case 2:
+                return ContactNumber.TYPE_ENDS;
         }
 
-        return number;
+        return ContactNumber.TYPE_EQUALS;
     }
 
     private void finishActivity(int result) {

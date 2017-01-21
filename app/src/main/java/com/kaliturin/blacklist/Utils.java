@@ -22,22 +22,4 @@ public class Utils {
         DrawableCompat.setTint(drawable, color);
         item.setIcon(drawable);
     }
-
-    /** Replaces found number's metadata with text information
-     */
-    public static String translateNumberMetadata(Context context, String number) {
-        if(number != null) {
-            if (number.startsWith(ContactNumber.STARTS_WITH)) {
-                return context.getString(R.string.starts_with) + " " +
-                        number.substring(ContactNumber.STARTS_WITH.length());
-            }
-
-            if (number.endsWith(ContactNumber.ENDS_WITH)) {
-                return context.getString(R.string.ends_with) + " " +
-                        number.substring(0, number.length() - ContactNumber.ENDS_WITH.length());
-            }
-        }
-
-        return number;
-    }
 }
