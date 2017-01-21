@@ -298,7 +298,7 @@ public class AddContactsFragment extends Fragment {
             int count = 1;
             for(Contact contact : contactList) {
                 if(isCancelled()) break;
-                db.addContact(contact.name, contactType, 0, contact.numbers);
+                db.addContact(contact.name, contactType, contact.numbers);
                 publishProgress(100 / contactList.size() * count++);
             }
             return null;

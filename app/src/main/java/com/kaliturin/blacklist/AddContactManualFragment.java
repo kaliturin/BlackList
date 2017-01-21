@@ -122,7 +122,7 @@ public class AddContactManualFragment extends Fragment {
 
         // save contact
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.addContact(name, contactType, 0, numbers);
+        db.addContact(name, contactType, numbers);
     }
 
     // Returns phone number with metadata from the passed row
@@ -149,6 +149,4 @@ public class AddContactManualFragment extends Fragment {
             activity.finish();
         }
     }
-
-
 }

@@ -125,7 +125,7 @@ public class ContactsAccessHelper {
                 }
             }
 
-            return new Contact(id, name, 0, 0, numbers);
+            return new Contact(id, name, 0, numbers);
         }
     }
 
@@ -289,7 +289,7 @@ public class ContactsAccessHelper {
             List<String> numbers = new LinkedList<>();
             numbers.add(number);
 
-            return new Contact(id, name, 0, 0, numbers);
+            return new Contact(id, name, 0, numbers);
         }
     }
 
@@ -364,7 +364,7 @@ public class ContactsAccessHelper {
                 name = number;
             }
 
-            return new Contact(id, name, 0, 0, numbers);
+            return new Contact(id, name, 0, numbers);
         }
     }
 
@@ -385,71 +385,3 @@ public class ContactsAccessHelper {
         Log.d("BlackList", sb.toString());
     }
 }
-
-/*
-    // Selects contacts from SMS inbox
-    public @Nullable ContactFromSMSCursorWrapper getContactsFromSMSInbox(@Nullable String filter) {
-        filter = (filter == null ? "%%" : "%" + filter + "%");
-        final String ID = "_id";
-        final String ADDRESS = "address";
-        final String PERSON = "person";
-
-        // filter by address if person is null
-        Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms/inbox"),
-                new String[]{"DISTINCT " + ID, ADDRESS, PERSON},
-                ADDRESS + " IS NOT NULL AND (" +
-                PERSON + " IS NOT NULL OR " +
-                ADDRESS + " LIKE ? )" +
-                ") GROUP BY (" + ADDRESS,
-                new String[]{filter},
-                Calls.DATE + " DESC");
-
-        return (validate(cursor) ? new ContactFromSMSCursorWrapper(cursor) : null);
-    }
-
-    // Contact from SMS cursor wrapper
-    public class ContactFromSMSCursorWrapper extends CursorWrapper implements ContactSource {
-        private final int ID;
-        private final int ADDRESS;
-        private final int PERSON;
-
-        private ContactFromSMSCursorWrapper(Cursor cursor) {
-            super(cursor);
-            cursor.moveToFirst();
-            ID = getColumnIndex("_id");
-            ADDRESS = getColumnIndex("address");
-            PERSON = getColumnIndex("person");
-        }
-
-        @Override
-        public Contact getContact() {
-            Contact contact = null;
-
-            // try to get contact by person id
-            if(!isNull(PERSON)) {
-                long person = getLong(PERSON);
-                ContactCursorWrapper cursor =
-                        ContactsAccessHelper.this.getContact(person);
-                if(cursor != null) {
-                    contact = cursor.getContact(false);
-                    cursor.close();
-                }
-            }
-
-            long id = getLong(ID);
-            String address = getString(ADDRESS);
-            List<String> numbers = new LinkedList<>();
-            numbers.add(address);
-
-            String name;
-            if(contact == null) {
-                name = address;
-            } else {
-                name = contact.name;
-            }
-
-            return new Contact(id, name, 0, 0, numbers);
-        }
-    }
-*/

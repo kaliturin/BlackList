@@ -49,7 +49,7 @@
     <string name="starts_with">Начинается на:</string>
     <string name="ends_with">Заканчивается на:</string>
     <string name="empty_sms">Нет текста</string>
-    <string name="contact_name">Имя контакта</string>
+    <string name="contact_name">Имя контакта (не обязательно)</string>
     <string name="phone_number">Номер телефона</string>
     <string name="add_another">Добавить ещё</string>
 

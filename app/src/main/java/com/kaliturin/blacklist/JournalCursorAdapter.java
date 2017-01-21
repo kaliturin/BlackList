@@ -105,14 +105,14 @@ public class JournalCursorAdapter extends CursorAdapter {
     // View holder improves scroll performance
     private class ViewHolder {
         private int itemId;
-        private CheckableLinearLayout row;
-        private ImageView icon;
-        private TextView sender;
-        private TextView number;
-        private TextView text;
-        private TextView date;
-        private TextView time;
-        private CheckBox cb;
+        private CheckableLinearLayout rowView;
+        private ImageView iconImageView;
+        private TextView senderTextView;
+        private TextView numberTextView;
+        private TextView textTextView;
+        private TextView dateTextView;
+        private TextView timeTextView;
+        private CheckBox checkBox;
 
         ViewHolder(View row) {
             this((CheckableLinearLayout) row,
@@ -125,43 +125,48 @@ public class JournalCursorAdapter extends CursorAdapter {
                     (CheckBox) row.findViewById(R.id.cb));
         }
 
-        ViewHolder(CheckableLinearLayout row, ImageView icon, TextView sender,
-                   TextView number, TextView text, TextView date, TextView time, CheckBox cb) {
-            this.row = row;
+        ViewHolder(CheckableLinearLayout rowView, ImageView iconImageView, TextView senderTextView,
+                   TextView numberTextView, TextView textTextView, TextView dateTextView,
+                   TextView timeTextView, CheckBox checkBox) {
+            this.rowView = rowView;
             this.itemId = 0;
-            this.icon = icon;
-            this.sender = sender;
-            this.number = number;
-            this.text = text;
-            this.date = date;
-            this.time = time;
-            this.cb = cb;
+            this.iconImageView = iconImageView;
+            this.senderTextView = senderTextView;
+            this.numberTextView = numberTextView;
+            this.textTextView = textTextView;
+            this.dateTextView = dateTextView;
+            this.timeTextView = timeTextView;
+            this.checkBox = checkBox;
         }
 
         private void setModel(Context context, JournalRecord item) {
             itemId = (int) item.id;
-            date.setText(dateFormat.format(toDate(item.time)));
-            time.setText(timeFormat.format(toDate(item.time)));
-            sender.setText(Utils.translateNumberMetadata(context, item.caller));
-            number.setText(Utils.translateNumberMetadata(context, item.number));
-            if(number.getText().length() > 0) {
-                number.setVisibility(View.VISIBLE);
+            dateTextView.setText(dateFormat.format(toDate(item.time)));
+            timeTextView.setText(timeFormat.format(toDate(item.time)));
+            senderTextView.setText(Utils.translateNumberMetadata(context, item.caller));
+
+            if(item.number != null &&
+                    !item.caller.equals(item.number)) {
+                numberTextView.setText(Utils.translateNumberMetadata(context, item.number));
+                numberTextView.setVisibility(View.VISIBLE);
             } else {
-                number.setVisibility(View.GONE);
+                numberTextView.setText("");
+                numberTextView.setVisibility(View.GONE);
             }
+
             if (item.text != null) {
-                icon.setImageResource(android.R.drawable.sym_action_email);
-                text.setText(item.text);
-                text.setVisibility(View.VISIBLE);
+                iconImageView.setImageResource(android.R.drawable.sym_action_email);
+                textTextView.setText(item.text);
+                textTextView.setVisibility(View.VISIBLE);
             } else {
-                icon.setImageResource(android.R.drawable.sym_action_call);
-                text.setText("");
-                text.setVisibility(View.GONE);
+                iconImageView.setImageResource(android.R.drawable.sym_action_call);
+                textTextView.setText("");
+                textTextView.setVisibility(View.GONE);
             }
 
             boolean checked = isChecked();
-            cb.setChecked(checked);
-            row.setChecked(checked);
+            checkBox.setChecked(checked);
+            rowView.setChecked(checked);
         }
 
         private void toggle() {
@@ -174,8 +179,8 @@ public class JournalCursorAdapter extends CursorAdapter {
 
         private void setChecked(boolean checked) {
             checkedItems.set(itemId, checked);
-            cb.setChecked(checked);
-            row.setChecked(checked);
+            checkBox.setChecked(checked);
+            rowView.setChecked(checked);
         }
 
         private Date toDate(long time) {

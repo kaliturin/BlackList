@@ -49,7 +49,7 @@
     <string name="starts_with">Starts with:</string>
     <string name="ends_with">Ends with:</string>
     <string name="empty_sms">No text</string>
-    <string name="contact_name">Contact name</string>
+    <string name="contact_name">Contact name (not necessary)</string>
     <string name="phone_number">Phone number</string>
     <string name="add_another">Add another</string>
 

@@ -373,7 +373,6 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             static final String ID = "_id";
             static final String NAME = "name";
             static final String TYPE = "type"; // black/white type
-            static final String FLAGS = "flags";
         }
 
         static class Statement {
@@ -382,8 +381,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             "(" +
                             Column.ID + " INTEGER PRIMARY KEY NOT NULL, " +
                             Column.NAME + " TEXT NOT NULL, " +
-                            Column.TYPE + " INTEGER NOT NULL DEFAULT 0, " +
-                            Column.FLAGS + " INTEGER NOT NULL DEFAULT 0" +
+                            Column.TYPE + " INTEGER NOT NULL DEFAULT 0 " +
                             ")";
 
             static final String SELECT_BY_TYPE =
@@ -419,7 +417,6 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         private final int ID;
         private final int NAME;
         private final int TYPE;
-        private final int FLAGS;
 
         public ContactCursorWrapper(Cursor cursor) {
             super(cursor);
@@ -427,7 +424,6 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             ID = cursor.getColumnIndex(ContactTable.Column.ID);
             NAME = getColumnIndex(ContactTable.Column.NAME);
             TYPE = getColumnIndex(ContactTable.Column.TYPE);
-            FLAGS = getColumnIndex(ContactTable.Column.FLAGS);
         }
 
         @Override
@@ -439,7 +435,6 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             long id = getLong(ID);
             String name = getString(NAME);
             int type = getInt(TYPE);
-            int flags = getInt(FLAGS);
 
             List<String> numbers = new LinkedList<>();
             if(withNumbers) {
@@ -453,7 +448,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                 }
             }
 
-            return new Contact(id, name, type, flags, numbers);
+            return new Contact(id, name, type, numbers);
         }
     }
 
@@ -501,7 +496,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Adds contact
-    private long addContact(@NonNull String name, int type, int flags) {
+    private long addContact(@NonNull String name, int type) {
         // try to find existed contact by name
         ContactCursorWrapper cursor = getContact(type, name);
         if(cursor != null) {
@@ -514,18 +509,16 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(ContactTable.Column.NAME, name);
         values.put(ContactTable.Column.TYPE, type);
-        values.put(ContactTable.Column.FLAGS, flags);
         return db.insert(ContactTable.NAME, null, values);
     }
 
-    // TODO: remove flags
     // Adds contact
-    public long addContact(@NonNull String name, int type, int flags, @NonNull List<String> numbers) {
+    public long addContact(@NonNull String name, int type, @NonNull List<String> numbers) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         long contactId;
         try {
-            contactId = addContact(name, type, flags);
+            contactId = addContact(name, type);
             if(contactId >= 0) {
                 for (String number : numbers) {
                     if (addNumber(contactId, number) == -1) {
@@ -567,18 +560,12 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         public final long id;
         public final String name;
         public final int type;
-        public final int flags;
         public final List<String> numbers;
 
-        Contact(long id,
-                @NonNull String name,
-                int type,
-                int flags,
-                @NonNull List<String> numbers) {
+        Contact(long id, @NonNull String name, int type, @NonNull List<String> numbers) {
             this.id = id;
             this.name = name;
             this.type = type;
-            this.flags = flags;
             this.numbers = numbers;
         }
     }

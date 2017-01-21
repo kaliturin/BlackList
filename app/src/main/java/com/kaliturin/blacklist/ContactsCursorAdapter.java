@@ -118,11 +118,13 @@ public class ContactsCursorAdapter extends CursorAdapter {
 
     // View holder improves scroll performance
     private class ViewHolder {
+        private StringBuilder sb = new StringBuilder();
+
         private int itemId;
-        private CheckableLinearLayout row;
-        private TextView name;
-        private TextView numbers;
-        private CheckBox cb;
+        private CheckableLinearLayout rowView;
+        private TextView nameTextView;
+        private TextView numbersTextView;
+        private CheckBox checkBox;
 
         ViewHolder(View row) {
             this((CheckableLinearLayout)row,
@@ -131,20 +133,22 @@ public class ContactsCursorAdapter extends CursorAdapter {
                     (CheckBox) row.findViewById(R.id.contact_cb));
         }
 
-        ViewHolder(CheckableLinearLayout row, TextView name, TextView numbers, CheckBox cb) {
+        ViewHolder(CheckableLinearLayout rowView, TextView nameTextView, TextView numbersTextView, CheckBox checkBox) {
             this.itemId = 0;
-            this.row = row;
-            this.name = name;
-            this.numbers = numbers;
-            this.cb = cb;
+            this.rowView = rowView;
+            this.nameTextView = nameTextView;
+            this.numbersTextView = numbersTextView;
+            this.checkBox = checkBox;
         }
 
         private void setModel(Context context, Contact contact) {
             itemId = (int) contact.id;
 
-            name.setText(Utils.translateNumberMetadata(context, contact.name));
+            // show contact name
+            nameTextView.setText(Utils.translateNumberMetadata(context, contact.name));
 
-            numbers.setText("");
+            // show contact numbers
+            sb.setLength(0);
             int size = contact.numbers.size();
             for (int i = 0; i < size; i++) {
                 String number = contact.numbers.get(i);
@@ -152,21 +156,22 @@ public class ContactsCursorAdapter extends CursorAdapter {
                 // if there is just 1 number and it equals to contact name - don't show it
                 if (size == 1 && contact.name.equals(number)) break;
 
-                numbers.append(Utils.translateNumberMetadata(context, number));
+                sb.append(Utils.translateNumberMetadata(context, number));
                 if (i < size - 1) {
-                    numbers.append("\n");
+                    sb.append("\n");
                 }
             }
-
-            if (numbers.getText().length() == 0) {
-                numbers.setVisibility(View.GONE);
+            numbersTextView.setText(sb.toString());
+            if (numbersTextView.getText().length() == 0) {
+                numbersTextView.setVisibility(View.GONE);
             } else {
-                numbers.setVisibility(View.VISIBLE);
+                numbersTextView.setVisibility(View.VISIBLE);
             }
 
+            // set selection
             boolean checked = isChecked();
-            cb.setChecked(checked);
-            row.setChecked(checked);
+            checkBox.setChecked(checked);
+            rowView.setChecked(checked);
         }
 
         private void toggle() {
@@ -179,8 +184,8 @@ public class ContactsCursorAdapter extends CursorAdapter {
 
         private void setChecked(boolean checked) {
             checkedItems.set(itemId, checked);
-            cb.setChecked(checked);
-            row.setChecked(checked);
+            checkBox.setChecked(checked);
+            rowView.setChecked(checked);
         }
     }
 }
