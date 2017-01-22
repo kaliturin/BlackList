@@ -5,6 +5,7 @@
     android:background="@color/colorPrimary">
 
     <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -18,12 +19,13 @@
                 android:id="@+id/edit_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLength="100"
                 android:hint="@string/contact_name">
                 <requestFocus />
             </EditText>
 
             <LinearLayout
-                android:id="@+id/layout_phones_list"
+                android:id="@+id/layout_number_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"/>
@@ -48,7 +50,8 @@
                     android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:clickable="false"
-                    android:src="@drawable/ic_menu_add" />
+                    android:src="@drawable/ic_menu_add"
+                    android:tint="@color/colorAccent" />
 
             </LinearLayout>
 

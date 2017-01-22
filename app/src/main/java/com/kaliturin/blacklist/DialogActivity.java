@@ -30,7 +30,7 @@ public class DialogActivity extends AppCompatActivity {
 
         // set fragment
         Fragment fragment = (Fragment) SharedData.get(SharedData.FRAGMENT);
-        String title = (String) getIntent().getExtras().get(SharedData.FRAGMENT);
+        String title = (String) getIntent().getExtras().get(SharedData.TITLE);
         setFragment(fragment, title);
     }
 
@@ -69,12 +69,12 @@ public class DialogActivity extends AppCompatActivity {
     }
 
     // Opens dialog-activity with passed fragment inside
-    public static void open(Activity parent, String title, Fragment fragment) {
+    public static void show(Activity parent, Fragment fragment, String title, int requestCode) {
         SharedData.put(SharedData.FRAGMENT, fragment);
         Intent intent = new Intent(parent, DialogActivity.class);
-        intent.putExtra(SharedData.FRAGMENT, title);
+        intent.putExtra(SharedData.TITLE, title);
         // start activity as a child of the current one and waiting for result code
-        parent.startActivityForResult(intent, 0);
+        parent.startActivityForResult(intent, requestCode);
     }
 
     /**
@@ -83,6 +83,7 @@ public class DialogActivity extends AppCompatActivity {
     private static class SharedData {
         private static HashMap<String, Object> sharedObjects = new HashMap<>();
         static final String FRAGMENT = "FRAGMENT";
+        static final String TITLE = "TITLE";
         static Object get(String name) {
             return sharedObjects.remove(name);
         }

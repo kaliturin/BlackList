@@ -41,6 +41,7 @@
     <string name="cancel">Отменить</string>
     <string name="add">Добавить</string>
     <string name="add_contact">Добавить контакт</string>
+    <string name="adding_contact">Добавление контакта</string>
     <string name="saving">Сохранение...</string>
     <string name="is_blocked">заблокирован</string>
     <string name="hidden">Скрытый</string>
@@ -53,6 +54,9 @@
     <string name="phone_number">Номер телефона</string>
     <string name="add_another">Добавить ещё</string>
     <string name="unnamed">Безымянный</string>
+    <string name="edit">Изменить</string>
+    <string name="editing_contact">Изменение контакта</string>
+    <string name="save">Сохранить</string>
 
     <string-array name="phone_metadata">
         <item>Равняется:</item>

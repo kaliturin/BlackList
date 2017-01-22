@@ -2,6 +2,7 @@ package com.kaliturin.blacklist;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,7 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
+
+import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
 /**
  * Contacts fragment (black/white list)
@@ -47,14 +49,14 @@ public class ContactsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle bundle = getArguments();
-        contactType = bundle.getInt(CONTACT_TYPE);
+        contactType = bundle.getInt(CONTACT_TYPE, 0);
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_contacts, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
@@ -95,7 +97,7 @@ public class ContactsFragment extends Fragment {
         // on row click listener
         cursorAdapter.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View row) {
                 if (cursorAdapter.hasCheckedItems()) {
                     snackBar.show();
                 } else {
@@ -107,10 +109,14 @@ public class ContactsFragment extends Fragment {
         // on row long click listener (receives clicked row)
         cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                // get contact id from row
-                int contactId = cursorAdapter.getContactId(v);
-                Toast.makeText(getContext(), "" + contactId, Toast.LENGTH_SHORT).show();
+            public boolean onLongClick(View row) {
+                // get contact from the row was clicked
+                Contact contact = cursorAdapter.getContact(row);
+                if(contact != null) {
+                    // create and show contact menu dialog
+                    ContactMenuPopupDialog.show(ContactsFragment.this, contact);
+                }
+
                 return true;
             }
         });
@@ -121,6 +127,18 @@ public class ContactsFragment extends Fragment {
 
         // init and run the contact items loader
         getLoaderManager().initLoader(0, null, newLoader(null, false));
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // if result from contact menu dialog
+        if(requestCode == ContactMenuPopupDialog.REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK) {
+                reloadItems(itemsFilter);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -186,10 +204,7 @@ public class ContactsFragment extends Fragment {
                 addContactsMenuFragment.setArguments(arguments);
                 // open the dialog activity with the fragment
                 String title = getString(R.string.add_contact);
-                Activity activity = getActivity();
-                if(activity != null) {
-                    DialogActivity.open(activity, title, addContactsMenuFragment);
-                }
+                DialogActivity.show(getActivity(), addContactsMenuFragment, title, 0);
                 return true;
             }
         });
@@ -304,4 +319,7 @@ public class ContactsFragment extends Fragment {
             cursorAdapter.changeCursor(null);
         }
     }
+
+//----------------------------------------------------
+
 }

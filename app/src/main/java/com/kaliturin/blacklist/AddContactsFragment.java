@@ -258,11 +258,8 @@ public class AddContactsFragment extends Fragment {
 //-------------------------------------------------------------------
 
     private void finishActivity(int result) {
-        Activity activity = getActivity();
-        if(activity != null) {
-            activity.setResult(result);
-            activity.finish();
-        }
+        getActivity().setResult(result);
+        getActivity().finish();
     }
 
     // Writes checked contacts to the database

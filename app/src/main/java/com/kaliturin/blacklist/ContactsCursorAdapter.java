@@ -135,15 +135,16 @@ public class ContactsCursorAdapter extends CursorAdapter {
         }
     }
 
-    public int getContactId(View row) {
+    public Contact getContact(View row) {
         ViewHolder viewHolder = (ViewHolder) row.getTag();
-        return viewHolder.itemId;
+        return (viewHolder != null ? viewHolder.contact : null);
     }
 
     // View holder improves scroll performance
     private class ViewHolder {
         private StringBuilder sb = new StringBuilder();
 
+        private Contact contact;
         private int itemId;
         private CheckableLinearLayout rowView;
         private TextView nameTextView;
@@ -158,6 +159,7 @@ public class ContactsCursorAdapter extends CursorAdapter {
         }
 
         ViewHolder(CheckableLinearLayout rowView, TextView nameTextView, TextView numbersTextView, CheckBox checkBox) {
+            this.contact = null;
             this.itemId = 0;
             this.rowView = rowView;
             this.nameTextView = nameTextView;
@@ -166,6 +168,8 @@ public class ContactsCursorAdapter extends CursorAdapter {
         }
 
         private void setModel(Context context, Contact contact) {
+            this.contact = contact;
+
             itemId = (int) contact.id;
             boolean oneNumberEquals = false;
 

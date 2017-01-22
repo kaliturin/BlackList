@@ -40,7 +40,7 @@ public class AddContactsMenuFragment extends Fragment {
                     sourceType = ContactSourceType.FROM_SMS_INBOX;
                     break;
                 case R.id.add_manually:
-                    title = getString(R.string.manually);
+                    title = getString(R.string.adding_contact);
                     break;
             }
 
@@ -53,17 +53,14 @@ public class AddContactsMenuFragment extends Fragment {
                 fragment = new AddContactsFragment();
             } else {
                 // create fragment of adding contacts manually
-                arguments.putInt(AddContactManualFragment.CONTACT_TYPE, contactType);
-                fragment = new AddContactManualFragment();
+                arguments.putInt(AddOrEditContactFragment.CONTACT_TYPE, contactType);
+                fragment = new AddOrEditContactFragment();
             }
 
             // add fragment args
             fragment.setArguments(arguments);
             // open the dialog activity with the fragment of contact adding
-            Activity activity = getActivity();
-            if(activity != null) {
-                DialogActivity.open(activity, title, fragment);
-            }
+            DialogActivity.show(getActivity(), fragment, title, 0);
         }
     };
 
@@ -75,7 +72,7 @@ public class AddContactsMenuFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle bundle = getArguments();
-        contactType = bundle.getInt(CONTACT_TYPE);
+        contactType = bundle.getInt(CONTACT_TYPE, 0);
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_contacts_menu, container, false);

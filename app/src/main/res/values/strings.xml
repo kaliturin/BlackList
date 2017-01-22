@@ -41,6 +41,7 @@
     <string name="cancel">Cancel</string>
     <string name="add">Add</string>
     <string name="add_contact">Add contact</string>
+    <string name="adding_contact">Adding contact</string>
     <string name="saving">Saving...</string>
     <string name="is_blocked">is blocked</string>
     <string name="hidden">Private</string>
@@ -53,6 +54,9 @@
     <string name="phone_number">Phone number</string>
     <string name="add_another">Add another</string>
     <string name="unnamed">Unnamed</string>
+    <string name="edit">Edit</string>
+    <string name="editing_contact">Editing contact</string>
+    <string name="save">Save</string>
 
     <string-array name="phone_metadata">
         <item>Equals to:</item>

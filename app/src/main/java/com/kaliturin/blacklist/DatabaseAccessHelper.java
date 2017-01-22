@@ -108,7 +108,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         }
 
         /** Concatenates passed clauses with 'AND' operator */
-        static String concatClauses(List<String> clauses) {
+        static String concatClauses(String[] clauses) {
             StringBuilder sb = new StringBuilder();
             for(String clause : clauses) {
                 if(TextUtils.isEmpty(clause)) continue;
@@ -233,10 +233,10 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         List<String> ids = contactIds.getIdentifiers(new LinkedList<String>());
 
         // build 'WHERE' clause
-        List<String> clauses = new LinkedList<>();
-        clauses.add(Common.getLikeClause(JournalTable.Column.CALLER, filter));
-        clauses.add(Common.getInClause(JournalTable.Column.ID, all, ids));
-        String clause = Common.concatClauses(clauses);
+        String clause = Common.concatClauses(new String[] {
+            Common.getLikeClause(JournalTable.Column.CALLER, filter),
+            Common.getInClause(JournalTable.Column.ID, all, ids)
+        });
 
         // delete records
         SQLiteDatabase db = getWritableDatabase();
@@ -583,13 +583,20 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         List<String> ids = contactIds.getIdentifiers(new LinkedList<String>());
 
         // build 'WHERE' clause
-        List<String> clauses = new LinkedList<>();
-        clauses.add(ContactTable.Column.TYPE  + " = " + type);
-        clauses.add(Common.getLikeClause(ContactTable.Column.NAME, filter));
-        clauses.add(Common.getInClause(ContactTable.Column.ID, all, ids));
-        String clause = Common.concatClauses(clauses);
+        String clause = Common.concatClauses(new String[] {
+            ContactTable.Column.TYPE  + " = " + type,
+            Common.getLikeClause(ContactTable.Column.NAME, filter),
+            Common.getInClause(ContactTable.Column.ID, all, ids)
+        });
 
         // delete contacts
+        SQLiteDatabase db = getWritableDatabase();
+        return db.delete(ContactTable.NAME, clause, null);
+    }
+
+    // Deletes contact by id
+    public int deleteContact(long contactId) {
+        String clause = ContactTable.Column.ID  + " = " + contactId;
         SQLiteDatabase db = getWritableDatabase();
         return db.delete(ContactTable.NAME, clause, null);
     }
