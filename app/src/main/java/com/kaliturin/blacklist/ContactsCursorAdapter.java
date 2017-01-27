@@ -83,7 +83,7 @@ public class ContactsCursorAdapter extends CursorAdapter {
     }
 
     // Sets all items checked/unchecked
-    void setCheckedAllItems(boolean checked) {
+    void setAllItemsChecked(boolean checked) {
         if(checkedItems.setAll(checked)) {
             notifyDataSetChanged();
         }

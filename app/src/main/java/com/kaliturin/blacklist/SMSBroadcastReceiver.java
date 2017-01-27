@@ -15,7 +15,7 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
  * BroadcastReceiver for SMS catching
  */
 
-public class SMSReceiver extends BroadcastReceiver {
+public class SMSBroadcastReceiver extends BroadcastReceiver {
     private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
 
     @Override

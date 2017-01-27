@@ -26,6 +26,8 @@ public class JournalCursorAdapter extends CursorAdapter {
     private Date datetime = new Date();
     private IdentifiersContainer checkedItems = new IdentifiersContainer(0);
     private View.OnClickListener outerOnClickListener = null;
+    private View.OnLongClickListener outerOnLongClickListener = null;
+    private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
 
     JournalCursorAdapter(Context context) {
@@ -43,8 +45,9 @@ public class JournalCursorAdapter extends CursorAdapter {
         // add view holder to the row
         view.setTag(viewHolder);
 
-        // on click listener for the row and checkbox (which is inside the row)
+        // on click listeners for the row and checkbox (which is inside the row)
         view.setOnClickListener(rowOnClickListener);
+        view.setOnLongClickListener(rowOnLongClickListener);
 
         return view;
     }
@@ -58,7 +61,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with new model
-        viewHolder.setModel(context, item);
+        viewHolder.setModel(item);
     }
 
     @Override
@@ -73,13 +76,17 @@ public class JournalCursorAdapter extends CursorAdapter {
         this.outerOnClickListener = onClickListener;
     }
 
+    void setOnLongClickListener(View.OnLongClickListener onLongClickListener) {
+        this.outerOnLongClickListener = onLongClickListener;
+    }
+
     // Returns checked items container
     IdentifiersContainer getCheckedItems() {
         return checkedItems;
     }
 
     // Sets all items checked/unchecked
-    void setCheckedAllItems(boolean checked) {
+    void setAllItemsChecked(boolean checked) {
         if(checkedItems.setAll(checked)) {
             notifyDataSetChanged();
         }
@@ -102,8 +109,25 @@ public class JournalCursorAdapter extends CursorAdapter {
         }
     }
 
+    // Row on long click listener
+    private class RowOnLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(View view) {
+            if(outerOnLongClickListener != null) {
+                return outerOnLongClickListener.onLongClick(view);
+            }
+            return false;
+        }
+    }
+
+    public JournalRecord getRecord(View row) {
+        ViewHolder viewHolder = (ViewHolder) row.getTag();
+        return (viewHolder != null ? viewHolder.record : null);
+    }
+
     // View holder improves scroll performance
     private class ViewHolder {
+        private JournalRecord record;
         private int itemId;
         private CheckableLinearLayout rowView;
         private ImageView iconImageView;
@@ -128,6 +152,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         ViewHolder(CheckableLinearLayout rowView, ImageView iconImageView, TextView senderTextView,
                    TextView numberTextView, TextView textTextView, TextView dateTextView,
                    TextView timeTextView, CheckBox checkBox) {
+            this.record = null;
             this.rowView = rowView;
             this.itemId = 0;
             this.iconImageView = iconImageView;
@@ -139,25 +164,26 @@ public class JournalCursorAdapter extends CursorAdapter {
             this.checkBox = checkBox;
         }
 
-        private void setModel(Context context, JournalRecord item) {
-            itemId = (int) item.id;
-            dateTextView.setText(dateFormat.format(toDate(item.time)));
-            timeTextView.setText(timeFormat.format(toDate(item.time)));
+        private void setModel(JournalRecord record) {
+            this.record = record;
+            itemId = (int) record.id;
+            dateTextView.setText(dateFormat.format(toDate(record.time)));
+            timeTextView.setText(timeFormat.format(toDate(record.time)));
 
-            senderTextView.setText(item.caller);
+            senderTextView.setText(record.caller);
 
-            if(item.number != null &&
-                    !item.caller.equals(item.number)) {
-                numberTextView.setText(item.number);
+            if(record.number != null &&
+                    !record.caller.equals(record.number)) {
+                numberTextView.setText(record.number);
                 numberTextView.setVisibility(View.VISIBLE);
             } else {
                 numberTextView.setText("");
                 numberTextView.setVisibility(View.GONE);
             }
 
-            if (item.text != null) {
+            if (record.text != null) {
                 iconImageView.setImageResource(android.R.drawable.sym_action_email);
-                textTextView.setText(item.text);
+                textTextView.setText(record.text);
                 textTextView.setVisibility(View.VISIBLE);
             } else {
                 iconImageView.setImageResource(android.R.drawable.sym_action_call);

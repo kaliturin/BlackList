@@ -16,7 +16,7 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
  * BroadcastReceiver for calls catching
  */
 
-public class CallReceiver extends BroadcastReceiver {
+public class CallBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
         // if block calls not enabled

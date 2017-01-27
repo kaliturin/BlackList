@@ -27,17 +27,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DialogActivity"
+            android:name=".CustomFragmentActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
-        <receiver android:name=".SMSReceiver">
+        <receiver android:name=".SMSBroadcastReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".CallReceiver">
+        <receiver android:name=".CallBroadcastReceiver">
             <intent-filter  android:priority="100" >
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>

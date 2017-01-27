@@ -13,10 +13,10 @@ import android.view.MenuItem;
 import java.util.HashMap;
 
 /**
- * Activity for representation general dialog with arbitrary fragment inside
+ * Activity with arbitrary fragment inside
  */
 
-public class DialogActivity extends AppCompatActivity {
+public class CustomFragmentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,10 @@ public class DialogActivity extends AppCompatActivity {
         // set fragment
         Fragment fragment = (Fragment) SharedData.get(SharedData.FRAGMENT);
         String title = (String) getIntent().getExtras().get(SharedData.TITLE);
-        setFragment(fragment, title);
+        if(!setFragment(fragment, title)) {
+            // TODO test
+            finish();
+        }
     }
 
     @Override
@@ -56,22 +59,30 @@ public class DialogActivity extends AppCompatActivity {
     }
 
     // Sets passed fragment to activity's layout
-    private void setFragment(Fragment fragment, String title) {
-        if(fragment != null) {
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.content_frame_layout, fragment);
-            fragmentTransaction.commit();
-        }
+    private boolean setFragment(Fragment fragment, String title) {
+        if(fragment == null) return false;
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.content_frame_layout, fragment);
+        fragmentTransaction.commit();
+
         ActionBar toolbar = getSupportActionBar();
-        if(toolbar != null) {
+        if (toolbar != null) {
             toolbar.setTitle(title);
         }
+
+        return true;
+    }
+
+    // Opens dialog-activity with passed fragment inside
+    public static void show(Activity parent, Fragment fragment, String title) {
+        show(parent, fragment, title, 0);
     }
 
     // Opens dialog-activity with passed fragment inside
     public static void show(Activity parent, Fragment fragment, String title, int requestCode) {
         SharedData.put(SharedData.FRAGMENT, fragment);
-        Intent intent = new Intent(parent, DialogActivity.class);
+        Intent intent = new Intent(parent, CustomFragmentActivity.class);
         intent.putExtra(SharedData.TITLE, title);
         // start activity as a child of the current one and waiting for result code
         parent.startActivityForResult(intent, requestCode);

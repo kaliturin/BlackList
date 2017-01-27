@@ -18,7 +18,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
+import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
+import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecord;
 
 /**
  * Fragment for the journal (blocked calls/sms list) representation
@@ -27,6 +33,8 @@ public class JournalFragment extends Fragment {
     private JournalCursorAdapter cursorAdapter = null;
     private SnackBarCustom snackBar = null;
     private String itemsFilter = null;
+    private SearchView searchView = null;
+    private MenuItem itemSearch = null;
 
     public JournalFragment() {
         // Required empty public constructor
@@ -57,7 +65,7 @@ public class JournalFragment extends Fragment {
                 new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setCheckedAllItems();
+                setAllItemsChecked();
             }
         });
         // "Delete" button
@@ -94,6 +102,79 @@ public class JournalFragment extends Fragment {
             }
         });
 
+        // on row long click listener (receives clicked row)
+        cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View row) {
+                // get contact from the clicked row
+                final JournalRecord record = cursorAdapter.getRecord(row);
+                if(record != null) {
+
+                    // find contacts in black and white lists by record's caller and number
+                    Contact blackContact = null, whiteContact = null;
+                    String number = (record.number == null ? record.caller : record.number);
+                    DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+                    List<Contact> contacts = db.getContacts(number);
+                    for(Contact contact : contacts) {
+                        if(contact.name.equals(record.caller)) {
+                            if (contact.type == Contact.TYPE_BLACK_LIST) {
+                                blackContact = contact;
+                            } else {
+                                whiteContact = contact;
+                            }
+                        }
+                    }
+
+                    // create and show menu dialog for actions with the contact
+                    MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
+                    builder.setDialogTitle(record.caller).
+                            // add menu item of record deletion
+                            addMenuItem(getString(R.string.delete_record), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    deleteItem(record.id);
+                                    reloadItems(itemsFilter);
+                                }
+                            }).
+                            // add menu item records searching
+                            addMenuItem(getString(R.string.find_all_records), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    // find all records by record's caller
+                                    searchItems(record.caller);
+                                }
+                            });
+
+                    // if found contact in the black list
+                    if (blackContact != null) {
+                        // add menu item of excluding the contact from the black list
+                        final long contactId = blackContact.id;
+                        builder.addMenuItem(getString(R.string.exclude_from_black), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                deleteContact(contactId);
+                            }
+                        });
+                    }
+
+                    // if not found contact in the white list
+                    if(whiteContact == null) {
+                        // add menu item of adding contact to the white list
+                        builder.addMenuItem(getString(R.string.move_to_white), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                moveContactToWhiteList(record.caller, record.number);
+                            }
+                        });
+                    }
+
+                    builder.show();
+                }
+                return true;
+            }
+        });
+
+
         // add cursor listener to the journal list
         ListView listView = (ListView) view.findViewById(R.id.journal_list);
         listView.setAdapter(cursorAdapter);
@@ -105,12 +186,12 @@ public class JournalFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
-        MenuItem itemSearch = menu.findItem(R.id.action_search);
+        itemSearch = menu.findItem(R.id.action_search);
         Utils.tintMenuIcon(getContext(), itemSearch, R.color.colorAccent);
         itemSearch.setVisible(true);
 
         // get the view from search menu item
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(itemSearch);
+        searchView = (SearchView) MenuItemCompat.getActionView(itemSearch);
         searchView.setQueryHint(getString(R.string.action_search));
         // set on text change listener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -147,17 +228,66 @@ public class JournalFragment extends Fragment {
 
 //-------------------------------------------------------------------
 
+    // TODO run in thread
+    private void moveContactToWhiteList(String caller, @Nullable String number) {
+        deleteContactsFromBlackList(caller, number);
+        addContactToWhiteList(caller, number);
+    }
+
+    // TODO consider to move to Helper
+    private void deleteContactsFromBlackList(String caller, @Nullable String number) {
+        if(number == null) {
+            number = caller;
+        }
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+        List<Contact> contacts = db.getContacts(number);
+        for(Contact contact : contacts) {
+            if(contact.name.equals(caller) &&
+                    contact.type == Contact.TYPE_BLACK_LIST) {
+                db.deleteContact(contact.id);
+            }
+        }
+    }
+
+    private void addContactToWhiteList(String caller, @Nullable String number) {
+        if(number == null) {
+            number = caller;
+        }
+        List<ContactNumber> list = new LinkedList<>();
+        list.add(new ContactNumber(number));
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+        db.addContact(caller, Contact.TYPE_WHITE_LIST, list);
+    }
+
+    private void deleteContact(long id) {
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+        db.deleteContact(id);
+    }
+
+    private void searchItems(String query) {
+        if(itemSearch != null && searchView != null) {
+            MenuItemCompat.expandActionView(itemSearch);
+            searchView.setQuery(query, true);
+        }
+    }
+
+    // Deletes contact by id
+    private void deleteItem(long recordId) {
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+        db.deleteJournalRecord(recordId);
+    }
+
     // Clears all items selection
     private void clearCheckedItems() {
         if(cursorAdapter != null) {
-            cursorAdapter.setCheckedAllItems(false);
+            cursorAdapter.setAllItemsChecked(false);
         }
     }
 
     // Sets all items selected
-    private void setCheckedAllItems() {
+    private void setAllItemsChecked() {
         if(cursorAdapter != null) {
-            cursorAdapter.setCheckedAllItems(true);
+            cursorAdapter.setAllItemsChecked(true);
         }
     }
 

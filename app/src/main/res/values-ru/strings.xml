@@ -54,9 +54,14 @@
     <string name="phone_number">Номер телефона</string>
     <string name="add_another">Добавить ещё</string>
     <string name="unnamed">Безымянный</string>
-    <string name="edit">Изменить</string>
+    <string name="edit_contact">Изменить контакт</string>
     <string name="editing_contact">Изменение контакта</string>
     <string name="save">Сохранить</string>
+    <string name="delete_record">Удалить запись</string>
+    <string name="remove_contact">Удалить контакт</string>
+    <string name="find_all_records">Найти все записи</string>
+    <string name="exclude_from_black">Удалить контакт из Чёрного списка</string>
+    <string name="move_to_white">Поместить контакт в Белый список</string>
 
     <string-array name="phone_metadata">
         <item>Равняется:</item>

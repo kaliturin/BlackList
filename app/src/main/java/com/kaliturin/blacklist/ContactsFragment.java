@@ -1,8 +1,6 @@
 package com.kaliturin.blacklist;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -67,7 +65,7 @@ public class ContactsFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        setCheckedAllItems();
+                        setAllItemsChecked();
                     }
                 });
         // "Delete" button
@@ -110,13 +108,28 @@ public class ContactsFragment extends Fragment {
         cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View row) {
-                // get contact from the row was clicked
-                Contact contact = cursorAdapter.getContact(row);
+                // get contact from the clicked row
+                final Contact contact = cursorAdapter.getContact(row);
                 if(contact != null) {
-                    // create and show contact menu dialog
-                    ContactMenuPopupDialog.show(ContactsFragment.this, contact);
+                    // create and show menu dialog for actions with the contact
+                    MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
+                    builder.setDialogTitle(contact.name).
+                            addMenuItem(getString(R.string.remove_contact), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    // delete contact
+                                    deleteItem(contact.id);
+                                    reloadItems(itemsFilter);
+                                }
+                            }).
+                            addMenuItem(getString(R.string.edit_contact), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    // edit contact
+                                    editContact(contact.id);
+                                }
+                            }).show();
                 }
-
                 return true;
             }
         });
@@ -127,18 +140,6 @@ public class ContactsFragment extends Fragment {
 
         // init and run the contact items loader
         getLoaderManager().initLoader(0, null, newLoader(null, false));
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // if result from contact menu dialog
-        if(requestCode == ContactMenuPopupDialog.REQUEST_CODE) {
-            if(resultCode == Activity.RESULT_OK) {
-                reloadItems(itemsFilter);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override
@@ -204,7 +205,8 @@ public class ContactsFragment extends Fragment {
                 addContactsMenuFragment.setArguments(arguments);
                 // open the dialog activity with the fragment
                 String title = getString(R.string.add_contact);
-                DialogActivity.show(getActivity(), addContactsMenuFragment, title, 0);
+                CustomFragmentActivity.show(getActivity(), addContactsMenuFragment, title);
+
                 return true;
             }
         });
@@ -214,17 +216,23 @@ public class ContactsFragment extends Fragment {
 
 //----------------------------------------------------
 
+    // Deletes contact by id
+    private void deleteItem(long id) {
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+        db.deleteContact(id);
+    }
+
     // Clears all items selection
     private void clearCheckedItems() {
         if(cursorAdapter != null) {
-            cursorAdapter.setCheckedAllItems(false);
+            cursorAdapter.setAllItemsChecked(false);
         }
     }
 
     // Sets all items selected
-    private void setCheckedAllItems() {
+    private void setAllItemsChecked() {
         if(cursorAdapter != null) {
-            cursorAdapter.setCheckedAllItems(true);
+            cursorAdapter.setAllItemsChecked(true);
         }
     }
 
@@ -250,6 +258,17 @@ public class ContactsFragment extends Fragment {
     private ContactsLoaderCallbacks newLoader(String itemsFilter, boolean deleteCheckedItems) {
         return new ContactsLoaderCallbacks(getContext(), contactType,
                 cursorAdapter, itemsFilter, deleteCheckedItems);
+    }
+
+    // Opens fragment for contact editing
+    private void editContact(long id) {
+        AddOrEditContactFragment fragment = new AddOrEditContactFragment();
+        Bundle arguments = new Bundle();
+        arguments.putInt(AddOrEditContactFragment.CONTACT_ID, (int)id);
+        arguments.putInt(AddOrEditContactFragment.CONTACT_TYPE, contactType);
+        fragment.setArguments(arguments);
+        CustomFragmentActivity.show(getActivity(), fragment,
+                getString(R.string.editing_contact));
     }
 
 //----------------------------------------------------

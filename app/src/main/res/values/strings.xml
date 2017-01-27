@@ -54,9 +54,14 @@
     <string name="phone_number">Phone number</string>
     <string name="add_another">Add another</string>
     <string name="unnamed">Unnamed</string>
-    <string name="edit">Edit</string>
+    <string name="edit_contact">Edit</string>
     <string name="editing_contact">Editing contact</string>
     <string name="save">Save</string>
+    <string name="delete_record">Delete record</string>
+    <string name="remove_contact">Remove contact</string>
+    <string name="find_all_records">Find all records</string>
+    <string name="exclude_from_black">Exclude contact from Black list</string>
+    <string name="move_to_white">Move contact to White list</string>
 
     <string-array name="phone_metadata">
         <item>Equals to:</item>

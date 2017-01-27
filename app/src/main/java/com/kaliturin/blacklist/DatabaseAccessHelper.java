@@ -243,6 +243,12 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return db.delete(JournalTable.NAME, clause, null);
     }
 
+    // Deletes record by specified id
+    public int deleteJournalRecord(long id) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.delete(JournalTable.NAME, JournalTable.Column.ID + " = " + id, null);
+    }
+
     // Writes journal record
     public long addJournalRecord(long time, @NonNull String caller,
                                  String number, String text) {
@@ -311,6 +317,10 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         public final String number;
         public final int type;
         public final long contactId;
+
+        public ContactNumber(@NonNull String number) {
+            this(0, number, TYPE_EQUALS, 0);
+        }
 
         public ContactNumber(long id, @NonNull String number, long contactId) {
             this(id, number, TYPE_EQUALS, contactId);
@@ -629,7 +639,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
 //----------------------------------------------------------------
 
     // Returns contact numbers
-    private List<ContactNumber> getContactNumbers(@NonNull String number) {
+    private List<ContactNumber> getContactNumbers(String number) {
         List<ContactNumber> list = new LinkedList<>();
         ContactNumberCursorWrapper cursor = getNumberByValue(number);
         if(cursor != null) {
@@ -643,7 +653,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Returns contacts by contact numbers
-    private List<Contact> getContacts(@NonNull List<ContactNumber> numbers) {
+    private List<Contact> getContacts(List<ContactNumber> numbers) {
         List<Contact> list = new LinkedList<>();
         for(ContactNumber number : numbers) {
             DatabaseAccessHelper.ContactCursorWrapper cursor = getContact(number.contactId);
@@ -657,7 +667,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Returns contacts by contact number
-    public List<Contact> getContacts(@NonNull String number) {
+    public List<Contact> getContacts(String number) {
         List<ContactNumber> numbers = getContactNumbers(number);
         return getContacts(numbers);
     }

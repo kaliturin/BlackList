@@ -31,11 +31,7 @@
                 android:id="@+id/contact_numbers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingStart="12dp"
-                android:paddingRight="12dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="12dp"
+                android:padding="12dp"
                 android:textSize="18sp"/>
         </LinearLayout>
 
