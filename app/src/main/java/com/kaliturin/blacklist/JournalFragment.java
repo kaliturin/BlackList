@@ -19,11 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
-import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
 import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecord;
 
 /**
@@ -114,7 +112,7 @@ public class JournalFragment extends Fragment {
                     Contact blackContact = null, whiteContact = null;
                     String number = (record.number == null ? record.caller : record.number);
                     DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-                    List<Contact> contacts = db.getContacts(number);
+                    List<Contact> contacts = db.getContacts(number, false);
                     for(Contact contact : contacts) {
                         if(contact.name.equals(record.caller)) {
                             if (contact.type == Contact.TYPE_BLACK_LIST) {
@@ -137,7 +135,7 @@ public class JournalFragment extends Fragment {
                                 }
                             }).
                             // add menu item records searching
-                            addMenuItem(getString(R.string.find_all_records), new View.OnClickListener() {
+                            addMenuItem(getString(R.string.find_similar_records), new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     // find all records by record's caller
@@ -145,7 +143,7 @@ public class JournalFragment extends Fragment {
                                 }
                             });
 
-                    // if found contact in the black list
+                    // if contact is found in the black list
                     if (blackContact != null) {
                         // add menu item of excluding the contact from the black list
                         final long contactId = blackContact.id;
@@ -155,9 +153,17 @@ public class JournalFragment extends Fragment {
                                 deleteContact(contactId);
                             }
                         });
+                    } else {
+                        // add menu item of adding the contact to the black list
+                        builder.addMenuItem(getString(R.string.add_to_black), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                addContactToBlackList(record.caller, record.number);
+                            }
+                        });
                     }
 
-                    // if not found contact in the white list
+                    // if contact is not found in the white list
                     if(whiteContact == null) {
                         // add menu item of adding contact to the white list
                         builder.addMenuItem(getString(R.string.move_to_white), new View.OnClickListener() {
@@ -173,7 +179,6 @@ public class JournalFragment extends Fragment {
                 return true;
             }
         });
-
 
         // add cursor listener to the journal list
         ListView listView = (ListView) view.findViewById(R.id.journal_list);
@@ -228,42 +233,27 @@ public class JournalFragment extends Fragment {
 
 //-------------------------------------------------------------------
 
-    // TODO run in thread
-    private void moveContactToWhiteList(String caller, @Nullable String number) {
-        deleteContactsFromBlackList(caller, number);
-        addContactToWhiteList(caller, number);
-    }
-
-    // TODO consider to move to Helper
-    private void deleteContactsFromBlackList(String caller, @Nullable String number) {
-        if(number == null) {
-            number = caller;
-        }
+    // Moves contact to the white list
+    private void moveContactToWhiteList(String caller, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        List<Contact> contacts = db.getContacts(number);
-        for(Contact contact : contacts) {
-            if(contact.name.equals(caller) &&
-                    contact.type == Contact.TYPE_BLACK_LIST) {
-                db.deleteContact(contact.id);
-            }
+        if(!db.updateContactType(Contact.TYPE_WHITE_LIST, caller, number)) {
+            db.addContact(Contact.TYPE_WHITE_LIST, caller, number);
         }
     }
 
-    private void addContactToWhiteList(String caller, @Nullable String number) {
-        if(number == null) {
-            number = caller;
-        }
-        List<ContactNumber> list = new LinkedList<>();
-        list.add(new ContactNumber(number));
+    // Adds contact to the black list
+    private void addContactToBlackList(String caller, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.addContact(caller, Contact.TYPE_WHITE_LIST, list);
+        db.addContact(Contact.TYPE_BLACK_LIST, caller, number);
     }
 
+    // Deletes contact by id
     private void deleteContact(long id) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
         db.deleteContact(id);
     }
 
+    // Shows SearchView with passed query
     private void searchItems(String query) {
         if(itemSearch != null && searchView != null) {
             MenuItemCompat.expandActionView(itemSearch);

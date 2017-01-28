@@ -119,6 +119,9 @@ public class AddOrEditContactFragment extends Fragment {
         View parent = getView();
         if(parent == null) return false;
 
+        // get contact name
+        String name = getName(parent);
+
         // get list of contact phones
         List<ContactNumber> numbers = new LinkedList<>();
         LinearLayout numberListLayout = (LinearLayout) parent.findViewById(R.id.layout_number_list);
@@ -131,11 +134,16 @@ public class AddOrEditContactFragment extends Fragment {
             }
         }
 
-        // nothing to save
-        if(numbers.isEmpty()) return false;
+        // if there is not any number - take name as number
+        if(numbers.isEmpty() && !name.isEmpty()) {
+            numbers.add(new ContactNumber(0, name, 0));
+        }
 
-        // get contact name
-        String name = getName(parent);
+        // nothing to save
+        if(numbers.isEmpty()) {
+            return false;
+        }
+
         if(name.isEmpty()) {
             // if name isn't defined
             if(numbers.size() == 1) {
@@ -153,7 +161,7 @@ public class AddOrEditContactFragment extends Fragment {
             db.deleteContact(contactId);
         }
         // save the new contact
-        db.addContact(name, contactType, numbers);
+        db.addContact(contactType, name, numbers);
 
         return true;
     }

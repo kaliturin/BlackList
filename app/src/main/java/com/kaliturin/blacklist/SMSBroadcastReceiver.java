@@ -172,7 +172,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     private List<Contact> getContacts(Context context, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        return db.getContacts(number);
+        return db.getContacts(number, false);
     }
 
     private void notifyUser(Context context, String name) {

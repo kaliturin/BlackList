@@ -59,14 +59,16 @@
     <string name="save">Сохранить</string>
     <string name="delete_record">Удалить запись</string>
     <string name="remove_contact">Удалить контакт</string>
-    <string name="find_all_records">Найти все записи</string>
+    <string name="find_similar_records">Найти похожие записи</string>
     <string name="exclude_from_black">Удалить контакт из Чёрного списка</string>
+    <string name="add_to_black">Добавить контакт в Чёрный список</string>
     <string name="move_to_white">Поместить контакт в Белый список</string>
+    <string name="move_to_black">Поместить контакт в Чёрный список</string>
 
     <string-array name="phone_metadata">
-        <item>Равняется:</item>
-        <item>Начинается на:</item>
-        <item>Заканчивается на:</item>
+        <item>равняется:</item>
+        <item>начинается на:</item>
+        <item>заканчивается на:</item>
     </string-array>
 
 </resources>

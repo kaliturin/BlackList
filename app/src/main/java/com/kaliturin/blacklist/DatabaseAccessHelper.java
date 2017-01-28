@@ -318,10 +318,6 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         public final int type;
         public final long contactId;
 
-        public ContactNumber(@NonNull String number) {
-            this(0, number, TYPE_EQUALS, 0);
-        }
-
         public ContactNumber(long id, @NonNull String number, long contactId) {
             this(id, number, TYPE_EQUALS, contactId);
         }
@@ -415,6 +411,20 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return (validate(cursor) ? new ContactNumberCursorWrapper(cursor) : null);
     }
 
+
+    // Returns contact numbers
+    private List<ContactNumber> getContactNumbers(String number) {
+        List<ContactNumber> list = new LinkedList<>();
+        ContactNumberCursorWrapper cursor = getNumberByValue(number);
+        if(cursor != null) {
+            do {
+                list.add(cursor.getNumber());
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return list;
+    }
 //----------------------------------------------------------------
 
     // Table of contacts (black/white lists)
@@ -443,6 +453,11 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             " ORDER BY " + Column.NAME +
                             " ASC";
 
+            static final String SELECT_BY_NAME =
+                    "SELECT * " +
+                            " FROM " + ContactTable.NAME +
+                            " WHERE " + Column.NAME + " = ? ";
+
             static final String SELECT_BY_TYPE_AND_NAME =
                     "SELECT * " +
                             " FROM " + ContactTable.NAME +
@@ -462,6 +477,29 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             " ORDER BY " + Column.NAME +
                             " ASC";
         }
+    }
+
+    // The contact
+    public static class Contact {
+        public static final int TYPE_BLACK_LIST = 1;
+        public static final int TYPE_WHITE_LIST = 2;
+
+        public final long id;
+        public final String name;
+        public final int type;
+        public final List<ContactNumber> numbers;
+
+        Contact(long id, @NonNull String name, int type, @NonNull List<ContactNumber> numbers) {
+            this.id = id;
+            this.name = name;
+            this.type = type;
+            this.numbers = numbers;
+        }
+    }
+
+    // Source of the contact
+    public interface ContactSource {
+        Contact getContact();
     }
 
     // Contact cursor wrapper
@@ -503,7 +541,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Selects all contacts by type
+    // Searches all contacts by type
     public @Nullable ContactCursorWrapper getContacts(int type) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
@@ -513,7 +551,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
     }
 
-    // Selects all contacts by type filtering by passed filter
+    // Searches all contacts by type filtering by passed filter
     public @Nullable ContactCursorWrapper getContacts(int type, @Nullable String filter) {
         if(filter == null) {
             return getContacts(type);
@@ -526,17 +564,27 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
     }
 
-    // Selects all contacts by type and name
+    // Searches contact by name
+    public @Nullable ContactCursorWrapper getContact(String name) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                ContactTable.Statement.SELECT_BY_NAME,
+                new String[]{name});
+
+        return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
+    }
+
+    // Searches contact by type and name
     public @Nullable ContactCursorWrapper getContact(int type, String name) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
-                ContactTable.Statement.SELECT_BY_TYPE_AND_NAME,
+        ContactTable.Statement.SELECT_BY_TYPE_AND_NAME,
                 new String[]{String.valueOf(type), name});
 
         return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
     }
 
-    // Selects contact by id
+    // Searches contact by id
     public @Nullable ContactCursorWrapper getContact(long contactId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
@@ -547,14 +595,15 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Adds contact
-    private long addContact(@NonNull String name, int type) {
-        // try to find existed contact by name
+    private long addContact(int type, @NonNull String name) {
+        // try to find existed contact
         ContactCursorWrapper cursor = getContact(type, name);
-        if(cursor != null) {
+        if (cursor != null) {
             Contact contact = cursor.getContact(false);
             cursor.close();
             return contact.id;
         }
+
         // add new contact
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -564,12 +613,12 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Adds contact
-    public long addContact(@NonNull String name, int type, @NonNull List<ContactNumber> numbers) {
+    public long addContact(int type, @NonNull String name, @NonNull List<ContactNumber> numbers) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         long contactId;
         try {
-            contactId = addContact(name, type);
+            contactId = addContact(type, name);
             if(contactId >= 0) {
                 for (ContactNumber number : numbers) {
                     if (addNumber(contactId, number.number, number.type) == -1) {
@@ -583,6 +632,16 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         }
 
         return contactId;
+    }
+
+    // Adds contact with one number
+    public long addContact(int type, @NonNull String name, @Nullable String number) {
+        if(number == null) {
+            number = name;
+        }
+        List<ContactNumber> numbers = new LinkedList<>();
+        numbers.add(new ContactNumber(0, number, 0));
+        return addContact(type, name, numbers);
     }
 
     // Deletes all contacts specified in container with specified type
@@ -606,59 +665,19 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
 
     // Deletes contact by id
     public int deleteContact(long contactId) {
-        String clause = ContactTable.Column.ID  + " = " + contactId;
         SQLiteDatabase db = getWritableDatabase();
-        return db.delete(ContactTable.NAME, clause, null);
-    }
-
-//----------------------------------------------------------------
-
-    // The contact
-    public static class Contact {
-        public static final int TYPE_BLACK_LIST = 1;
-        public static final int TYPE_WHITE_LIST = 2;
-
-        public final long id;
-        public final String name;
-        public final int type;
-        public final List<ContactNumber> numbers;
-
-        Contact(long id, @NonNull String name, int type, @NonNull List<ContactNumber> numbers) {
-            this.id = id;
-            this.name = name;
-            this.type = type;
-            this.numbers = numbers;
-        }
-    }
-
-    // Source of the contact
-    public interface ContactSource {
-        Contact getContact();
-    }
-
-//----------------------------------------------------------------
-
-    // Returns contact numbers
-    private List<ContactNumber> getContactNumbers(String number) {
-        List<ContactNumber> list = new LinkedList<>();
-        ContactNumberCursorWrapper cursor = getNumberByValue(number);
-        if(cursor != null) {
-            do {
-                list.add(cursor.getNumber());
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-
-        return list;
+        return db.delete(ContactTable.NAME,
+                ContactTable.Column.ID  + " = " + contactId,
+                null);
     }
 
     // Returns contacts by contact numbers
-    private List<Contact> getContacts(List<ContactNumber> numbers) {
+    private List<Contact> getContacts(List<ContactNumber> numbers, boolean withNumbers) {
         List<Contact> list = new LinkedList<>();
         for(ContactNumber number : numbers) {
-            DatabaseAccessHelper.ContactCursorWrapper cursor = getContact(number.contactId);
+            ContactCursorWrapper cursor = getContact(number.contactId);
             if(cursor != null) {
-                list.add(cursor.getContact(false));
+                list.add(cursor.getContact(withNumbers));
                 cursor.close();
             }
         }
@@ -666,10 +685,66 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // Returns contacts by contact number
-    public List<Contact> getContacts(String number) {
+    // Returns found contacts by contact number
+    public List<Contact> getContacts(String number, boolean withNumbers) {
         List<ContactNumber> numbers = getContactNumbers(number);
-        return getContacts(numbers);
+        return getContacts(numbers, withNumbers);
+    }
+
+    public boolean updateContactType(int type, String name, @Nullable String number) {
+        // try to find existed contact by number
+        String _number = (number == null ? name : number);
+        List<Contact> contacts = getContacts(_number, false);
+        for(Contact contact : contacts) {
+            // check contact name
+            if (contact.name.equals(name)) {
+                if (contact.type != type) {
+                    return updateContactType(type, contact.id);
+                } else {
+                    // contact already updated
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean updateContactType(int type, String name) {
+        // try to find existed contact by name
+        ContactCursorWrapper cursor = getContact(name);
+        if(cursor != null) {
+            Contact contact = cursor.getContact(false);
+            cursor.close();
+            if (contact.type != type) {
+                return updateContactType(type, contact.id);
+            }
+            // contact already updated
+            return true;
+        }
+        return false;
+    }
+
+    // Reverse the contact type to opposite
+    public boolean reverseContactType(Contact contact) {
+        int type = reverseContactType(contact.type);
+        return updateContactType(type, contact.id);
+    }
+
+    // Changes contact type
+    public boolean updateContactType(int type, long contactId) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ContactTable.Column.TYPE, type);
+        return db.update(ContactTable.NAME, values,
+                ContactTable.Column.ID + " = " + contactId,
+                null) > 0;
+    }
+
+    // Reverses passed contact type
+    private int reverseContactType(int type) {
+        return  (type == Contact.TYPE_BLACK_LIST ?
+                Contact.TYPE_WHITE_LIST :
+                Contact.TYPE_BLACK_LIST);
     }
 
 //----------------------------------------------------------------

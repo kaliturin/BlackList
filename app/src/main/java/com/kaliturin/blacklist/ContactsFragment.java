@@ -114,19 +114,31 @@ public class ContactsFragment extends Fragment {
                     // create and show menu dialog for actions with the contact
                     MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
                     builder.setDialogTitle(contact.name).
+                            // add menu item of contact deletion
                             addMenuItem(getString(R.string.remove_contact), new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    // delete contact
-                                    deleteItem(contact.id);
+                                    deleteContact(contact.id);
                                     reloadItems(itemsFilter);
                                 }
                             }).
+                            // add menu item of contact editing
                             addMenuItem(getString(R.string.edit_contact), new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     // edit contact
                                     editContact(contact.id);
+                                }
+                            });
+                    // add menu item of contact moving to opposite list
+                    String itemTitle = (contact.type == Contact.TYPE_WHITE_LIST ?
+                                        getString(R.string.move_to_black) :
+                                        getString(R.string.move_to_white));
+                    builder.addMenuItem(itemTitle, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    moveContactToOppositeList(contact);
+                                    reloadItems(itemsFilter);
                                 }
                             }).show();
                 }
@@ -217,9 +229,15 @@ public class ContactsFragment extends Fragment {
 //----------------------------------------------------
 
     // Deletes contact by id
-    private void deleteItem(long id) {
+    private void deleteContact(long id) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
         db.deleteContact(id);
+    }
+
+    // Move contact to another type list
+    private void moveContactToOppositeList(Contact contact) {
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+        db.reverseContactType(contact);
     }
 
     // Clears all items selection
