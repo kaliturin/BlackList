@@ -7,7 +7,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
@@ -37,7 +40,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        // TODO: check whether can be different addresses in messages
         // get address number
         String number = messages[0].getDisplayOriginatingAddress();
 
@@ -138,7 +140,10 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     private String getSMSMessageBody(Context context, SmsMessage[] messages) {
         StringBuilder smsBody = new StringBuilder();
         for (SmsMessage message : messages) {
-            smsBody.append(message.getMessageBody());
+            String text = message.getMessageBody();
+            if(text != null) {
+                smsBody.append(text);
+            }
         }
         String body = smsBody.toString();
         if(body.isEmpty()) {
