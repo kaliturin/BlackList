@@ -118,6 +118,7 @@ public class ContactsAccessHelper {
                 ContactNumberCursorWrapper cursor = getContactNumbers(id);
                 if(cursor != null) {
                     do {
+                        debug(cursor);
                         ContactNumber number = new ContactNumber(cursor.getPosition(),
                                 cursor.getNumber(), id);
                         numbers.add(number);
@@ -132,30 +133,25 @@ public class ContactsAccessHelper {
 
     // Contact's number cursor wrapper
     private static class ContactNumberCursorWrapper extends CursorWrapper {
-        private final int NORMALIZED_NUMBER;
         private final int NUMBER;
 
         private ContactNumberCursorWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
-            NORMALIZED_NUMBER = cursor.getColumnIndex(getNormalizedNumberColumnName());
-            NUMBER = cursor.getColumnIndex(Phone.NUMBER);
+            NUMBER = cursor.getColumnIndex(getNumberColumnName());
         }
 
         String getNumber() {
-            String number = getString(NORMALIZED_NUMBER);
-            if(number == null) {
-                number = getString(NUMBER);
-            }
+            String number = getString(NUMBER);
             return number;
         }
 
-        private static String getNormalizedNumberColumnName() {
+        private static String getNumberColumnName() {
             final String name;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 name = Phone.NORMALIZED_NUMBER;
             } else {
-                name = Phone.DATA4;
+                name = Phone.DATA1;
             }
             return name;
         }
@@ -163,11 +159,11 @@ public class ContactsAccessHelper {
 
     // Selects all numbers of specified contact
     private @Nullable ContactNumberCursorWrapper getContactNumbers(long contactId) {
-        String NORMALIZED_NUMBER = ContactNumberCursorWrapper.getNormalizedNumberColumnName();
+        String NUMBER = ContactNumberCursorWrapper.getNumberColumnName();
         Cursor cursor = contentResolver.query(
                 Phone.CONTENT_URI,
-                new String[]{NORMALIZED_NUMBER, Phone.NUMBER},
-                Phone.NUMBER + " IS NOT NULL AND " +
+                new String[]{NUMBER},
+                NUMBER + " IS NOT NULL AND " +
                 Phone.CONTACT_ID + " = " + contactId,
                 null,
                 null);
@@ -177,13 +173,12 @@ public class ContactsAccessHelper {
 
     // Returns true if passed number contains in contacts
     public boolean containsNumberInContacts(@NonNull String number) {
-        String NORMALIZED_NUMBER = ContactNumberCursorWrapper.getNormalizedNumberColumnName();
+        String NUMBER = ContactNumberCursorWrapper.getNumberColumnName();
         Cursor cursor = contentResolver.query(
                 Phone.CONTENT_URI,
-                new String[]{NORMALIZED_NUMBER, Phone.NUMBER},
-                NORMALIZED_NUMBER + " = ? OR " +
-                Phone.NUMBER + " = ? ",
-                new String[]{number, number},
+                new String[]{NUMBER},
+                NUMBER + " = " + number,
+                null,
                 null);
 
         if(validate(cursor)) {

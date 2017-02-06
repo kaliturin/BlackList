@@ -10,27 +10,27 @@
     <string name="block_calls">Блокировать звонки из Чёрного списка</string>
     <string name="block_all_calls">Блокировать все звонки</string>
     <string name="block_calls_not_from_contacts">Блокировать звонки не из списка контактов</string>
-    <string name="block_calls_not_from_sms_inbox">Блокировать звонки не из списка входящих СМС</string>
+    <string name="block_calls_not_from_sms_inbox">Блокировать звонки не из списка входящих SMS</string>
     <string name="block_hidden_calls">Блокировать звонки со скрытых номеров</string>
     <string name="show_calls_notifications">Извещать о заблокированном звонке в строке статуса</string>
     <string name="write_calls_journal">Вести журнал заблокированных звонков</string>
 
-    <string name="SMS">СМС</string>
-    <string name="block_sms">Блокировать СМС из Чёрного списка</string>
-    <string name="block_all_sms">Блокировать все СМС</string>
-    <string name="block_sms_not_from_contacts">Блокировать СМС не из списка контактов</string>
-    <string name="block_sms_not_from_inbox">Блокировать СМС не из списка входящих СМС</string>
-    <string name="block_hidden_sms">Блокировать СМС со крытых номеров</string>
-    <string name="show_sms_notifications">Извещать о заблокированном СМС в строке статуса</string>
-    <string name="write_sms_journal">Вести журнал заблокированных СМС</string>
+    <string name="SMS">SMS</string>
+    <string name="block_sms">Блокировать SMS из Чёрного списка</string>
+    <string name="block_all_sms">Блокировать все SMS</string>
+    <string name="block_sms_not_from_contacts">Блокировать SMS не из списка контактов</string>
+    <string name="block_sms_not_from_inbox">Блокировать SMS не из списка входящих SMS</string>
+    <string name="block_hidden_sms">Блокировать SMS со крытых номеров</string>
+    <string name="show_sms_notifications">Извещать о заблокированном SMS в строке статуса</string>
+    <string name="write_sms_journal">Вести журнал заблокированных SMS</string>
 
     <string name="from_contacts_list">Из списка контактов</string>
     <string name="from_calls_list">Из списка вызовов</string>
-    <string name="from_sms_list">Из списка входящих СМС</string>
+    <string name="from_sms_list">Из списка входящих SMS</string>
     <string name="manually">Вручную</string>
     <string name="contacts_list">Список контактов</string>
     <string name="calls_list">Список вызовов</string>
-    <string name="sms_inbox_list">Список входящих СМС</string>
+    <string name="sms_inbox_list">Список входящих SMS</string>
 
     <string name="black_list_title">Чёрный список</string>
     <string name="white_list_title">Белый список</string>
@@ -64,7 +64,7 @@
     <string name="add_to_black">Добавить контакт в Чёрный список</string>
     <string name="move_to_white">Поместить контакт в Белый список</string>
     <string name="move_to_black">Поместить контакт в Чёрный список</string>
-    <string name="set_as_default_sms_app">Уcтановить как приложение для работы с СМС по умолчанию (необходимо для блокировки СМС в версиях Android 4.4 и последующих)</string>
+    <string name="set_as_default_sms_app">Уcтановить как приложение для работы с SMS по умолчанию (необходимо для блокировки SMS в версиях Android 4.4 и последующих)</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>

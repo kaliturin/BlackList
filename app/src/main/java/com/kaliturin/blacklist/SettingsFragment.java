@@ -52,9 +52,18 @@ public class SettingsFragment extends Fragment {
         SettingsArrayAdapter adapter = new SettingsArrayAdapter(getContext());
         adapter.addModel(R.string.SMS);
 
-        if (DefaultSMSAppHelper.isDefault(getContext())) {
-            adapter.addModel(R.string.set_as_default_sms_app, true, defaultSMSAppListener);
+        // default sms feature is available
+        boolean isAvailable = DefaultSMSAppHelper.isAvailable();
+        // current app is default sms app
+        boolean isDefault = DefaultSMSAppHelper.isDefault(getContext());
 
+        if(isAvailable) {
+            // show sms default app switch
+            adapter.addModel(R.string.set_as_default_sms_app, isDefault, defaultSMSAppListener);
+        }
+
+        if (!isAvailable || isDefault) {
+            // show sms settings
             adapter.addModel(R.string.block_sms, Settings.BLOCK_SMS);
             adapter.addModel(R.string.block_all_sms, Settings.BLOCK_ALL_SMS);
             adapter.addModel(R.string.block_hidden_sms, Settings.BLOCK_HIDDEN_SMS);
@@ -62,10 +71,9 @@ public class SettingsFragment extends Fragment {
             adapter.addModel(R.string.block_sms_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
             adapter.addModel(R.string.show_sms_notifications, Settings.SHOW_SMS_NOTIFICATIONS);
             adapter.addModel(R.string.write_sms_journal, Settings.WRITE_SMS_JOURNAL);
-        } else {
-            adapter.addModel(R.string.set_as_default_sms_app, false, defaultSMSAppListener);
         }
 
+        // show calls settings
         adapter.addModel(R.string.CALLS);
         adapter.addModel(R.string.block_calls, Settings.BLOCK_CALLS);
         adapter.addModel(R.string.block_all_calls, Settings.BLOCK_ALL_CALLS);
