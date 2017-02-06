@@ -7,7 +7,7 @@
     <string name="action_settings">Настройки</string>
 
     <string name="CALLS">ЗВОНКИ</string>
-    <string name="block_calls">Блокировать звонки из чёрного списка</string>
+    <string name="block_calls">Блокировать звонки из Чёрного списка</string>
     <string name="block_all_calls">Блокировать все звонки</string>
     <string name="block_calls_not_from_contacts">Блокировать звонки не из списка контактов</string>
     <string name="block_calls_not_from_sms_inbox">Блокировать звонки не из списка входящих СМС</string>
@@ -16,7 +16,7 @@
     <string name="write_calls_journal">Вести журнал заблокированных звонков</string>
 
     <string name="SMS">СМС</string>
-    <string name="block_sms">Блокировать СМС из чёрного списка</string>
+    <string name="block_sms">Блокировать СМС из Чёрного списка</string>
     <string name="block_all_sms">Блокировать все СМС</string>
     <string name="block_sms_not_from_contacts">Блокировать СМС не из списка контактов</string>
     <string name="block_sms_not_from_inbox">Блокировать СМС не из списка входящих СМС</string>
@@ -64,6 +64,7 @@
     <string name="add_to_black">Добавить контакт в Чёрный список</string>
     <string name="move_to_white">Поместить контакт в Белый список</string>
     <string name="move_to_black">Поместить контакт в Чёрный список</string>
+    <string name="set_as_default_sms_app">Уcтановить как приложение для работы с СМС по умолчанию (необходимо для блокировки СМС в версиях Android 4.4 и последующих)</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>

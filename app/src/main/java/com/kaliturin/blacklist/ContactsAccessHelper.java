@@ -385,4 +385,25 @@ public class ContactsAccessHelper {
         }
         Log.d("BlackList", sb.toString());
     }
+
+    /*
+    SMS table row example:
+    [_id]=6
+    [thread_id]=5
+    [address]=123
+    [person]=null
+    [date]=1485692853433
+    [date_sent]=1485692853000
+    [protocol]=0
+    [read]=0
+    [status]=-1
+    [type]=1
+    [reply_path_present]=0
+    [subject]=null
+    [body]=Don't forget the marshmallows!
+    [service_center]=null
+    [locked]=0
+    [error_code]=0
+    [seen]=0
+     */
 }

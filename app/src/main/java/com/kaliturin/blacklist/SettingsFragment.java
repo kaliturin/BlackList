@@ -1,19 +1,32 @@
 package com.kaliturin.blacklist;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
 /**
  * Settings fragment
  */
 public class SettingsFragment extends Fragment {
+
+    View.OnClickListener defaultSMSAppListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Activity activity = SettingsFragment.this.getActivity();
+            DefaultSMSAppHelper.askForDefaultAppChange(activity, 0);
+        }
+    };
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -29,9 +42,30 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         // Create list adapter and fill it with data
         SettingsArrayAdapter adapter = new SettingsArrayAdapter(getContext());
+        adapter.addModel(R.string.SMS);
+
+        if (DefaultSMSAppHelper.isDefault(getContext())) {
+            adapter.addModel(R.string.set_as_default_sms_app, true, defaultSMSAppListener);
+
+            adapter.addModel(R.string.block_sms, Settings.BLOCK_SMS);
+            adapter.addModel(R.string.block_all_sms, Settings.BLOCK_ALL_SMS);
+            adapter.addModel(R.string.block_hidden_sms, Settings.BLOCK_HIDDEN_SMS);
+            adapter.addModel(R.string.block_sms_not_from_contacts, Settings.BLOCK_SMS_NOT_FROM_CONTACTS);
+            adapter.addModel(R.string.block_sms_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
+            adapter.addModel(R.string.show_sms_notifications, Settings.SHOW_SMS_NOTIFICATIONS);
+            adapter.addModel(R.string.write_sms_journal, Settings.WRITE_SMS_JOURNAL);
+        } else {
+            adapter.addModel(R.string.set_as_default_sms_app, false, defaultSMSAppListener);
+        }
+
         adapter.addModel(R.string.CALLS);
         adapter.addModel(R.string.block_calls, Settings.BLOCK_CALLS);
         adapter.addModel(R.string.block_all_calls, Settings.BLOCK_ALL_CALLS);
@@ -40,16 +74,8 @@ public class SettingsFragment extends Fragment {
         adapter.addModel(R.string.block_calls_not_from_sms_inbox, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX);
         adapter.addModel(R.string.show_calls_notifications, Settings.SHOW_CALLS_NOTIFICATIONS);
         adapter.addModel(R.string.write_calls_journal, Settings.WRITE_CALLS_JOURNAL);
-        adapter.addModel(R.string.SMS);
-        adapter.addModel(R.string.block_sms, Settings.BLOCK_SMS);
-        adapter.addModel(R.string.block_all_sms, Settings.BLOCK_ALL_SMS);
-        adapter.addModel(R.string.block_hidden_sms, Settings.BLOCK_HIDDEN_SMS);
-        adapter.addModel(R.string.block_sms_not_from_contacts, Settings.BLOCK_SMS_NOT_FROM_CONTACTS);
-        adapter.addModel(R.string.block_sms_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
-        adapter.addModel(R.string.show_sms_notifications, Settings.SHOW_SMS_NOTIFICATIONS);
-        adapter.addModel(R.string.write_sms_journal, Settings.WRITE_SMS_JOURNAL);
 
-        ListView listView = (ListView) view.findViewById(R.id.settings_list);
+        ListView listView = (ListView) getView().findViewById(R.id.settings_list);
         listView.setAdapter(adapter);
     }
 }

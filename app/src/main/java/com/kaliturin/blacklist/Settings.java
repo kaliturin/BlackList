@@ -28,6 +28,8 @@ public class Settings {
     public static final String SHOW_SMS_NOTIFICATIONS = "SHOW_SMS_NOTIFICATIONS";
     public static final String WRITE_SMS_JOURNAL  = "WRITE_SMS_JOURNAL";
 
+    public static final String DEFAULT_SMS_APP_NATIVE_PACKAGE = "DEFAULT_SMS_APP_NATIVE_PACKAGE";
+
     public static final String TRUE = "TRUE";
     public static final String FALSE = "FALSE";
 

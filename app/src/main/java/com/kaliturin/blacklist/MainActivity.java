@@ -1,31 +1,21 @@
 package com.kaliturin.blacklist;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
-import android.support.annotation.IntegerRes;
-import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -75,8 +65,8 @@ public class MainActivity extends AppCompatActivity
         int itemId = R.id.nav_journal;
 
         String action = getIntent().getAction();
-        if(action != null &&
-            action.equals(ACTION_SHOW_JOURNAL)) {
+        if (action != null &&
+                action.equals(ACTION_SHOW_JOURNAL)) {
             itemId = R.id.nav_journal;
         }
         navigationView.setCheckedItem(itemId);
@@ -111,7 +101,7 @@ public class MainActivity extends AppCompatActivity
         // check for result code from the child activity
         // (it could be a dialog-activity)
         if (resultCode == RESULT_OK) {
-           fragmentSwitcher.updateFragment();
+            fragmentSwitcher.updateFragment();
         }
     }
 
@@ -151,7 +141,7 @@ public class MainActivity extends AppCompatActivity
         private void switchFragment(Fragment fragment, Bundle arguments, @StringRes int titleRes) {
             // update fragment's arguments
             Bundle bundle = fragment.getArguments();
-            if(bundle != null) {
+            if (bundle != null) {
                 bundle.clear();
                 bundle.putAll(arguments);
             } else {
@@ -160,7 +150,7 @@ public class MainActivity extends AppCompatActivity
 
             // update or replace the current showed fragment
             Fragment current = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
-            if(current == fragment) {
+            if (current == fragment) {
                 updateFragment();
             } else {
                 fragment.setArguments(arguments);
@@ -172,7 +162,7 @@ public class MainActivity extends AppCompatActivity
             // TODO: pass title to fragment through args
             // set toolbar title
             ActionBar toolbar = getSupportActionBar();
-            if(toolbar != null) {
+            if (toolbar != null) {
                 toolbar.setTitle(getString(titleRes));
             }
 
@@ -183,11 +173,9 @@ public class MainActivity extends AppCompatActivity
         // Updates the current fragment with the new arguments
         private void updateFragment() {
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
-            if(fragment != null) {
+            if (fragment != null) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.detach(fragment);
-                ft.attach(fragment);
-                ft.commit();
+                ft.detach(fragment).attach(fragment).commit();
             }
         }
     }
