@@ -3,6 +3,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_journal"
+            android:icon="@drawable/ic_menu_journal"
+            android:title="@string/journal_title" />
+        <item
             android:id="@+id/nav_black_list"
             android:icon="@drawable/ic_menu_blacklist"
             android:title="@string/black_list_title" />
@@ -10,10 +14,6 @@
             android:id="@+id/nav_white_list"
             android:icon="@drawable/ic_menu_white_list"
             android:title="@string/white_list_title" />
-        <item
-            android:id="@+id/nav_journal"
-            android:icon="@drawable/ic_menu_journal"
-            android:title="@string/journal_title" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_menu_settings"

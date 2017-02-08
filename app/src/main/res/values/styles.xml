@@ -2,7 +2,6 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <!--item name="colorPrimaryDark">@color/colorPrimaryDark</item-->
         <item name="colorAccent">@color/colorAccent</item>
@@ -24,9 +23,11 @@
     </style>
 
     <style name="AppTheme.Toolbar" parent="AppTheme">
-        <!--item name="colorControlNormal">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/colorAccent</item-->
         <item name="android:textColorSecondary">@color/colorAccent</item>
+    </style>
+
+    <style name="ToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="AppTheme.CheckBox" parent="AppTheme">

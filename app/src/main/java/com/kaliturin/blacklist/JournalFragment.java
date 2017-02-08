@@ -10,7 +10,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -28,6 +32,7 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecord;
  * Fragment for the journal (blocked calls/sms list) representation
  */
 public class JournalFragment extends Fragment {
+    public static String TITLE = "TITLE";
     private JournalCursorAdapter cursorAdapter = null;
     private SnackBarCustom snackBar = null;
     private String itemsFilter = null;
@@ -36,6 +41,17 @@ public class JournalFragment extends Fragment {
 
     public JournalFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Bundle bundle = getArguments();
+        String title = bundle.getString(TITLE);
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle(title);
+        }
     }
 
     @Override
@@ -186,6 +202,12 @@ public class JournalFragment extends Fragment {
 
         // init and run the journal records loader
         getLoaderManager().initLoader(0, null, newLoader(null, false));
+    }
+
+    @Override
+    public void onDestroyView() {
+        getLoaderManager().destroyLoader(0);
+        super.onDestroyView();
     }
 
     @Override

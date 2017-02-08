@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import android.widget.Toast;
  * Settings fragment
  */
 public class SettingsFragment extends Fragment {
+    public static String TITLE = "TITLE";
 
     View.OnClickListener defaultSMSAppListener = new View.OnClickListener() {
         @Override
@@ -27,6 +30,17 @@ public class SettingsFragment extends Fragment {
             DefaultSMSAppHelper.askForDefaultAppChange(activity, 0);
         }
     };
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Bundle bundle = getArguments();
+        String title = bundle.getString(TITLE);
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle(title);
+        }
+    }
 
     public SettingsFragment() {
         // Required empty public constructor

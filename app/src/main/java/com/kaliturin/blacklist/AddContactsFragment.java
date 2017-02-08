@@ -123,6 +123,12 @@ public class AddContactsFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        getLoaderManager().destroyLoader(0);
+        super.onDestroyView();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
         MenuItem itemSearch = menu.findItem(R.id.action_search);

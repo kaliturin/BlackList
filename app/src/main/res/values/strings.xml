@@ -36,10 +36,10 @@
     <string name="white_list_title">White list</string>
     <string name="journal_title">Journal</string>
     <string name="settings_title">Settings</string>
-    <string name="select_all">Select all</string>
-    <string name="delete">Delete</string>
-    <string name="cancel">Cancel</string>
-    <string name="add">Add</string>
+    <string name="select_all">SELECT ALL</string>
+    <string name="delete">DELETE</string>
+    <string name="cancel">CANCEL</string>
+    <string name="add">ADD</string>
     <string name="add_contact">Add a contact</string>
     <string name="adding_contact">Adding a contact</string>
     <string name="saving">Saving...</string>

@@ -27,7 +27,7 @@ public class Notification {
 
     private static void showNotification(Context context, String message, int icon) {
         Intent activityIntent = new Intent(context, MainActivity.class);
-        activityIntent.setAction(MainActivity.ACTION_SHOW_JOURNAL);
+        //activityIntent.setAction(MainActivity.ACTION_SHOW_JOURNAL);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);

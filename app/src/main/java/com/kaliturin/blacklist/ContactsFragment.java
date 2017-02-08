@@ -9,6 +9,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
@@ -25,7 +28,8 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
  */
 
 public class ContactsFragment extends Fragment {
-    // bundle argument name
+    // bundle arguments names
+    public static String TITLE = "TITLE";
     public static final String CONTACT_TYPE = "CONTACT_TYPE";
 
     private ContactsCursorAdapter cursorAdapter = null;
@@ -35,6 +39,17 @@ public class ContactsFragment extends Fragment {
 
     public ContactsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Bundle bundle = getArguments();
+        String title = bundle.getString(TITLE);
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle(title);
+        }
     }
 
     @Override

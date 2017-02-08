@@ -13,7 +13,9 @@
         android:textColor="@color/colorAccent"
         android:layout_weight="1"
         android:gravity="start"
-        android:padding="10dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:textSize="14sp"
         android:textStyle="bold"
         android:background="@drawable/control_selector"/>
 
@@ -24,7 +26,9 @@
         android:textColor="@color/colorAccent"
         android:layout_weight="1"
         android:gravity="center"
-        android:padding="10dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:textSize="14sp"
         android:textStyle="bold"
         android:background="@drawable/control_selector"/>
 
@@ -35,7 +39,9 @@
         android:textColor="@color/colorAccent"
         android:layout_weight="1"
         android:gravity="end"
-        android:padding="10dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:textSize="14sp"
         android:textStyle="bold"
         android:background="@drawable/control_selector" />
 
