@@ -44,22 +44,20 @@ public class AddContactsMenuFragment extends Fragment {
             }
 
             Bundle arguments = new Bundle();
-            Fragment fragment;
+            Class<? extends Fragment> fragmentClass;
             if(sourceType != null) {
                 // create fragment of adding contacts from inbox/calls
                 arguments.putInt(AddContactsFragment.CONTACT_TYPE, contactType);
                 arguments.putSerializable(AddContactsFragment.SOURCE_TYPE, sourceType);
-                fragment = new AddContactsFragment();
+                fragmentClass = AddContactsFragment.class;
             } else {
                 // create fragment of adding contacts manually
                 arguments.putInt(AddOrEditContactFragment.CONTACT_TYPE, contactType);
-                fragment = new AddOrEditContactFragment();
+                fragmentClass = AddOrEditContactFragment.class;
             }
 
-            // add fragment args
-            fragment.setArguments(arguments);
             // open the dialog activity with the fragment of contact adding
-            CustomFragmentActivity.show(getActivity(), fragment, title);
+            CustomFragmentActivity.show(getActivity(), title, fragmentClass, arguments, 0);
         }
     };
 

@@ -1,22 +1,23 @@
 package com.kaliturin.blacklist;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
-import java.util.HashMap;
 
 /**
  * Activity with arbitrary fragment inside
  */
 public class CustomFragmentActivity extends AppCompatActivity {
-    private static HashMap<String, Object> arguments = new HashMap<>();
-    private static final String TITLE = "TITLE";
-    private static final String FRAGMENT = "FRAGMENT";
+    private static final String ACTIVITY_TITLE = "ACTIVITY_TITLE";
+    private static final String FRAGMENT_ARGUMENTS = "FRAGMENT_ARGUMENTS";
+    private static final String FRAGMENT_CLASS = "FRAGMENT_CLASS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,26 +25,32 @@ public class CustomFragmentActivity extends AppCompatActivity {
         setContentView(R.layout.app_bar_main);
 
         // get toolbar's title
-        String title = (String) getIntent().getExtras().get(TITLE);
-        if(title == null) {
-            finish();
-            return;
+        String title = getIntent().getStringExtra(ACTIVITY_TITLE);
+        if (title != null) {
+            // setup toolbar
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(title);
         }
 
-        // setup toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(title);
-
         // there is not just a screen rotation
-        if(savedInstanceState == null) {
-            // set fragment
-            Fragment fragment = (Fragment) arguments.remove(FRAGMENT);
-            if (fragment == null) {
+        if (savedInstanceState == null) {
+            // create fragment
+            Fragment fragment;
+            String fragmentClass = getIntent().getStringExtra(FRAGMENT_CLASS);
+            try {
+                Class<?> clazz = Class.forName(fragmentClass);
+                fragment = (Fragment) clazz.newInstance();
+            } catch (Exception ex) {
+                Log.w("BlackList", ex);
                 finish();
                 return;
             }
+            // add arguments
+            Bundle arguments = getIntent().getBundleExtra(FRAGMENT_ARGUMENTS);
+            fragment.setArguments(arguments);
+            // put fragment int activity
             getSupportFragmentManager().
                     beginTransaction().
                     replace(R.id.content_frame_layout, fragment).
@@ -72,17 +79,29 @@ public class CustomFragmentActivity extends AppCompatActivity {
         }
     }
 
-    // Opens dialog-activity with passed fragment inside
-    public static void show(Activity parent, Fragment fragment, String title) {
-        show(parent, fragment, title, 0);
+    // Opens activity with fragment and waiting for result
+    public static void show(Activity context, String activityTitle,
+                            Class<? extends Fragment> fragmentClass,
+                            Bundle fragmentArguments, int requestCode) {
+        Intent intent = getIntent(context, activityTitle, fragmentClass, fragmentArguments);
+        context.startActivityForResult(intent, requestCode);
     }
 
-    // Opens dialog-activity with passed fragment inside
-    public static void show(Activity parent, Fragment fragment, String title, int requestCode) {
-        arguments.put(FRAGMENT, fragment);
-        Intent intent = new Intent(parent, CustomFragmentActivity.class);
-        intent.putExtra(TITLE, title);
-        // start activity as a child of the current one and waiting for result code
-        parent.startActivityForResult(intent, requestCode);
+    // Opens activity with fragment
+    public static void show(Context context, String activityTitle,
+                            Class<? extends Fragment> fragmentClass,
+                            Bundle fragmentArguments) {
+        Intent intent = getIntent(context, activityTitle, fragmentClass, fragmentArguments);
+        context.startActivity(intent);
+    }
+
+    private static Intent getIntent(Context context, String activityTitle,
+                                    Class<? extends Fragment> fragmentClass,
+                                    Bundle fragmentArguments) {
+        Intent intent = new Intent(context, CustomFragmentActivity.class);
+        intent.putExtra(ACTIVITY_TITLE, activityTitle);
+        intent.putExtra(FRAGMENT_CLASS, fragmentClass.getName());
+        intent.putExtra(FRAGMENT_ARGUMENTS, fragmentArguments);
+        return intent;
     }
 }

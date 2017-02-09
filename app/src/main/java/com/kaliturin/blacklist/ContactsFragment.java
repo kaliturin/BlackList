@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
@@ -224,15 +223,13 @@ public class ContactsFragment extends Fragment {
         itemAdd.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // add contacts menu fragment
-                AddContactsMenuFragment addContactsMenuFragment = new AddContactsMenuFragment();
                 // set current type of contacts (black/white list)
                 Bundle arguments = new Bundle();
                 arguments.putInt(AddContactsMenuFragment.CONTACT_TYPE, contactType);
-                addContactsMenuFragment.setArguments(arguments);
-                // open the dialog activity with the fragment
+                // open the dialog activity with the contacts menu fragment
                 String title = getString(R.string.add_contact);
-                CustomFragmentActivity.show(getActivity(), addContactsMenuFragment, title);
+                CustomFragmentActivity.show(getActivity(), title,
+                        AddContactsMenuFragment.class, arguments, 0);
 
                 return true;
             }
@@ -295,13 +292,11 @@ public class ContactsFragment extends Fragment {
 
     // Opens fragment for contact editing
     private void editContact(long id) {
-        AddOrEditContactFragment fragment = new AddOrEditContactFragment();
         Bundle arguments = new Bundle();
         arguments.putInt(AddOrEditContactFragment.CONTACT_ID, (int)id);
         arguments.putInt(AddOrEditContactFragment.CONTACT_TYPE, contactType);
-        fragment.setArguments(arguments);
-        CustomFragmentActivity.show(getActivity(), fragment,
-                getString(R.string.editing_contact));
+        CustomFragmentActivity.show(getActivity(), getString(R.string.editing_contact),
+                AddOrEditContactFragment.class, arguments, 0);
     }
 
 //----------------------------------------------------
