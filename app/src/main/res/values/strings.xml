@@ -56,7 +56,7 @@
     <string name="unnamed">Unnamed</string>
     <string name="edit_contact">Edit the contact</string>
     <string name="editing_contact">Contact editing</string>
-    <string name="save">Save</string>
+    <string name="save">SAVE</string>
     <string name="delete_record">Delete the record</string>
     <string name="remove_contact">Remove the contact</string>
     <string name="find_similar_records">Find similar records</string>

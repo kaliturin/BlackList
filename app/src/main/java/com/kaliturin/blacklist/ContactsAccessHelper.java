@@ -8,6 +8,7 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CallLog.Calls;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.support.annotation.NonNull;
@@ -78,8 +79,8 @@ public class ContactsAccessHelper {
         return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
     }
 
-    // Selects contact by id
-    public @Nullable ContactCursorWrapper getContact(long contactId) {
+    // Selects contact from contacts list by id
+    private @Nullable ContactCursorWrapper getContactCursor(long contactId) {
         Cursor cursor = contentResolver.query(
                 Contacts.CONTENT_URI,
                 new String[] {Contacts._ID, Contacts.DISPLAY_NAME},
@@ -91,6 +92,40 @@ public class ContactsAccessHelper {
                 null);
 
         return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
+    }
+
+    public @Nullable Contact getContact(long contactId) {
+        Contact contact = null;
+        ContactCursorWrapper cursor = getContactCursor(contactId);
+        if(cursor != null) {
+            contact = cursor.getContact(false);
+            cursor.close();
+        }
+        return contact;
+    }
+
+    // Selects contact from contacts list by phone number
+    private  @Nullable ContactCursorWrapper getContactCursor(String number) {
+        Uri lookupUri = Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(number));
+        Cursor cursor = contentResolver.query(lookupUri,
+                new String[]{Contacts._ID, Contacts.DISPLAY_NAME},
+                null,
+                null,
+                null);
+
+        return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
+    }
+
+    public @Nullable Contact getContact(String number) {
+        Contact contact = null;
+        ContactCursorWrapper cursor = getContactCursor(number);
+        if(cursor != null) {
+            contact = cursor.getContact(false);
+            cursor.close();
+        }
+        return contact;
     }
 
     // Contact's cursor wrapper
@@ -118,7 +153,6 @@ public class ContactsAccessHelper {
                 ContactNumberCursorWrapper cursor = getContactNumbers(id);
                 if(cursor != null) {
                     do {
-                        debug(cursor);
                         ContactNumber number = new ContactNumber(cursor.getPosition(),
                                 cursor.getNumber(), id);
                         numbers.add(number);
@@ -244,10 +278,8 @@ public class ContactsAccessHelper {
                 } else {
                     // get person name from contacts
                     long contactId = cursor.getLong(_PERSON);
-                    ContactCursorWrapper contactCursor = getContact(contactId);
-                    if(contactCursor != null) {
-                        Contact contact = contactCursor.getContact(false);
-                        contactCursor.close();
+                    Contact contact = getContact(contactId);
+                    if(contact != null) {
                         person = contact.name;
                     }
                     // filter contact

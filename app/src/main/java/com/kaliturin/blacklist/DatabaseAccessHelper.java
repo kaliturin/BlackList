@@ -733,6 +733,12 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return getContacts(numbers, withNumbers);
     }
 
+    // Moves the contact to the opposite type list
+    public long moveContact(Contact contact) {
+        int type = reverseContactType(contact.type);
+        return addContact(type, contact.name, contact.numbers);
+    }
+
     // Changes type of contact found by number and name
     public boolean updateContactType(int type, String name, @Nullable String number) {
         number = (number == null ? name : number);

@@ -12,17 +12,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    private static final String CURRENT_ITEM_ID = "CURRENT_ITEM_ID";
     private FragmentSwitcher fragmentSwitcher = new FragmentSwitcher();
 
     @Override
@@ -37,6 +34,10 @@ public class MainActivity extends AppCompatActivity
         // init settings defaults
         Settings.setDefaults(this);
 
+        // set sms receiving status
+        //DefaultSMSAppHelper.updateState(this);
+        //DefaultSMSAppHelper.enableSMSReceiving(this, true);
+
         // toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -44,26 +45,31 @@ public class MainActivity extends AppCompatActivity
         // drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                fragmentSwitcher.onDrawerOpened();
-                super.onDrawerOpened(drawerView);
-            }
-        };
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        // TODO if screen rotated - select current menu item
         // navigation menu
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // if there is not a screen rotation
-        if(savedInstanceState == null) {
+        // if there it was a screen rotation
+        if(savedInstanceState != null) {
+            // set current navigation menu item
+            int itemId = savedInstanceState.getInt(CURRENT_ITEM_ID);
+            navigationView.setCheckedItem(itemId);
+            fragmentSwitcher.setCurrentItemId(itemId);
+        } else {
+            // set default fragment as current
             navigationView.setCheckedItem(R.id.nav_journal);
             fragmentSwitcher.switchFragment(R.id.nav_journal);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(CURRENT_ITEM_ID, fragmentSwitcher.getCurrentItemId());
     }
 
     @Override
@@ -78,7 +84,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // Handle navigation view item click
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         fragmentSwitcher.switchFragment(item.getItemId());
@@ -118,71 +123,78 @@ public class MainActivity extends AppCompatActivity
         return super.onKeyUp(keyCode, event);
     }
 
-    // Switcher of the main fragment inside activity
+    // Switcher of fragments of activity
     private class FragmentSwitcher {
-        private final String FRAGMENT = "FRAGMENT";
+        private final String CURRENT_FRAGMENT = "CURRENT_FRAGMENT";
         private ContactsFragment blackListFragment = new ContactsFragment();
         private ContactsFragment whiteListFragment = new ContactsFragment();
         private JournalFragment journalFragment = new JournalFragment();
         private SettingsFragment settingsFragment = new SettingsFragment();
-
-        void onDrawerOpened() {
-            // TODO
-            onBackPressed();
-        }
+        private int currentItemId;
 
         boolean onBackPressed() {
-            // TODO consider use interface for this
             return journalFragment.dismissSnackBar() ||
                     blackListFragment.dismissSnackBar() ||
                     whiteListFragment.dismissSnackBar();
         }
 
+        int getCurrentItemId() {
+            return currentItemId;
+        }
+
+        void setCurrentItemId(int itemId) {
+            currentItemId = itemId;
+        }
+
         // Switches fragment by navigation menu item
-        void switchFragment(@IdRes int menuItemId) {
-            Bundle args = new Bundle();
-            switch (menuItemId) {
+        void switchFragment(@IdRes int itemId) {
+            setCurrentItemId(itemId);
+            Bundle arguments = new Bundle();
+            switch (itemId) {
                 case R.id.nav_journal:
-                    args.putString(JournalFragment.TITLE, getString(R.string.journal_title));
-                    switchFragment(journalFragment, args);
+                    arguments.putString(JournalFragment.TITLE, getString(R.string.journal_title));
+                    switchFragment(journalFragment, arguments);
                     break;
                 case R.id.nav_black_list:
-                    args.putString(JournalFragment.TITLE, getString(R.string.black_list_title));
-                    args.putInt(ContactsFragment.CONTACT_TYPE, Contact.TYPE_BLACK_LIST);
-                    switchFragment(blackListFragment, args);
+                    arguments.putString(JournalFragment.TITLE, getString(R.string.black_list_title));
+                    arguments.putInt(ContactsFragment.CONTACT_TYPE, Contact.TYPE_BLACK_LIST);
+                    switchFragment(blackListFragment, arguments);
                     break;
                 case R.id.nav_white_list:
-                    args.putString(JournalFragment.TITLE, getString(R.string.white_list_title));
-                    args.putInt(ContactsFragment.CONTACT_TYPE, Contact.TYPE_WHITE_LIST);
-                    switchFragment(whiteListFragment, args);
+                    arguments.putString(JournalFragment.TITLE, getString(R.string.white_list_title));
+                    arguments.putInt(ContactsFragment.CONTACT_TYPE, Contact.TYPE_WHITE_LIST);
+                    switchFragment(whiteListFragment, arguments);
                     break;
                 default:
-                    args.putString(JournalFragment.TITLE, getString(R.string.settings_title));
-                    switchFragment(settingsFragment, args);
+                    arguments.putString(JournalFragment.TITLE, getString(R.string.settings_title));
+                    switchFragment(settingsFragment, arguments);
                     break;
             }
         }
 
         // Switches to passed fragment
-        private void switchFragment(Fragment fragment, Bundle args) {
+        private void switchFragment(Fragment fragment, Bundle arguments) {
             // replace the current showed fragment
-            Fragment current = getSupportFragmentManager().findFragmentByTag(FRAGMENT);
+            Fragment current = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
             if (current != fragment) {
-                fragment.setArguments(args);
+                fragment.setArguments(arguments);
                 getSupportFragmentManager().
                         beginTransaction().
-                        replace(R.id.content_frame_layout, fragment, FRAGMENT).
+                        replace(R.id.content_frame_layout, fragment, CURRENT_FRAGMENT).
                         commit();
             }
         }
 
         // Updates the current fragment with the new arguments
         private void updateFragment() {
-            Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT);
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
             if (fragment != null) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.detach(fragment).attach(fragment).commit();
             }
         }
     }
+
+
+
 }

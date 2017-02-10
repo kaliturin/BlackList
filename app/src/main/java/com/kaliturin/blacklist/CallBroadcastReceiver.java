@@ -19,11 +19,6 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 public class CallBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
-        // if block calls not enabled
-        if(!Settings.getBooleanValue(context, Settings.BLOCK_CALLS)) {
-            return;
-        }
-
         // get telephony service
         TelephonyManager telephony = (TelephonyManager)
                 context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -63,12 +58,15 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        // if  contact is from the black list...
-        contact = findContactByType(contacts, Contact.TYPE_BLACK_LIST);
-        if(contact != null) {
-            // break call and notify
-            breakCallAndNotify(context, contact.name, number);
-            return;
+        // if block calls from the black list
+        if(Settings.getBooleanValue(context, Settings.BLOCK_CALLS_FROM_BLACK_LIST)) {
+            // if  contact is from the black list...
+            contact = findContactByType(contacts, Contact.TYPE_BLACK_LIST);
+            if(contact != null) {
+                // break call and notify
+                breakCallAndNotify(context, contact.name, number);
+                return;
+            }
         }
 
         boolean abort = false;

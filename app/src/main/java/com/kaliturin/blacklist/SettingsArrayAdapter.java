@@ -3,6 +3,7 @@ package com.kaliturin.blacklist;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
+    private SparseArray<View> rowsArray = new SparseArray<>();
 
     public SettingsArrayAdapter(Context context) {
         super(context, 0);
@@ -24,21 +26,25 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
     @Override
     @NonNull
     public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-
-        // get model by position
-        Model model = getItem(position);
-        // create row by model
-        if (model != null) {
-            if (model.property == null && model.listener == null) {
-                convertView = inflater.inflate(R.layout.settings_title, parent, false);
-            } else {
-                convertView = inflater.inflate(R.layout.settings_row, parent, false);
+        // get created row by position
+        View row = rowsArray.get(position);
+        if(row == null) {
+            // get model by position
+            Model model = getItem(position);
+            if (model != null) {
+                // create row by model
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                if (model.property == null && model.listener == null) {
+                    row = inflater.inflate(R.layout.settings_title, parent, false);
+                } else {
+                    row = inflater.inflate(R.layout.settings_row, parent, false);
+                }
+                setModel(row, model);
+                rowsArray.put(position, row);
             }
-            setModel(convertView, model);
         }
 
-        return convertView;
+        return row;
     }
 
     private void setModel(View row, Model model) {

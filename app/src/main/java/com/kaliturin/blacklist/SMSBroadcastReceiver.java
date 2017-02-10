@@ -1,16 +1,15 @@
 package com.kaliturin.blacklist;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.telephony.SmsMessage;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
@@ -20,17 +19,18 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
 public class SMSBroadcastReceiver extends BroadcastReceiver {
     private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
+    private static final String SMS_DELIVER = "android.provider.Telephony.SMS_DELIVER";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // if block sms not enabled
-        if(!Settings.getBooleanValue(context, Settings.BLOCK_SMS)) {
+        // check action
+        String action = intent.getAction();
+        if(action == null || !action.equals(getAction())) {
             return;
         }
 
-        // check action
-        String action = intent.getAction();
-        if(action == null || !action.equals(SMS_RECEIVED)) {
+        // if not default sms app
+        if(!DefaultSMSAppHelper.isDefault(context)) {
             return;
         }
 
@@ -40,6 +40,15 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
+        // process messages
+        if(!processMessages(context, messages)) {
+            // messages were not blocked - write them to the inbox
+            writeToInbox(context, messages);
+        }
+    }
+
+    // Processes messages; returns true if messages were blocked, false else
+    private boolean processMessages(Context context, SmsMessage[] messages) {
         // get address number
         String number = messages[0].getDisplayOriginatingAddress();
 
@@ -50,8 +59,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 String name = context.getString(R.string.hidden);
                 // abort broadcast and notify user
                 abortSMSAndNotify(context, name, name, messages);
+                return true;
             }
-            return;
+            return false;
         }
 
         // get contacts linked to the number
@@ -62,21 +72,23 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             String name = getContactName(contacts, number);
             // abort SMS and notify the user
             abortSMSAndNotify(context, name, number, messages);
-            return;
+            return true;
         }
 
         // if contact is from the white list
         Contact contact = findContactByType(contacts, Contact.TYPE_WHITE_LIST);
         if(contact != null) {
-            return;
+            return false;
         }
 
         // if contact is from the black list
-        contact = findContactByType(contacts, Contact.TYPE_BLACK_LIST);
-        if(contact != null) {
-            // abort SMS and notify the user
-            abortSMSAndNotify(context, contact.name, number, messages);
-            return;
+        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_FROM_BLACK_LIST)) {
+            contact = findContactByType(contacts, Contact.TYPE_BLACK_LIST);
+            if (contact != null) {
+                // abort SMS and notify the user
+                abortSMSAndNotify(context, contact.name, number, messages);
+                return true;
+            }
         }
 
         boolean abort = false;
@@ -85,7 +97,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_CONTACTS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
             if(db.containsNumberInContacts(number)) {
-                return;
+                return false;
             }
             abort = true;
         }
@@ -94,7 +106,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_INBOX)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
             if(db.containsNumberInSMSInbox(number)) {
-                return;
+                return false;
             }
             abort = true;
         }
@@ -103,6 +115,13 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             // abort SMS and notify the user
             abortSMSAndNotify(context, number, number, messages);
         }
+
+        return abort;
+    }
+
+    private String getAction() {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ?
+                SMS_DELIVER : SMS_RECEIVED);
     }
 
     private Contact findContactByType(List<Contact> contacts, int contactType) {
@@ -120,7 +139,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         SmsMessage[] messages = null;
         Bundle bundle = intent.getExtras();
         if(bundle != null) {
-            Object[] pdus = (Object[]) intent.getExtras().get("pdus");
+            Object[] pdus = (Object[]) bundle.get("pdus");
             if (pdus != null) {
                 messages = new SmsMessage[pdus.length];
                 for (int i = 0; i < pdus.length; i++) {
@@ -209,4 +228,28 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         notifyUser(context, name);
     }
 
+    // Writes SMS messages to the inbox
+    // Needed only for API19 and above - where only default SMS app can write to the inbox
+    private void writeToInbox(Context context, SmsMessage[] messages) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            for (SmsMessage message : messages) {
+                ContentValues values = new ContentValues();
+                values.put(Telephony.Sms.ADDRESS, message.getDisplayOriginatingAddress());
+                values.put(Telephony.Sms.BODY, message.getMessageBody());
+                values.put(Telephony.Sms.PERSON, getPerson(context, message.getOriginatingAddress()));
+                values.put(Telephony.Sms.DATE_SENT, message.getTimestampMillis());
+                values.put(Telephony.Sms.PROTOCOL, message.getProtocolIdentifier());
+                values.put(Telephony.Sms.REPLY_PATH_PRESENT, message.isReplyPathPresent());
+                values.put(Telephony.Sms.SERVICE_CENTER, message.getServiceCenterAddress());
+                context.getApplicationContext().getContentResolver().insert(Telephony.Sms.Inbox.CONTENT_URI, values);
+            }
+        }
+    }
+
+    // Lookups contact id from contacts list by number
+    private Long getPerson(Context context, String number) {
+        ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
+        Contact contact = db.getContact(number);
+        return (contact != null ? contact.id : null);
+    }
 }

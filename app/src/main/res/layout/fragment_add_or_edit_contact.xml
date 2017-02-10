@@ -13,7 +13,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
 
             <EditText
                 android:id="@+id/edit_name"
@@ -23,15 +25,6 @@
                 android:hint="@string/contact_name">
                 <requestFocus />
             </EditText>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:paddingRight="8dp"
-                android:paddingLeft="8dp"
-                android:textColor="@color/colorText"
-                android:text="@string/phone_number" />
 
             <LinearLayout
                 android:id="@+id/layout_number_list"

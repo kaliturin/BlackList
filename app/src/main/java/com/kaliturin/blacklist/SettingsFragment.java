@@ -2,19 +2,15 @@ package com.kaliturin.blacklist;
 
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 
 /**
@@ -78,8 +74,8 @@ public class SettingsFragment extends Fragment {
 
         if (!isAvailable || isDefault) {
             // show sms settings
-            adapter.addModel(R.string.block_sms, Settings.BLOCK_SMS);
             adapter.addModel(R.string.block_all_sms, Settings.BLOCK_ALL_SMS);
+            adapter.addModel(R.string.block_sms, Settings.BLOCK_SMS_FROM_BLACK_LIST);
             adapter.addModel(R.string.block_hidden_sms, Settings.BLOCK_HIDDEN_SMS);
             adapter.addModel(R.string.block_sms_not_from_contacts, Settings.BLOCK_SMS_NOT_FROM_CONTACTS);
             adapter.addModel(R.string.block_sms_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
@@ -89,8 +85,8 @@ public class SettingsFragment extends Fragment {
 
         // show calls settings
         adapter.addModel(R.string.CALLS);
-        adapter.addModel(R.string.block_calls, Settings.BLOCK_CALLS);
         adapter.addModel(R.string.block_all_calls, Settings.BLOCK_ALL_CALLS);
+        adapter.addModel(R.string.block_calls, Settings.BLOCK_CALLS_FROM_BLACK_LIST);
         adapter.addModel(R.string.block_hidden_calls, Settings.BLOCK_HIDDEN_CALLS);
         adapter.addModel(R.string.block_calls_not_from_contacts, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS);
         adapter.addModel(R.string.block_calls_not_from_sms_inbox, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX);

@@ -12,7 +12,7 @@ import java.util.Map;
  */
 
 public class Settings {
-    public static final String BLOCK_CALLS = "BLOCK_CALLS";
+    public static final String BLOCK_CALLS_FROM_BLACK_LIST = "BLOCK_CALLS_FROM_BLACK_LIST";
     public static final String BLOCK_ALL_CALLS = "BLOCK_ALL_CALLS";
     public static final String BLOCK_CALLS_NOT_FROM_CONTACTS = "BLOCK_CALLS_NOT_FROM_CONTACTS";
     public static final String BLOCK_CALLS_NOT_FROM_SMS_INBOX = "BLOCK_CALLS_NOT_FROM_SMS_INBOX";
@@ -20,7 +20,7 @@ public class Settings {
     public static final String SHOW_CALLS_NOTIFICATIONS = "SHOW_CALLS_NOTIFICATIONS";
     public static final String WRITE_CALLS_JOURNAL  = "WRITE_CALLS_JOURNAL";
 
-    public static final String BLOCK_SMS = "BLOCK_SMS";
+    public static final String BLOCK_SMS_FROM_BLACK_LIST = "BLOCK_SMS_FROM_BLACK_LIST";
     public static final String BLOCK_ALL_SMS = "BLOCK_ALL_SMS";
     public static final String BLOCK_SMS_NOT_FROM_CONTACTS = "BLOCK_SMS_NOT_FROM_CONTACTS";
     public static final String BLOCK_SMS_NOT_FROM_INBOX = "BLOCK_SMS_NOT_FROM_INBOX";
@@ -66,7 +66,7 @@ public class Settings {
 
     public static void setDefaults(Context context) {
         Map<String, String> map = new HashMap<>();
-        map.put(BLOCK_CALLS, TRUE);
+        map.put(BLOCK_CALLS_FROM_BLACK_LIST, TRUE);
         map.put(BLOCK_ALL_CALLS, FALSE);
         map.put(BLOCK_CALLS_NOT_FROM_CONTACTS, FALSE);
         map.put(BLOCK_CALLS_NOT_FROM_SMS_INBOX, FALSE);
@@ -74,7 +74,7 @@ public class Settings {
         map.put(SHOW_CALLS_NOTIFICATIONS, TRUE);
         map.put(WRITE_CALLS_JOURNAL, TRUE);
 
-        map.put(BLOCK_SMS, TRUE);
+        map.put(BLOCK_SMS_FROM_BLACK_LIST, TRUE);
         map.put(BLOCK_ALL_SMS, FALSE);
         map.put(BLOCK_SMS_NOT_FROM_CONTACTS, FALSE);
         map.put(BLOCK_SMS_NOT_FROM_INBOX, FALSE);

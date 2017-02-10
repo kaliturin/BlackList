@@ -246,10 +246,10 @@ public class ContactsFragment extends Fragment {
         db.deleteContact(id);
     }
 
-    // Move contact to another type list
+    // Move contact to opposite type list
     private void moveContactToOppositeList(Contact contact) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.reverseContactType(contact);
+        db.moveContact(contact);
     }
 
     // Clears all items selection
