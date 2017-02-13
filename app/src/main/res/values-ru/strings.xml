@@ -49,6 +49,7 @@
 
     <string name="starts_with">Начинается на:</string>
     <string name="ends_with">Заканчивается на:</string>
+    <string name="contains">Содержит:</string>
     <string name="empty_sms">Нет текста</string>
     <string name="contact_name">Имя контакта (не обязательно)</string>
     <string name="phone_number">Номер телефона</string>
@@ -65,11 +66,13 @@
     <string name="move_to_white">Поместить контакт в Белый список</string>
     <string name="move_to_black">Поместить контакт в Чёрный список</string>
     <string name="set_as_default_sms_app">Уcтановить как приложение для работы с SMS по умолчанию (необходимо для блокировки SMS в версиях Android 4.4 и последующих)</string>
+    <string name="symbols">Символы</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>
         <item>начинается на:</item>
         <item>заканчивается на:</item>
+        <item>содержит:</item>
     </string-array>
 
 </resources>

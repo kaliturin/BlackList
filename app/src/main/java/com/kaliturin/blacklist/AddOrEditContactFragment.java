@@ -231,6 +231,8 @@ public class AddOrEditContactFragment extends Fragment {
                 return ContactNumber.TYPE_STARTS;
             case 2:
                 return ContactNumber.TYPE_ENDS;
+            case 3:
+                return ContactNumber.TYPE_CONTAINS;
         }
 
         return ContactNumber.TYPE_EQUALS;
@@ -244,6 +246,9 @@ public class AddOrEditContactFragment extends Fragment {
                 break;
             case ContactNumber.TYPE_ENDS:
                 position = 2;
+                break;
+            case ContactNumber.TYPE_CONTAINS:
+                position = 3;
                 break;
         }
         Spinner numberTypeSpinner = (Spinner) row.findViewById(R.id.spinner_number_type);

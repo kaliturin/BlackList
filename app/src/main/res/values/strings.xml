@@ -7,26 +7,26 @@
     <string name="action_settings">Settings</string>
 
     <string name="CALLS">CALLS</string>
-    <string name="block_calls">Block calls</string>
+    <string name="block_calls">Block calls from the Black list</string>
     <string name="block_all_calls">Block all calls</string>
-    <string name="block_calls_not_from_contacts">Block calls not from the contacts list</string>
-    <string name="block_calls_not_from_sms_inbox">Block calls not from the SMS inbox list</string>
+    <string name="block_calls_not_from_contacts">Block calls not from the Contacts list</string>
+    <string name="block_calls_not_from_sms_inbox">Block calls not from the SMS Inbox list</string>
     <string name="block_hidden_calls">Block private calls numbers</string>
     <string name="show_calls_notifications">Show blocked calls notifications</string>
     <string name="write_calls_journal">Write blocked calls to the journal</string>
 
     <string name="SMS">SMS</string>
-    <string name="block_sms">Block SMS</string>
+    <string name="block_sms">Block SMS from the Black list</string>
     <string name="block_all_sms">Block all SMS</string>
-    <string name="block_sms_not_from_contacts">Block SMS not from the contacts list</string>
-    <string name="block_sms_not_from_inbox">Block SMS not from the inbox list</string>
+    <string name="block_sms_not_from_contacts">Block SMS not from the Contacts list</string>
+    <string name="block_sms_not_from_inbox">Block SMS not from the Inbox list</string>
     <string name="block_hidden_sms">Block private SMS numbers</string>
     <string name="show_sms_notifications">Show blocked SMS notifications</string>
     <string name="write_sms_journal">Write blocked SMS to the journal</string>
 
-    <string name="from_contacts_list">From the contacts list</string>
-    <string name="from_calls_list">From the calls list</string>
-    <string name="from_sms_list">From the inbox SMS list</string>
+    <string name="from_contacts_list">From the Contacts list</string>
+    <string name="from_calls_list">From the Calls list</string>
+    <string name="from_sms_list">From the Inbox SMS list</string>
     <string name="manually">Manually</string>
     <string name="contacts_list">List of contacts</string>
     <string name="calls_list">List of calls</string>
@@ -49,6 +49,7 @@
 
     <string name="starts_with">Starts with:</string>
     <string name="ends_with">Ends with:</string>
+    <string name="contains">Contains:</string>
     <string name="empty_sms">No text</string>
     <string name="contact_name">Contact name (not necessary)</string>
     <string name="phone_number">Phone number</string>
@@ -65,11 +66,13 @@
     <string name="move_to_white">Move the contact to the White list</string>
     <string name="move_to_black">Move the contact to the Black list</string>
     <string name="set_as_default_sms_app">Set as default SMS application (needed for SMS blocking since Android 4.4 and later)</string>
+    <string name="symbols">Symbols</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>
         <item>starts with:</item>
         <item>ends with:</item>
+        <item>contains:</item>
     </string-array>
 
 </resources>

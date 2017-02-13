@@ -74,7 +74,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         // if number is from the contacts
         if(Settings.getBooleanValue(context, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.containsNumberInContacts(number)) {
+            if(db.getContact(number) != null) {
                 return;
             }
             abort = true;
@@ -118,7 +118,6 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
                 return contact;
             }
         }
-
         return null;
     }
 

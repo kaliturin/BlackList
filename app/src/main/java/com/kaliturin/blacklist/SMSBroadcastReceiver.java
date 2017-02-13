@@ -96,7 +96,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // if number is from the contacts
         if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_CONTACTS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.containsNumberInContacts(number)) {
+            if(db.getContact(number) != null) {
                 return false;
             }
             abort = true;

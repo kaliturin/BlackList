@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.MatrixCursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.CallLog.Calls;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -153,9 +152,11 @@ public class ContactsAccessHelper {
                 ContactNumberCursorWrapper cursor = getContactNumbers(id);
                 if(cursor != null) {
                     do {
-                        ContactNumber number = new ContactNumber(cursor.getPosition(),
-                                cursor.getNumber(), id);
-                        numbers.add(number);
+                        // normalize the phone number (remove spaces and brackets)
+                        String number = normalizeContactNumber(cursor.getNumber());
+                        // create and add contact number instance
+                        ContactNumber contactNumber = new ContactNumber(cursor.getPosition(), number, id);
+                        numbers.add(contactNumber);
                     } while (cursor.moveToNext());
                     cursor.close();
                 }
@@ -165,6 +166,10 @@ public class ContactsAccessHelper {
         }
     }
 
+    public String normalizeContactNumber(String number) {
+        return number.replaceAll("[-() ]","");
+    }
+
     // Contact's number cursor wrapper
     private static class ContactNumberCursorWrapper extends CursorWrapper {
         private final int NUMBER;
@@ -172,55 +177,25 @@ public class ContactsAccessHelper {
         private ContactNumberCursorWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
-            NUMBER = cursor.getColumnIndex(getNumberColumnName());
+            NUMBER = cursor.getColumnIndex(Phone.NUMBER);
         }
 
         String getNumber() {
-            String number = getString(NUMBER);
-            return number;
-        }
-
-        private static String getNumberColumnName() {
-            final String name;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                name = Phone.NORMALIZED_NUMBER;
-            } else {
-                name = Phone.DATA1;
-            }
-            return name;
+            return getString(NUMBER);
         }
     }
 
     // Selects all numbers of specified contact
     private @Nullable ContactNumberCursorWrapper getContactNumbers(long contactId) {
-        String NUMBER = ContactNumberCursorWrapper.getNumberColumnName();
         Cursor cursor = contentResolver.query(
                 Phone.CONTENT_URI,
-                new String[]{NUMBER},
-                NUMBER + " IS NOT NULL AND " +
+                new String[]{Phone.NUMBER},
+                Phone.NUMBER + " IS NOT NULL AND " +
                 Phone.CONTACT_ID + " = " + contactId,
                 null,
                 null);
 
         return (validate(cursor) ? new ContactNumberCursorWrapper(cursor) : null);
-    }
-
-    // Returns true if passed number contains in contacts
-    public boolean containsNumberInContacts(@NonNull String number) {
-        String NUMBER = ContactNumberCursorWrapper.getNumberColumnName();
-        Cursor cursor = contentResolver.query(
-                Phone.CONTENT_URI,
-                new String[]{NUMBER},
-                NUMBER + " = " + number,
-                null,
-                null);
-
-        if(validate(cursor)) {
-            cursor.close();
-            return true;
-        }
-
-        return false;
     }
 
     // Returns true if passed number contains in SMS inbox

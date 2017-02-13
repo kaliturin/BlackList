@@ -181,7 +181,7 @@ public class ContactsCursorAdapter extends CursorAdapter {
                 if (contact.name.equals(number.number)) {
                     // there is just 1 number and it equals to the contact name
                     // add number type title before the contact name
-                    name = getNumberTypeTitle(context, number.type) + name;
+                    name = getNumberTypeTitle(context, number.type) + " " + name;
                     oneNumberEquals = true;
                 }
             }
@@ -193,6 +193,7 @@ public class ContactsCursorAdapter extends CursorAdapter {
                 for (int i = 0; i < size; i++) {
                     ContactNumber number = contact.numbers.get(i);
                     sb.append(getNumberTypeTitle(context, number.type));
+                    sb.append(" ");
                     sb.append(number.number);
                     if (i < size - 1) {
                         sb.append("\n");
@@ -233,6 +234,8 @@ public class ContactsCursorAdapter extends CursorAdapter {
                 return context.getString(R.string.starts_with);
             case ContactNumber.TYPE_ENDS:
                 return context.getString(R.string.ends_with);
+            case ContactNumber.TYPE_CONTAINS:
+                return context.getString(R.string.contains);
         }
         return "";
     }

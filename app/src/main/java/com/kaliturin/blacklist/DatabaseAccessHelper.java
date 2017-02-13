@@ -303,7 +303,9 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             Column.TYPE + " = " +  ContactNumber.TYPE_STARTS + " AND " +
                             " ? LIKE " + Column.NUMBER + "||'%') OR (" +
                             Column.TYPE + " = " +  ContactNumber.TYPE_ENDS + " AND " +
-                            " ? LIKE '%'||" + Column.NUMBER + ")";
+                            " ? LIKE '%'||" + Column.NUMBER + ") OR (" +
+                            Column.TYPE + " = " +  ContactNumber.TYPE_CONTAINS + " AND " +
+                            " ? LIKE '%'||" + Column.NUMBER + "||'%')";
         }
     }
 
@@ -312,6 +314,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         public static final int TYPE_EQUALS = 0;
         public static final int TYPE_STARTS = 1;
         public static final int TYPE_ENDS = 2;
+        public static final int TYPE_CONTAINS = 3;
 
         public final long id;
         public final String number;
