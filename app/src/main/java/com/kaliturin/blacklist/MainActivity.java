@@ -1,6 +1,7 @@
 package com.kaliturin.blacklist;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -34,10 +35,6 @@ public class MainActivity extends AppCompatActivity
         // init settings defaults
         Settings.setDefaults(this);
 
-        // set sms receiving status
-        //DefaultSMSAppHelper.updateState(this);
-        //DefaultSMSAppHelper.enableSMSReceiving(this, true);
-
         // toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -53,16 +50,37 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // if there it was a screen rotation
+        // if there was a screen rotation
         if(savedInstanceState != null) {
             // set current navigation menu item
             int itemId = savedInstanceState.getInt(CURRENT_ITEM_ID);
             navigationView.setCheckedItem(itemId);
             fragmentSwitcher.setCurrentItemId(itemId);
         } else {
-            // set default fragment as current
-            navigationView.setCheckedItem(R.id.nav_journal);
-            fragmentSwitcher.switchFragment(R.id.nav_journal);
+            // process SENDTO action
+            String action = getIntent().getAction();
+            if(action != null && action.equals("android.intent.action.SENDTO")) {
+                // switch to SMS showing fragment
+                navigationView.setCheckedItem(R.id.nav_sms);
+                fragmentSwitcher.switchFragment(R.id.nav_sms);
+
+                // get phone number where to send the SMS
+                Uri uri = getIntent().getData();
+                if (uri != null) {
+                    String ssp = uri.getSchemeSpecificPart();
+                    String number = ContactsAccessHelper.normalizeContactNumber(ssp);
+                    // add it to the fragment's args
+                    Bundle arguments = new Bundle();
+                    arguments.putString("NUMBER", number);
+                    // open SMS sending activity
+                    CustomFragmentActivity.show(this, getString(R.string.sending_sms),
+                            SendSMSFragment.class, arguments);
+                }
+            } else {
+                // set default fragment as current
+                navigationView.setCheckedItem(R.id.nav_journal);
+                fragmentSwitcher.switchFragment(R.id.nav_journal);
+            }
         }
     }
 
@@ -130,6 +148,7 @@ public class MainActivity extends AppCompatActivity
         private ContactsFragment whiteListFragment = new ContactsFragment();
         private JournalFragment journalFragment = new JournalFragment();
         private SettingsFragment settingsFragment = new SettingsFragment();
+        private SMSConversationsFragment SMSConversationsFragment = new SMSConversationsFragment();
         private int currentItemId;
 
         boolean onBackPressed() {
@@ -148,25 +167,33 @@ public class MainActivity extends AppCompatActivity
 
         // Switches fragment by navigation menu item
         void switchFragment(@IdRes int itemId) {
+            switchFragment(itemId, new Bundle());
+        }
+
+        // Switches fragment by navigation menu item
+        void switchFragment(@IdRes int itemId, Bundle arguments) {
             setCurrentItemId(itemId);
-            Bundle arguments = new Bundle();
             switch (itemId) {
                 case R.id.nav_journal:
                     arguments.putString(JournalFragment.TITLE, getString(R.string.journal_title));
                     switchFragment(journalFragment, arguments);
                     break;
                 case R.id.nav_black_list:
-                    arguments.putString(JournalFragment.TITLE, getString(R.string.black_list_title));
+                    arguments.putString(ContactsFragment.TITLE, getString(R.string.black_list_title));
                     arguments.putInt(ContactsFragment.CONTACT_TYPE, Contact.TYPE_BLACK_LIST);
                     switchFragment(blackListFragment, arguments);
                     break;
                 case R.id.nav_white_list:
-                    arguments.putString(JournalFragment.TITLE, getString(R.string.white_list_title));
+                    arguments.putString(ContactsFragment.TITLE, getString(R.string.white_list_title));
                     arguments.putInt(ContactsFragment.CONTACT_TYPE, Contact.TYPE_WHITE_LIST);
                     switchFragment(whiteListFragment, arguments);
                     break;
+                case R.id.nav_sms:
+                    arguments.putString(SMSConversationsFragment.TITLE, getString(R.string.sms_title));
+                    switchFragment(SMSConversationsFragment, arguments);
+                    break;
                 default:
-                    arguments.putString(JournalFragment.TITLE, getString(R.string.settings_title));
+                    arguments.putString(SettingsFragment.TITLE, getString(R.string.settings_title));
                     switchFragment(settingsFragment, arguments);
                     break;
             }

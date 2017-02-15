@@ -138,15 +138,15 @@ public class JournalCursorAdapter extends CursorAdapter {
         private TextView timeTextView;
         private CheckBox checkBox;
 
-        ViewHolder(View row) {
-            this((CheckableLinearLayout) row,
-                    (ImageView) row.findViewById(R.id.icon),
-                    (TextView) row.findViewById(R.id.sender),
-                    (TextView) row.findViewById(R.id.number),
-                    (TextView) row.findViewById(R.id.text),
-                    (TextView) row.findViewById(R.id.date),
-                    (TextView) row.findViewById(R.id.time),
-                    (CheckBox) row.findViewById(R.id.cb));
+        ViewHolder(View rowView) {
+            this((CheckableLinearLayout) rowView,
+                    (ImageView) rowView.findViewById(R.id.icon),
+                    (TextView) rowView.findViewById(R.id.sender),
+                    (TextView) rowView.findViewById(R.id.number),
+                    (TextView) rowView.findViewById(R.id.text),
+                    (TextView) rowView.findViewById(R.id.date),
+                    (TextView) rowView.findViewById(R.id.time),
+                    (CheckBox) rowView.findViewById(R.id.cb));
         }
 
         ViewHolder(CheckableLinearLayout rowView, ImageView iconImageView, TextView senderTextView,
@@ -164,26 +164,26 @@ public class JournalCursorAdapter extends CursorAdapter {
             this.checkBox = checkBox;
         }
 
-        private void setModel(JournalRecord record) {
-            this.record = record;
-            itemId = (int) record.id;
-            dateTextView.setText(dateFormat.format(toDate(record.time)));
-            timeTextView.setText(timeFormat.format(toDate(record.time)));
+        private void setModel(JournalRecord model) {
+            this.record = model;
+            itemId = (int) model.id;
+            dateTextView.setText(dateFormat.format(toDate(model.time)));
+            timeTextView.setText(timeFormat.format(toDate(model.time)));
 
-            senderTextView.setText(record.caller);
+            senderTextView.setText(model.caller);
 
-            if(record.number != null &&
-                    !record.caller.equals(record.number)) {
-                numberTextView.setText(record.number);
+            if(model.number != null &&
+                    !model.caller.equals(model.number)) {
+                numberTextView.setText(model.number);
                 numberTextView.setVisibility(View.VISIBLE);
             } else {
                 numberTextView.setText("");
                 numberTextView.setVisibility(View.GONE);
             }
 
-            if (record.text != null) {
+            if (model.text != null) {
                 iconImageView.setImageResource(android.R.drawable.sym_action_email);
-                textTextView.setText(record.text);
+                textTextView.setText(model.text);
                 textTextView.setVisibility(View.VISIBLE);
             } else {
                 iconImageView.setImageResource(android.R.drawable.sym_action_call);

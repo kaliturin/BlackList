@@ -36,6 +36,7 @@
     <string name="white_list_title">White list</string>
     <string name="journal_title">Journal</string>
     <string name="settings_title">Settings</string>
+    <string name="sms_title">SMS</string>
     <string name="select_all">SELECT ALL</string>
     <string name="delete">DELETE</string>
     <string name="cancel">CANCEL</string>
@@ -67,6 +68,7 @@
     <string name="move_to_black">Move the contact to the Black list</string>
     <string name="set_as_default_sms_app">Set as default SMS application (needed for SMS blocking since Android 4.4 and later)</string>
     <string name="symbols">Symbols</string>
+    <string name="sending_sms">Sending SMS</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>
@@ -74,5 +76,8 @@
         <item>ends with:</item>
         <item>contains:</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

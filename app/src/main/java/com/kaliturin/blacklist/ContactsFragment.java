@@ -319,11 +319,11 @@ public class ContactsFragment extends Fragment {
 
         @Override
         public Cursor loadInBackground() {
-            DatabaseAccessHelper dao = DatabaseAccessHelper.getInstance(getContext());
+            DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
             if (deletingItems != null) {
-                dao.deleteContacts(contactType, deletingItems, itemsFilter);
+                db.deleteContacts(contactType, deletingItems, itemsFilter);
             }
-            return dao.getContacts(contactType, itemsFilter);
+            return db.getContacts(contactType, itemsFilter);
         }
     }
 

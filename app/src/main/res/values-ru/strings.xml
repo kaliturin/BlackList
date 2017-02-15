@@ -20,7 +20,7 @@
     <string name="block_all_sms">Блокировать все SMS</string>
     <string name="block_sms_not_from_contacts">Блокировать SMS не из списка контактов</string>
     <string name="block_sms_not_from_inbox">Блокировать SMS не из списка входящих SMS</string>
-    <string name="block_hidden_sms">Блокировать SMS со крытых номеров</string>
+    <string name="block_hidden_sms">Блокировать SMS со скрытых номеров</string>
     <string name="show_sms_notifications">Извещать о заблокированном SMS в строке статуса</string>
     <string name="write_sms_journal">Вести журнал заблокированных SMS</string>
 
@@ -67,6 +67,7 @@
     <string name="move_to_black">Поместить контакт в Чёрный список</string>
     <string name="set_as_default_sms_app">Уcтановить как приложение для работы с SMS по умолчанию (необходимо для блокировки SMS в версиях Android 4.4 и последующих)</string>
     <string name="symbols">Символы</string>
+    <string name="sending_sms">Отправка SMS</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>

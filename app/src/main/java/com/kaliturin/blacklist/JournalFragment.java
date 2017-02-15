@@ -259,9 +259,7 @@ public class JournalFragment extends Fragment {
     // TODO consider to run it from thread
     private void moveContactToWhiteList(String caller, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        if(!db.updateContactType(Contact.TYPE_WHITE_LIST, caller, number)) {
-            db.addContact(Contact.TYPE_WHITE_LIST, caller, number);
-        }
+        db.addContact(Contact.TYPE_WHITE_LIST, caller, number);
     }
 
     // Adds contact to the black list

@@ -40,6 +40,7 @@ public class Permissions {
         };
         for (int i = 0; i < PERMISSIONS.length; i++) {
             if (!checkPermission(context, PERMISSIONS[i])) {
+                // TODO fix
                 ActivityCompat.requestPermissions(context, PERMISSIONS, i);
             }
         }

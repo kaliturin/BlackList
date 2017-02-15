@@ -15,6 +15,7 @@ import android.view.MenuItem;
  * Activity with arbitrary fragment inside
  */
 public class CustomFragmentActivity extends AppCompatActivity {
+    private static final String TAG = CustomFragmentActivity.class.getName();
     private static final String ACTIVITY_TITLE = "ACTIVITY_TITLE";
     private static final String FRAGMENT_ARGUMENTS = "FRAGMENT_ARGUMENTS";
     private static final String FRAGMENT_CLASS = "FRAGMENT_CLASS";
@@ -43,7 +44,7 @@ public class CustomFragmentActivity extends AppCompatActivity {
                 Class<?> clazz = Class.forName(fragmentClass);
                 fragment = (Fragment) clazz.newInstance();
             } catch (Exception ex) {
-                Log.w("BlackList", ex);
+                Log.w(TAG, ex);
                 finish();
                 return;
             }
