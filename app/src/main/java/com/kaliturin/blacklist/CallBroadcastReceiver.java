@@ -3,6 +3,7 @@ package com.kaliturin.blacklist;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
 import java.lang.reflect.Method;
@@ -42,6 +43,9 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
 
         // get contacts linked to the current number
         List<Contact> contacts = getContacts(context, number);
+        if(contacts == null) {
+            return;
+        }
 
         // if block all calls
         if(Settings.getBooleanValue(context, Settings.BLOCK_ALL_CALLS)) {
@@ -146,7 +150,9 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             number = null;
         }
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        db.addJournalRecord(System.currentTimeMillis(), name, number, null);
+        if(db != null) {
+            db.addJournalRecord(System.currentTimeMillis(), name, number, null);
+        }
     }
 
     // Checks whether number is private
@@ -162,9 +168,10 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         return false;
     }
 
+    @Nullable
     private List<Contact> getContacts(Context context, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        return db.getContacts(number, false);
+        return (db == null ? null : db.getContacts(number, false));
     }
 
     private void breakCallAndNotify(Context context, String name, String number) {

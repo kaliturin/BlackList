@@ -9,10 +9,10 @@ import android.widget.TextView;
 /**
  * Customized snack bar
  */
-public class SnackBarCustom {
+public class CustomSnackBar {
     private ViewGroup snackBarView;
 
-    public SnackBarCustom(View parentView, @IdRes int snackBarId) {
+    public CustomSnackBar(View parentView, @IdRes int snackBarId) {
         snackBarView = (ViewGroup) parentView.findViewById(snackBarId);
         // hide all children views
         for (int i = 0; i < snackBarView.getChildCount(); i++) {

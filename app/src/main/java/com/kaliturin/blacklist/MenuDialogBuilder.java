@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * Builder of dialog with menu items list
+ * Builder of a dialog with menu items list
  */
 public class MenuDialogBuilder {
     private Activity activity = null;

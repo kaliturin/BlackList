@@ -1,6 +1,7 @@
 package com.kaliturin.blacklist;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorRes;
 import android.support.v4.content.ContextCompat;
@@ -21,5 +22,13 @@ public class Utils {
         Drawable drawable = DrawableCompat.wrap(item.getIcon());
         DrawableCompat.setTint(drawable, color);
         item.setIcon(drawable);
+    }
+
+    /** Returns app name
+     */
+    public static String getApplicationName(Context context) {
+        ApplicationInfo info = context.getApplicationInfo();
+        int id = info.labelRes;
+        return id == 0 ? info.nonLocalizedLabel.toString() : context.getString(id);
     }
 }

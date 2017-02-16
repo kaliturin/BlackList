@@ -32,7 +32,7 @@ public class ContactsFragment extends Fragment {
     public static final String CONTACT_TYPE = "CONTACT_TYPE";
 
     private ContactsCursorAdapter cursorAdapter = null;
-    private SnackBarCustom snackBar = null;
+    private CustomSnackBar snackBar = null;
     private int contactType = 0;
     private String itemsFilter = null;
 
@@ -72,7 +72,7 @@ public class ContactsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
-        snackBar = new SnackBarCustom(view, R.id.snack_bar);
+        snackBar = new CustomSnackBar(view, R.id.snack_bar);
         // "Select all" button
         snackBar.setButton(R.id.button_left,
                 getString(R.string.select_all),
@@ -243,13 +243,17 @@ public class ContactsFragment extends Fragment {
     // Deletes contact by id
     private void deleteContact(long id) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.deleteContact(id);
+        if(db != null) {
+            db.deleteContact(id);
+        }
     }
 
     // Move contact to opposite type list
     private void moveContactToOppositeList(Contact contact) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.moveContact(contact);
+        if(db != null) {
+            db.moveContact(contact);
+        }
     }
 
     // Clears all items selection
@@ -320,6 +324,9 @@ public class ContactsFragment extends Fragment {
         @Override
         public Cursor loadInBackground() {
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+            if(db == null) {
+                return null;
+            }
             if (deletingItems != null) {
                 db.deleteContacts(contactType, deletingItems, itemsFilter);
             }

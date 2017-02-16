@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
+import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
 
 import java.util.List;
@@ -194,9 +195,10 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         return false;
     }
 
+    @Nullable
     private List<Contact> getContacts(Context context, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        return db.getContacts(number, false);
+        return (db == null ? null : db.getContacts(number, false));
     }
 
     private void notifyUser(Context context, String name) {
@@ -213,7 +215,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         }
         String text = getSMSMessageBody(context, messages);
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        db.addJournalRecord(System.currentTimeMillis(), name, number, text);
+        if(db != null) {
+            db.addJournalRecord(System.currentTimeMillis(), name, number, text);
+        }
     }
 
     private void abortSMSAndNotify(Context context, String name, String number, SmsMessage[] messages) {
@@ -232,6 +236,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     // Needed only for API19 and above - where only default SMS app can write to the inbox
     private void writeToInbox(Context context, SmsMessage[] messages) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // check write permission
+            if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return;
+
             for (SmsMessage message : messages) {
                 ContentValues values = new ContentValues();
                 values.put(Telephony.Sms.ADDRESS, message.getDisplayOriginatingAddress());

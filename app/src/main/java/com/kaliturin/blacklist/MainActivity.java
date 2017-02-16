@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity
 
         // TODO apply permissions denials
         // permissions
-        Permissions.checkAndRequestPermissions(this);
+        Permissions.checkAndRequest(this);
 
         // init settings defaults
         Settings.setDefaults(this);
@@ -124,7 +124,10 @@ public class MainActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
+        // process permissions results
         Permissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // check granted permissions and notify about not granted
+        Permissions.notifyIfNotGranted(this);
     }
 
     @Override
@@ -148,7 +151,7 @@ public class MainActivity extends AppCompatActivity
         private ContactsFragment whiteListFragment = new ContactsFragment();
         private JournalFragment journalFragment = new JournalFragment();
         private SettingsFragment settingsFragment = new SettingsFragment();
-        private SMSConversationsFragment SMSConversationsFragment = new SMSConversationsFragment();
+        private SMSConversationsFragment smsFragment = new SMSConversationsFragment();
         private int currentItemId;
 
         boolean onBackPressed() {
@@ -190,7 +193,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case R.id.nav_sms:
                     arguments.putString(SMSConversationsFragment.TITLE, getString(R.string.sms_title));
-                    switchFragment(SMSConversationsFragment, arguments);
+                    switchFragment(smsFragment, arguments);
                     break;
                 default:
                     arguments.putString(SettingsFragment.TITLE, getString(R.string.settings_title));

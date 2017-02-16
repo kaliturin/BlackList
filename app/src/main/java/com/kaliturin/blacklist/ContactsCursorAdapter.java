@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Contacts' cursor adapter
  */
-public class ContactsCursorAdapter extends CursorAdapter {
+class ContactsCursorAdapter extends CursorAdapter {
     private IdentifiersContainer checkedItems = new IdentifiersContainer(0);
     private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;
@@ -128,14 +128,12 @@ public class ContactsCursorAdapter extends CursorAdapter {
     private class RowOnLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View view) {
-            if(outerOnLongClickListener != null) {
-                return outerOnLongClickListener.onLongClick(view);
-            }
-            return false;
+            return (outerOnLongClickListener != null &&
+                    outerOnLongClickListener.onLongClick(view));
         }
     }
 
-    public Contact getContact(View row) {
+    Contact getContact(View row) {
         ViewHolder viewHolder = (ViewHolder) row.getTag();
         return (viewHolder != null ? viewHolder.contact : null);
     }

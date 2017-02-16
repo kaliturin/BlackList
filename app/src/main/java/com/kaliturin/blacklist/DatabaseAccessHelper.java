@@ -29,9 +29,12 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static DatabaseAccessHelper sInstance = null;
 
+    @Nullable
     public static synchronized DatabaseAccessHelper getInstance(Context context) {
         if (sInstance == null) {
-            sInstance = new DatabaseAccessHelper(context.getApplicationContext());
+            if(Permissions.isGranted(context, Permissions.WRITE_EXTERNAL_STORAGE)) {
+                sInstance = new DatabaseAccessHelper(context.getApplicationContext());
+            }
         }
         return sInstance;
     }

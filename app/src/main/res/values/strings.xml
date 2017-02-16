@@ -69,6 +69,7 @@
     <string name="set_as_default_sms_app">Set as default SMS application (needed for SMS blocking since Android 4.4 and later)</string>
     <string name="symbols">Symbols</string>
     <string name="sending_sms">Sending SMS</string>
+    <string name="needs_permission">needs permission</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>

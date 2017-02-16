@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,7 +38,7 @@ public class AddContactsFragment extends Fragment {
     public static final String SOURCE_TYPE = "SOURCE_TYPE";
 
     private ContactsCursorAdapter cursorAdapter = null;
-    private SnackBarCustom snackBar = null;
+    private CustomSnackBar snackBar = null;
     private ContactSourceType sourceType = null;
     private int contactType = 0;
 
@@ -70,7 +69,7 @@ public class AddContactsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
-        snackBar = new SnackBarCustom(view, R.id.snack_bar);
+        snackBar = new CustomSnackBar(view, R.id.snack_bar);
         // "Select all" button
         snackBar.setButton(R.id.button_left,
                 getString(R.string.select_all),
@@ -298,11 +297,13 @@ public class AddContactsFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-            int count = 1;
-            for(Contact contact : contactList) {
-                if(isCancelled()) break;
-                db.addContact(contactType, contact.name, contact.numbers);
-                publishProgress(100 / contactList.size() * count++);
+            if(db != null) {
+                int count = 1;
+                for (Contact contact : contactList) {
+                    if (isCancelled()) break;
+                    db.addContact(contactType, contact.name, contact.numbers);
+                    publishProgress(100 / contactList.size() * count++);
+                }
             }
             return null;
         }

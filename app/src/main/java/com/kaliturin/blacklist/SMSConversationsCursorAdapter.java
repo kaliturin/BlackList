@@ -19,7 +19,7 @@ import java.util.Date;
  * Cursor adapter for SMS conversations
  */
 
-public class SMSConversationsCursorAdapter extends CursorAdapter {
+class SMSConversationsCursorAdapter extends CursorAdapter {
 
     SMSConversationsCursorAdapter(Context context) {
         super(context, null, 0);

@@ -13,7 +13,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -34,7 +32,7 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecord;
 public class JournalFragment extends Fragment {
     public static String TITLE = "TITLE";
     private JournalCursorAdapter cursorAdapter = null;
-    private SnackBarCustom snackBar = null;
+    private CustomSnackBar snackBar = null;
     private String itemsFilter = null;
     private SearchView searchView = null;
     private MenuItem itemSearch = null;
@@ -72,7 +70,7 @@ public class JournalFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
-        snackBar = new SnackBarCustom(view, R.id.snack_bar);
+        snackBar = new CustomSnackBar(view, R.id.snack_bar);
         // "Select all" button
         snackBar.setButton(R.id.button_left,
                 getString(R.string.select_all),
@@ -128,13 +126,15 @@ public class JournalFragment extends Fragment {
                     Contact blackContact = null, whiteContact = null;
                     String number = (record.number == null ? record.caller : record.number);
                     DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-                    List<Contact> contacts = db.getContacts(number, false);
-                    for(Contact contact : contacts) {
-                        if(contact.name.equals(record.caller)) {
-                            if (contact.type == Contact.TYPE_BLACK_LIST) {
-                                blackContact = contact;
-                            } else {
-                                whiteContact = contact;
+                    if(db != null) {
+                        List<Contact> contacts = db.getContacts(number, false);
+                        for(Contact contact : contacts) {
+                            if(contact.name.equals(record.caller)) {
+                                if (contact.type == Contact.TYPE_BLACK_LIST) {
+                                    blackContact = contact;
+                                } else {
+                                    whiteContact = contact;
+                                }
                             }
                         }
                     }
@@ -259,20 +259,26 @@ public class JournalFragment extends Fragment {
     // TODO consider to run it from thread
     private void moveContactToWhiteList(String caller, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.addContact(Contact.TYPE_WHITE_LIST, caller, number);
+        if(db != null) {
+            db.addContact(Contact.TYPE_WHITE_LIST, caller, number);
+        }
     }
 
     // Adds contact to the black list
     // TODO consider to run it from thread
     private void addContactToBlackList(String caller, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.addContact(Contact.TYPE_BLACK_LIST, caller, number);
+        if(db != null) {
+            db.addContact(Contact.TYPE_BLACK_LIST, caller, number);
+        }
     }
 
     // Deletes contact by id
     private void deleteContact(long id) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.deleteContact(id);
+        if(db != null) {
+            db.deleteContact(id);
+        }
     }
 
     // Shows SearchView with passed query
@@ -286,7 +292,9 @@ public class JournalFragment extends Fragment {
     // Deletes contact by id
     private void deleteItem(long recordId) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        db.deleteJournalRecord(recordId);
+        if(db != null) {
+            db.deleteJournalRecord(recordId);
+        }
     }
 
     // Clears all items selection
@@ -345,11 +353,14 @@ public class JournalFragment extends Fragment {
 
         @Override
         public Cursor loadInBackground() {
-            DatabaseAccessHelper dao = DatabaseAccessHelper.getInstance(getContext());
-            if (deletingItems != null) {
-                dao.deleteJournalRecords(deletingItems, itemsFilter);
+            DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+            if(db == null) {
+                return null;
             }
-            return dao.getJournalRecords(itemsFilter);
+            if(deletingItems != null) {
+                db.deleteJournalRecords(deletingItems, itemsFilter);
+            }
+            return db.getJournalRecords(itemsFilter);
         }
     }
 

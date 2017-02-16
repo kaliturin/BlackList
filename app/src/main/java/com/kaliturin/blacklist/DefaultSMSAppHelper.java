@@ -15,16 +15,16 @@ import android.provider.Telephony;
  */
 class DefaultSMSAppHelper {
 
-    public static boolean isAvailable() {
+    static boolean isAvailable() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
 
-    public static void updateState(Context context) {
+    static void updateState(Context context) {
         boolean ready = isDefault(context);
         enableSMSReceiving(context, ready);
     }
 
-    public static void enableSMSReceiving(Context context, boolean enable) {
+    static void enableSMSReceiving(Context context, boolean enable) {
         int state = (enable ?
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED);
@@ -37,7 +37,7 @@ class DefaultSMSAppHelper {
     }
 
     @TargetApi(19)
-    public static boolean isDefault(Context context) {
+    static boolean isDefault(Context context) {
         if (!isAvailable()) return true;
         String myPackage = context.getPackageName();
         String smsPackage = Telephony.Sms.getDefaultSmsPackage(context);
@@ -45,7 +45,7 @@ class DefaultSMSAppHelper {
     }
 
     @TargetApi(19)
-    public static void askForDefaultAppChange(Activity activity, int requestCode) {
+    static void askForDefaultAppChange(Activity activity, int requestCode) {
         if (!isAvailable()) return;
         String packageName;
         // current app package is already set as default

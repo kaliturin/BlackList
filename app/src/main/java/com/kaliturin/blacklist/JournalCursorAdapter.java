@@ -113,10 +113,8 @@ public class JournalCursorAdapter extends CursorAdapter {
     private class RowOnLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View view) {
-            if(outerOnLongClickListener != null) {
-                return outerOnLongClickListener.onLongClick(view);
-            }
-            return false;
+            return  (outerOnLongClickListener != null &&
+                     outerOnLongClickListener.onLongClick(view));
         }
     }
 

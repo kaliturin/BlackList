@@ -51,7 +51,7 @@ public class AddOrEditContactFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
-        SnackBarCustom snackBar = new SnackBarCustom(view, R.id.snack_bar);
+        CustomSnackBar snackBar = new CustomSnackBar(view, R.id.snack_bar);
         // "Add" button
         snackBar.setButton(R.id.button_left,
                 getString(R.string.save),
@@ -93,12 +93,14 @@ public class AddOrEditContactFragment extends Fragment {
         } else {
             // get contact by id
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-            ContactCursorWrapper cursor = db.getContact(contactId);
-            if (cursor != null) {
-                initView(view, cursor.getContact());
-                cursor.close();
-            } else {
-                finishActivity(Activity.RESULT_CANCELED);
+            if(db != null) {
+                ContactCursorWrapper cursor = db.getContact(contactId);
+                if (cursor != null) {
+                    initView(view, cursor.getContact());
+                    cursor.close();
+                } else {
+                    finishActivity(Activity.RESULT_CANCELED);
+                }
             }
         }
     }
@@ -156,12 +158,14 @@ public class AddOrEditContactFragment extends Fragment {
         }
 
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        if(contactId >= 0) {
-            // delete the old contact
-            db.deleteContact(contactId);
+        if(db != null) {
+            if (contactId >= 0) {
+                // delete the old contact
+                db.deleteContact(contactId);
+            }
+            // save the new contact
+            db.addContact(contactType, name, numbers);
         }
-        // save the new contact
-        db.addContact(contactType, name, numbers);
 
         return true;
     }
