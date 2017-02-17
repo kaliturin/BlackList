@@ -119,7 +119,7 @@ public class AddContactsFragment extends Fragment {
         listView.setAdapter(cursorAdapter);
 
         // init and run the loader of contacts
-        getLoaderManager().initLoader(0, null, newLoader(null));
+        getLoaderManager().initLoader(0, null, newLoaderCallbacks(null));
     }
 
     @Override
@@ -196,11 +196,11 @@ public class AddContactsFragment extends Fragment {
     // Reloads items
     private void reloadItems(String itemsFilter) {
         dismissSnackBar();
-        getLoaderManager().restartLoader(0, null, newLoader(itemsFilter));
+        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter));
     }
 
     // Creates new contacts loader
-    private ContactsLoaderCallbacks newLoader(String itemsFilter) {
+    private ContactsLoaderCallbacks newLoaderCallbacks(String itemsFilter) {
         return new ContactsLoaderCallbacks(getContext(), sourceType, cursorAdapter, itemsFilter);
     }
 
@@ -222,7 +222,7 @@ public class AddContactsFragment extends Fragment {
         @Override
         public Cursor loadInBackground() {
             ContactsAccessHelper dao = ContactsAccessHelper.getInstance(getContext());
-            return dao.getContacts(sourceType, itemsFilter);
+            return dao.getContacts(getContext(), sourceType, itemsFilter);
         }
     }
 
@@ -268,9 +268,13 @@ public class AddContactsFragment extends Fragment {
 
     // Writes checked contacts to the database
     private void writeCheckedContacts() {
-        List<Contact> contactList = cursorAdapter.extractCheckedContacts();
-        ContactsWriter writer = new ContactsWriter(getContext(), contactType, contactList);
-        writer.execute();
+        // if permission is granted
+        if(!Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+            // get list of contacts and write it to the DB
+            List<Contact> contactList = cursorAdapter.extractCheckedContacts();
+            ContactsWriter writer = new ContactsWriter(getContext(), contactType, contactList);
+            writer.execute();
+        }
     }
 
     // Async task - writes contacts to the DB

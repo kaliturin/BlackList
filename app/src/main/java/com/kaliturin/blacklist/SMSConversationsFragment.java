@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import java.security.Permission;
+
 
 /**
  * Fragment for showing SMS conversations
@@ -50,6 +52,9 @@ public class SMSConversationsFragment extends Fragment {
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // notify user if permission isn't granted
+        Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_SMS);
+
         // cursor adapter
         cursorAdapter = new SMSConversationsCursorAdapter(getContext());
 
@@ -83,7 +88,7 @@ public class SMSConversationsFragment extends Fragment {
         @Override
         public Cursor loadInBackground() {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-            return db.getSMSConversations();
+            return db.getSMSConversations(getContext());
         }
     }
 

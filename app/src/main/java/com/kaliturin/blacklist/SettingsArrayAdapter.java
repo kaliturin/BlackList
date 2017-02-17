@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import java.security.Permission;
+
 /**
  * Settings array adapter
  */

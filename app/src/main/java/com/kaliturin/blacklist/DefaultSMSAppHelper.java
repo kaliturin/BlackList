@@ -67,8 +67,13 @@ class DefaultSMSAppHelper {
         if (!isAvailable()) return;
         Intent intent;
         if(packageName == null) {
-            // TODO check on older versions
-            intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+            String action;
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                action = android.provider.Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS;
+            } else {
+                action = android.provider.Settings.ACTION_WIRELESS_SETTINGS;
+            }
+            intent = new Intent(action);
         } else {
             intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
             intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName);

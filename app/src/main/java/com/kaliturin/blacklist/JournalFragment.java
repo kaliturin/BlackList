@@ -68,6 +68,7 @@ public class JournalFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE);
 
         // snack bar
         snackBar = new CustomSnackBar(view, R.id.snack_bar);
@@ -201,7 +202,7 @@ public class JournalFragment extends Fragment {
         listView.setAdapter(cursorAdapter);
 
         // init and run the journal records loader
-        getLoaderManager().initLoader(0, null, newLoader(null, false));
+        getLoaderManager().initLoader(0, null, newLoaderCallbacks(null, false));
     }
 
     @Override
@@ -319,19 +320,19 @@ public class JournalFragment extends Fragment {
 
     // Deletes all checked items
     private void deleteCheckedItems() {
-        getLoaderManager().restartLoader(0, null, newLoader(itemsFilter, true));
+        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, true));
     }
 
     // Reloads items
     private void reloadItems(String itemsFilter) {
         this.itemsFilter = itemsFilter;
         dismissSnackBar();
-        getLoaderManager().restartLoader(0, null, newLoader(itemsFilter, false));
+        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, false));
     }
 
     // Creates new journal items loader
-    private JournalItemsLoaderCallbacks newLoader(String itemsFilter,
-                                                  boolean deleteCheckedItems) {
+    private JournalItemsLoaderCallbacks newLoaderCallbacks(String itemsFilter,
+                                                           boolean deleteCheckedItems) {
         return new JournalItemsLoaderCallbacks(getContext(),
                 cursorAdapter, itemsFilter, deleteCheckedItems);
     }

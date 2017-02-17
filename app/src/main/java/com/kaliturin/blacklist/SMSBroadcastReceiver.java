@@ -236,6 +236,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     // Needed only for API19 and above - where only default SMS app can write to the inbox
     private void writeToInbox(Context context, SmsMessage[] messages) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // TODO check if redundant
             // check write permission
             if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return;
 

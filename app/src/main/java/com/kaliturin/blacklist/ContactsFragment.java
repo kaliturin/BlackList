@@ -70,6 +70,7 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE);
 
         // snack bar
         snackBar = new CustomSnackBar(view, R.id.snack_bar);
@@ -165,7 +166,7 @@ public class ContactsFragment extends Fragment {
         listView.setAdapter(cursorAdapter);
 
         // init and run the contact items loader
-        getLoaderManager().initLoader(0, null, newLoader(null, false));
+        getLoaderManager().initLoader(0, null, newLoaderCallbacks(null, false));
     }
 
     @Override
@@ -278,18 +279,18 @@ public class ContactsFragment extends Fragment {
 
     // Deletes checked items
     private void deleteCheckedItems() {
-        getLoaderManager().restartLoader(0, null, newLoader(itemsFilter, true));
+        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, true));
     }
 
     // Reloads items
     private void reloadItems(String itemsFilter) {
         this.itemsFilter = itemsFilter;
         dismissSnackBar();
-        getLoaderManager().restartLoader(0, null, newLoader(itemsFilter, false));
+        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, false));
     }
 
     // Creates new contacts loader
-    private ContactsLoaderCallbacks newLoader(String itemsFilter, boolean deleteCheckedItems) {
+    private ContactsLoaderCallbacks newLoaderCallbacks(String itemsFilter, boolean deleteCheckedItems) {
         return new ContactsLoaderCallbacks(getContext(), contactType,
                 cursorAdapter, itemsFilter, deleteCheckedItems);
     }

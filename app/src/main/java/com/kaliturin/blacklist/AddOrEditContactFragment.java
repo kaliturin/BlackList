@@ -58,10 +58,12 @@ public class AddOrEditContactFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int result = (saveContact() ?
-                                Activity.RESULT_OK :
-                                Activity.RESULT_CANCELED);
-                        finishActivity(result);
+                        if(!Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+                            int result = (saveContact() ?
+                                    Activity.RESULT_OK :
+                                    Activity.RESULT_CANCELED);
+                            finishActivity(result);
+                        }
                     }
                 });
 

@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity
         Permissions.checkAndRequest(this);
 
         // init settings defaults
-        Settings.setDefaults(this);
+        Settings.initDefaults(this);
 
         // toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

@@ -42,7 +42,7 @@ class Permissions {
     };
 
     // Checks for permission
-    static boolean isGranted(Context context, String permission) {
+    static boolean isGranted(@NonNull Context context, @NonNull String permission) {
         Boolean result = permissionsResults.get(permission);
         if(result == null) {
             int permissionCheck = ActivityCompat.checkSelfPermission(context, permission);
@@ -53,17 +53,24 @@ class Permissions {
     }
 
     // Checks for permissions and notifies if they aren't granted
-    static void notifyIfNotGranted(Activity activity) {
+    static void notifyIfNotGranted(@NonNull Activity activity) {
         for(String permission : PERMISSIONS) {
-            if(!isGranted(activity, permission)) {
-                notify(activity, permission);
-            }
+            notifyIfNotGranted(activity, permission);
         }
+    }
+
+    // Checks for permission and notifies if it isn't granted
+    static boolean notifyIfNotGranted(@NonNull Activity activity, @NonNull String permission) {
+        if(!isGranted(activity, permission)) {
+            notify(activity, permission);
+            return true;
+        }
+        return false;
     }
 
     // TODO: test
     // Notifies the user that permission isn't granted
-    private static void notify(final Activity activity, String permission) {
+    static void notify(@NonNull final Activity activity, @NonNull String permission) {
         PackageManager pm = activity.getPackageManager();
         PermissionInfo info = null;
         try {
@@ -77,23 +84,24 @@ class Permissions {
             if(label == null) {
                 label = info.nonLocalizedLabel;
             }
-            final String message = Utils.getApplicationName(activity) + " " +
+            final String message = "\"" + Utils.getApplicationName(activity) + "\" " +
                     activity.getString(R.string.needs_permission) + ": " + label;
-
-            // TODO remove
-            Log.w(TAG, message);
 
             activity.runOnUiThread(new Runnable() {
                 public void run() {
-                    Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
                 }
             });
         }
     }
 
     // Checks for permissions and shows a dialog for permission granting
-    static void checkAndRequest(Activity context) {
+    static void checkAndRequest(@NonNull Activity context) {
         ActivityCompat.requestPermissions(context, PERMISSIONS, REQUEST_CODE);
+    }
+
+    static void reset() {
+        permissionsResults.clear();
     }
 
     // Saves the results of permission granting request

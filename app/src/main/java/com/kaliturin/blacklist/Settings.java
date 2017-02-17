@@ -69,7 +69,7 @@ class Settings {
         return (value != null && value.equals(TRUE));
     }
 
-    static void setDefaults(Context context) {
+    static void initDefaults(Context context) {
         Map<String, String> map = new HashMap<>();
         map.put(BLOCK_CALLS_FROM_BLACK_LIST, TRUE);
         map.put(BLOCK_ALL_CALLS, FALSE);
@@ -88,8 +88,10 @@ class Settings {
         map.put(WRITE_SMS_JOURNAL, TRUE);
 
         for(Map.Entry<String, String> entry : map.entrySet()) {
-            if(getStringValue(context, entry.getKey()) == null) {
-                setStringValue(context, entry.getKey(), entry.getValue());
+            String setting = entry.getKey();
+            if(getStringValue(context, setting) == null) {
+                String value = entry.getValue();
+                setStringValue(context, setting, value);
             }
         }
     }

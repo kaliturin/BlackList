@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.security.Permission;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,7 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.ContactSource;
 /**
  * Contacts list access helper
  */
-public class ContactsAccessHelper {
+class ContactsAccessHelper {
     private static final String TAG = ContactsAccessHelper.class.getName();
     private static ContactsAccessHelper sInstance = null;
     private ContentResolver contentResolver = null;
@@ -52,25 +53,39 @@ public class ContactsAccessHelper {
     }
 
     // Types of the contact sources
-    public enum ContactSourceType {
+    enum ContactSourceType {
         FROM_CONTACTS,
         FROM_CALLS_LOG,
         FROM_SMS_INBOX
     }
 
     // Returns contacts from specified source
-    public @Nullable Cursor getContacts(ContactSourceType sourceType, @Nullable String filter) {
+    @Nullable
+    Cursor getContacts(Context context, ContactSourceType sourceType, @Nullable String filter) {
         switch (sourceType) {
+            case FROM_CONTACTS:
+                if(Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
+                    return getContacts(filter);
+                }
+                break;
             case FROM_CALLS_LOG:
-                return getContactsFromCallsLog(filter);
+                if(Permissions.isGranted(context, Permissions.READ_CALL_LOG)) {
+                    return getContactsFromCallsLog(filter);
+                }
+                break;
             case FROM_SMS_INBOX:
-                return getContactsFromSMSInbox(filter);
+                if(Permissions.isGranted(context, Permissions.READ_SMS)) {
+                    return getContactsFromSMSInbox(filter);
+                }
+                break;
         }
-        return getContacts(filter);
+
+        return null;
     }
 
     // Selects contacts from contacts list
-    public @Nullable ContactCursorWrapper getContacts(@Nullable String filter) {
+    @Nullable
+    private ContactCursorWrapper getContacts(@Nullable String filter) {
         filter = (filter == null ? "%%" : "%" + filter + "%");
         Cursor cursor = contentResolver.query(
                 Contacts.CONTENT_URI,
@@ -86,7 +101,8 @@ public class ContactsAccessHelper {
     }
 
     // Selects contact from contacts list by id
-    private @Nullable ContactCursorWrapper getContactCursor(long contactId) {
+    @Nullable
+    private ContactCursorWrapper getContactCursor(long contactId) {
         Cursor cursor = contentResolver.query(
                 Contacts.CONTENT_URI,
                 new String[] {Contacts._ID, Contacts.DISPLAY_NAME},
@@ -111,7 +127,8 @@ public class ContactsAccessHelper {
     }
 
     // Selects contact from contacts list by phone number
-    private  @Nullable ContactCursorWrapper getContactCursor(String number) {
+    @Nullable
+    private ContactCursorWrapper getContactCursor(String number) {
         Uri lookupUri = Uri.withAppendedPath(
                 ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
                 Uri.encode(number));
@@ -124,7 +141,8 @@ public class ContactsAccessHelper {
         return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
     }
 
-    public @Nullable Contact getContact(String number) {
+    @Nullable
+    Contact getContact(String number) {
         Contact contact = null;
         ContactCursorWrapper cursor = getContactCursor(number);
         if(cursor != null) {
@@ -135,7 +153,7 @@ public class ContactsAccessHelper {
     }
 
     // Contact's cursor wrapper
-    public class ContactCursorWrapper extends CursorWrapper implements ContactSource {
+    private class ContactCursorWrapper extends CursorWrapper implements ContactSource {
         private final int ID;
         private final int NAME;
 
@@ -151,7 +169,7 @@ public class ContactsAccessHelper {
             return getContact(true);
         }
 
-        public Contact getContact(boolean withNumbers) {
+        Contact getContact(boolean withNumbers) {
             long id = getLong(ID);
             String name = getString(NAME);
             List<ContactNumber> numbers = new LinkedList<>();
@@ -173,7 +191,7 @@ public class ContactsAccessHelper {
         }
     }
 
-    public static String normalizeContactNumber(String number) {
+    static String normalizeContactNumber(String number) {
         return number.replaceAll("[-() ]","");
     }
 
@@ -193,7 +211,8 @@ public class ContactsAccessHelper {
     }
 
     // Selects all numbers of specified contact
-    private @Nullable ContactNumberCursorWrapper getContactNumbers(long contactId) {
+    @Nullable
+    private ContactNumberCursorWrapper getContactNumbers(long contactId) {
         Cursor cursor = contentResolver.query(
                 Phone.CONTENT_URI,
                 new String[]{Phone.NUMBER},
@@ -208,7 +227,7 @@ public class ContactsAccessHelper {
 //-------------------------------------------------------------------------------------
 
     // Returns true if passed number contains in SMS inbox
-    public boolean containsNumberInSMSInbox(@NonNull String number) {
+    boolean containsNumberInSMSInbox(@NonNull String number) {
         final String ID = "_id";
         final String ADDRESS = "address";
         final String PERSON = "person";
@@ -229,7 +248,8 @@ public class ContactsAccessHelper {
     }
 
     // Selects contacts from SMS inbox filtering by contact name or number
-    public @Nullable ContactFromSMSCursorWrapper getContactsFromSMSInbox(@Nullable String filter) {
+    @Nullable
+    private ContactFromSMSCursorWrapper getContactsFromSMSInbox(@Nullable String filter) {
         filter = (filter == null ? "" : filter.toLowerCase());
         final String ID = "_id";
         final String ADDRESS = "address"; // number
@@ -280,7 +300,7 @@ public class ContactsAccessHelper {
     }
 
     // Contact from SMS cursor wrapper
-    public class ContactFromSMSCursorWrapper extends CursorWrapper implements ContactSource {
+    private class ContactFromSMSCursorWrapper extends CursorWrapper implements ContactSource {
         private final int ID;
         private final int ADDRESS;
         private final int PERSON;
@@ -308,7 +328,8 @@ public class ContactsAccessHelper {
 //-------------------------------------------------------------------------------------
 
     // Selects contacts from calls log
-    public @Nullable ContactFromCallsCursorWrapper getContactsFromCallsLog(@Nullable String filter) {
+    @Nullable
+    private ContactFromCallsCursorWrapper getContactsFromCallsLog(@Nullable String filter) {
         filter = (filter == null ? "%%" : "%" + filter + "%");
         Cursor cursor = null;
         // This try/catch is required by IDE because we use Calls.CONTENT_URI
@@ -354,7 +375,7 @@ public class ContactsAccessHelper {
     }
 
     // Contact from calls cursor wrapper
-    public class ContactFromCallsCursorWrapper extends  CursorWrapper implements ContactSource {
+    private class ContactFromCallsCursorWrapper extends  CursorWrapper implements ContactSource {
         private final int ID;
         private final int NUMBER;
         private final int NAME;
@@ -427,7 +448,12 @@ public class ContactsAccessHelper {
     }
 
     // Returns SMS conversation cursor wrapper
-    SMSConversationWrapper getSMSConversations() {
+    @Nullable
+    SMSConversationWrapper getSMSConversations(Context context) {
+        if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
+            return null;
+        }
+
         // select available conversation's data
         Cursor cursor = contentResolver.query(
                 Uri.parse("content://sms/conversations"),
@@ -535,7 +561,7 @@ public class ContactsAccessHelper {
         }
     }
 
-    static void debug(Cursor cursor) {
+    private static void debug(Cursor cursor) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cursor.getColumnCount(); i++) {
             String s = cursor.getString(i);

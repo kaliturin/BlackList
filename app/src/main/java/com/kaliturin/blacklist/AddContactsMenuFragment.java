@@ -25,39 +25,48 @@ public class AddContactsMenuFragment extends Fragment {
         public void onClick(View v) {
             ContactSourceType sourceType = null;
             String title = "";
+            String permission = "";
             switch (v.getId()) {
                 case R.id.add_from_contacts:
                     title = getString(R.string.contacts_list);
                     sourceType = ContactSourceType.FROM_CONTACTS;
+                    permission = Permissions.READ_CONTACTS;
                     break;
                 case R.id.add_from_calls:
                     title = getString(R.string.calls_list);
                     sourceType = ContactSourceType.FROM_CALLS_LOG;
+                    permission = Permissions.READ_CALL_LOG;
                     break;
                 case R.id.add_from_sms:
                     title = getString(R.string.sms_inbox_list);
                     sourceType = ContactSourceType.FROM_SMS_INBOX;
+                    permission = Permissions.READ_SMS;
                     break;
                 case R.id.add_manually:
                     title = getString(R.string.adding_contact);
+                    permission = Permissions.WRITE_EXTERNAL_STORAGE;
                     break;
             }
 
-            Bundle arguments = new Bundle();
-            Class<? extends Fragment> fragmentClass;
-            if(sourceType != null) {
-                // create fragment of adding contacts from inbox/calls
-                arguments.putInt(AddContactsFragment.CONTACT_TYPE, contactType);
-                arguments.putSerializable(AddContactsFragment.SOURCE_TYPE, sourceType);
-                fragmentClass = AddContactsFragment.class;
-            } else {
-                // create fragment of adding contacts manually
-                arguments.putInt(AddOrEditContactFragment.CONTACT_TYPE, contactType);
-                fragmentClass = AddOrEditContactFragment.class;
-            }
+            // if permission is granted
+            if(!Permissions.notifyIfNotGranted(getActivity(), permission)) {
+                // permission is granted
+                Bundle arguments = new Bundle();
+                Class<? extends Fragment> fragmentClass;
+                if (sourceType != null) {
+                    // create fragment of adding contacts from inbox/calls
+                    arguments.putInt(AddContactsFragment.CONTACT_TYPE, contactType);
+                    arguments.putSerializable(AddContactsFragment.SOURCE_TYPE, sourceType);
+                    fragmentClass = AddContactsFragment.class;
+                } else {
+                    // create fragment of adding contacts manually
+                    arguments.putInt(AddOrEditContactFragment.CONTACT_TYPE, contactType);
+                    fragmentClass = AddOrEditContactFragment.class;
+                }
 
-            // open the dialog activity with the fragment of contact adding
-            CustomFragmentActivity.show(getActivity(), title, fragmentClass, arguments, 0);
+                // open the dialog activity with the fragment of contact adding
+                CustomFragmentActivity.show(getActivity(), title, fragmentClass, arguments, 0);
+            }
         }
     };
 

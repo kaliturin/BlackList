@@ -24,6 +24,7 @@ public class SettingsFragment extends Fragment {
         public void onClick(View v) {
             Activity activity = SettingsFragment.this.getActivity();
             DefaultSMSAppHelper.askForDefaultAppChange(activity, 0);
+            Permissions.reset();
         }
     };
 
@@ -52,6 +53,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE);
     }
 
     @Override
