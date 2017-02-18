@@ -31,11 +31,13 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Bundle bundle = getArguments();
-        String title = bundle.getString(TITLE);
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if(actionBar != null) {
-            actionBar.setTitle(title);
+        Bundle arguments = getArguments();
+        if(arguments != null) {
+            String title = arguments.getString(TITLE);
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(title);
+            }
         }
     }
 

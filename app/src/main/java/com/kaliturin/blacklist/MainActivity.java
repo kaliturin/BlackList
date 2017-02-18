@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity
         private ContactsFragment whiteListFragment = new ContactsFragment();
         private JournalFragment journalFragment = new JournalFragment();
         private SettingsFragment settingsFragment = new SettingsFragment();
-        private SMSConversationsFragment smsFragment = new SMSConversationsFragment();
+        private SMSAllConversationsFragment smsFragment = new SMSAllConversationsFragment();
         private int currentItemId;
 
         boolean onBackPressed() {
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity
                     switchFragment(whiteListFragment, arguments);
                     break;
                 case R.id.nav_sms:
-                    arguments.putString(SMSConversationsFragment.TITLE, getString(R.string.sms_title));
+                    arguments.putString(SMSAllConversationsFragment.TITLE, getString(R.string.sms_title));
                     switchFragment(smsFragment, arguments);
                     break;
                 default:

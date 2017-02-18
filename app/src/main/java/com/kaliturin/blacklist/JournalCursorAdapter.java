@@ -27,8 +27,8 @@ public class JournalCursorAdapter extends CursorAdapter {
     private IdentifiersContainer checkedItems = new IdentifiersContainer(0);
     private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;
-    private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
+    private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
 
     JournalCursorAdapter(Context context) {
         super(context, null, 0);

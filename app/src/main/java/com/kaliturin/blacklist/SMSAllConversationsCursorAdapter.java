@@ -16,19 +16,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Cursor adapter for SMS conversations
+ * Cursor adapter for all SMS conversations
  */
+class SMSAllConversationsCursorAdapter extends CursorAdapter {
+    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
+    private Date datetime = new Date();
+    private View.OnClickListener outerOnClickListener = null;
+    private View.OnLongClickListener outerOnLongClickListener = null;
+    private RowOnClickListener rowOnClickListener = new RowOnClickListener();
+    private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
 
-class SMSConversationsCursorAdapter extends CursorAdapter {
-
-    SMSConversationsCursorAdapter(Context context) {
+    SMSAllConversationsCursorAdapter(Context context) {
         super(context, null, 0);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.sms_conversation_row, parent, false);
+        View view = inflater.inflate(R.layout.sms_all_conversations_row, parent, false);
 
         // view holder for the row
         ViewHolder viewHolder = new ViewHolder(view);
@@ -36,8 +41,8 @@ class SMSConversationsCursorAdapter extends CursorAdapter {
         view.setTag(viewHolder);
 
         // on click listeners for the row and checkbox (which is inside the row)
-        //view.setOnClickListener(rowOnClickListener);
-        //view.setOnLongClickListener(rowOnLongClickListener);
+        view.setOnClickListener(rowOnClickListener);
+        view.setOnLongClickListener(rowOnLongClickListener);
 
         return view;
     }
@@ -54,8 +59,39 @@ class SMSConversationsCursorAdapter extends CursorAdapter {
         viewHolder.setModel(model);
     }
 
-    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
-    private Date datetime = new Date();
+//---------------------------------------------------------------------------------
+
+    SMSConversation getSMSConversation(View row) {
+        ViewHolder holder = (ViewHolder) row.getTag();
+        return holder.model;
+    }
+
+    void setOnClickListener(View.OnClickListener onClickListener) {
+        this.outerOnClickListener = onClickListener;
+    }
+
+    void setOnLongClickListener(View.OnLongClickListener onLongClickListener) {
+        this.outerOnLongClickListener = onLongClickListener;
+    }
+
+    // Row on long click listener
+    private class RowOnLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(View view) {
+            return  (outerOnLongClickListener != null &&
+                    outerOnLongClickListener.onLongClick(view));
+        }
+    }
+
+    // Row on click listener
+    private class RowOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if(outerOnClickListener != null) {
+                outerOnClickListener.onClick(view);
+            }
+        }
+    }
 
     private class ViewHolder {
         private SMSConversation model;

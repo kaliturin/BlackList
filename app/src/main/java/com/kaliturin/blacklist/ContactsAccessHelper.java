@@ -14,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.security.Permission;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -475,7 +474,8 @@ class ContactsAccessHelper {
                 String threadId = cursor.getString(THREAD_ID);
                 String snippet = cursor.getString(SNIPPET);
                 // find date and address by the last SMS from the thread
-                SMSRecordCursorWrapper smsRecordCursor = getSMSRecordsByThreadId(threadId, true, 1);
+                SMSRecordCursorWrapper smsRecordCursor =
+                        getSMSRecordsByThreadId(context, threadId, true, 1);
                 if(smsRecordCursor != null) {
                     SMSRecord smsRecord = smsRecordCursor.getSMSRecord();
                     smsRecordCursor.close();
@@ -492,7 +492,12 @@ class ContactsAccessHelper {
 
     // Selects SMS records by thread id
     @Nullable
-    private SMSRecordCursorWrapper getSMSRecordsByThreadId(String threadId, boolean desc, int limit) {
+    SMSRecordCursorWrapper getSMSRecordsByThreadId(Context context, String threadId, boolean desc, int limit) {
+        if(!Permissions.isGranted(context, Permissions.READ_SMS) ||
+                !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
+            return null;
+        }
+
         String orderClause = (desc ? " date DESC " : " date ASC ");
         String limitClause = (limit > 0 ? " LIMIT " + limit : "");
         Cursor cursor = contentResolver.query(
@@ -507,6 +512,8 @@ class ContactsAccessHelper {
 
     // SMS record
     class SMSRecord {
+        static final int TYPE_INBOX = 1;
+
         final long id;
         final int type;
         final long date;
@@ -547,13 +554,16 @@ class ContactsAccessHelper {
             int type = getInt(TYPE);
             long date = getLong(DATE);
             String address = getString(ADDRESS);
+            Contact contact;
             if(!isNull(PERSON)) {
                 // if person is defined - get contact name
                 long contactId = getLong(PERSON);
-                Contact contact = getContact(contactId);
-                if(contact != null) {
-                    address = contact.name;
-                }
+                contact = getContact(contactId);
+            } else {
+                contact = getContact(address);
+            }
+            if(contact != null) {
+                address = contact.name;
             }
             String body = getString(BODY);
 

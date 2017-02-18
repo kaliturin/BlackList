@@ -56,9 +56,11 @@ public class AddContactsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Bundle bundle = getArguments();
-        contactType = bundle.getInt(CONTACT_TYPE);
-        sourceType = (ContactSourceType) bundle.getSerializable(SOURCE_TYPE);
+        Bundle arguments = getArguments();
+        if(arguments != null) {
+            contactType = arguments.getInt(CONTACT_TYPE);
+            sourceType = (ContactSourceType) arguments.getSerializable(SOURCE_TYPE);
+        }
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_contacts, container, false);

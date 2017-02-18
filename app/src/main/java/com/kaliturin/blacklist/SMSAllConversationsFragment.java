@@ -16,28 +16,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import java.security.Permission;
-
 
 /**
- * Fragment for showing SMS conversations
+ * Fragment for showing all SMS conversations
  */
-public class SMSConversationsFragment extends Fragment {
+public class SMSAllConversationsFragment extends Fragment {
     public static String TITLE = "TITLE";
-    private SMSConversationsCursorAdapter cursorAdapter = null;
+    private SMSAllConversationsCursorAdapter cursorAdapter = null;
 
-    public SMSConversationsFragment() {
+    public SMSAllConversationsFragment() {
         // Required empty public constructor
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Bundle bundle = getArguments();
-        String title = bundle.getString(TITLE);
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if(actionBar != null) {
-            actionBar.setTitle(title);
+        Bundle arguments = getArguments();
+        if(arguments != null) {
+            String title = arguments.getString(TITLE);
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(title);
+            }
         }
     }
 
@@ -45,7 +45,7 @@ public class SMSConversationsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sms_conversations, container, false);
+        return inflater.inflate(R.layout.fragment_sms_all_conversations, container, false);
     }
 
     @Override
@@ -54,15 +54,30 @@ public class SMSConversationsFragment extends Fragment {
 
         // notify user if permission isn't granted
         Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_SMS);
+        Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_CONTACTS);
 
         // cursor adapter
-        cursorAdapter = new SMSConversationsCursorAdapter(getContext());
+        cursorAdapter = new SMSAllConversationsCursorAdapter(getContext());
+        cursorAdapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View row) {
+                // get the clicked conversation
+                ContactsAccessHelper.SMSConversation smsConversation =
+                        cursorAdapter.getSMSConversation(row);
+                // open activity with sms of the conversation
+                Bundle arguments = new Bundle();
+                arguments.putString(SMSConversationFragment.SMS_THREAD_ID,
+                        String.valueOf(smsConversation.threadId));
+                CustomFragmentActivity.show(getContext(), smsConversation.address,
+                        SMSConversationFragment.class, arguments);
+            }
+        });
 
         // add cursor listener to the list
         ListView listView = (ListView) view.findViewById(R.id.rows_list);
         listView.setAdapter(cursorAdapter);
 
-        // init and run the contact items loader
+        // init and run the items loader
         getLoaderManager().initLoader(0, null, newLoader());
     }
 
@@ -72,16 +87,16 @@ public class SMSConversationsFragment extends Fragment {
         super.onDestroyView();
     }
 
-    // Creates new contacts loader
-    private SMSConversationsLoaderCallbacks newLoader() {
-        return new SMSConversationsLoaderCallbacks(getContext(), cursorAdapter);
-    }
-
 //----------------------------------------------------------------------
 
-    // Items loader
-    private static class SMSConversationsLoader extends CursorLoader {
-        SMSConversationsLoader(Context context) {
+    // Creates SMS conversations loader
+    private SMSAllConversationsLoaderCallbacks newLoader() {
+        return new SMSAllConversationsLoaderCallbacks(getContext(), cursorAdapter);
+    }
+
+    // SMS conversations loader
+    private static class SMSAllConversationsLoader extends CursorLoader {
+        SMSAllConversationsLoader(Context context) {
             super(context);
         }
 
@@ -92,20 +107,20 @@ public class SMSConversationsFragment extends Fragment {
         }
     }
 
-    // Contact items loader callbacks
-    private static class SMSConversationsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+    // SMS conversations loader callbacks
+    private static class SMSAllConversationsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
         private Context context;
-        private SMSConversationsCursorAdapter cursorAdapter;
+        private SMSAllConversationsCursorAdapter cursorAdapter;
 
-        SMSConversationsLoaderCallbacks(Context context,
-                                        SMSConversationsCursorAdapter cursorAdapter) {
+        SMSAllConversationsLoaderCallbacks(Context context,
+                                           SMSAllConversationsCursorAdapter cursorAdapter) {
             this.context = context;
             this.cursorAdapter = cursorAdapter;
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return new SMSConversationsLoader(context);
+            return new SMSAllConversationsLoader(context);
         }
 
         @Override

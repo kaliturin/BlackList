@@ -77,8 +77,10 @@ public class AddContactsMenuFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Bundle bundle = getArguments();
-        contactType = bundle.getInt(CONTACT_TYPE, 0);
+        Bundle arguments = getArguments();
+        if(arguments != null) {
+            contactType = arguments.getInt(CONTACT_TYPE, 0);
+        }
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_contacts_menu, container, false);
