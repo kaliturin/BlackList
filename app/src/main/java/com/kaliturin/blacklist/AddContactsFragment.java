@@ -134,7 +134,7 @@ public class AddContactsFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
         MenuItem itemSearch = menu.findItem(R.id.action_search);
-        Utils.tintMenuIcon(getContext(), itemSearch, R.color.colorAccent);
+        Utils.setMenuIconTint(getContext(), itemSearch, R.color.colorAccent);
         itemSearch.setVisible(true);
 
         // get the view from search menu item

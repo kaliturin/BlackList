@@ -19,7 +19,7 @@ import java.util.Date;
  * Cursor adapter for all SMS conversations
  */
 class SMSAllConversationsCursorAdapter extends CursorAdapter {
-    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
+    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
     private Date datetime = new Date();
     private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;

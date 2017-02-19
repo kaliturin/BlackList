@@ -2,14 +2,18 @@ package com.kaliturin.blacklist;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.support.v4.widget.CursorAdapter;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.kaliturin.blacklist.ContactsAccessHelper.SMSRecordCursorWrapper;
 import com.kaliturin.blacklist.ContactsAccessHelper.SMSRecord;
+import com.kaliturin.blacklist.ContactsAccessHelper.SMSRecordCursorWrapper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,15 +24,20 @@ import java.util.Date;
  */
 
 public class SMSConversationCursorAdapter extends CursorAdapter {
-    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
+    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
+    private final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
     private Date datetime = new Date();
     private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
     private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
+    private Padding paddingStart;
+    private Padding paddingEnd;
 
     SMSConversationCursorAdapter(Context context) {
         super(context, null, 0);
+        paddingStart = new Padding(context, Gravity.START, 5, 50);
+        paddingEnd = new Padding(context, Gravity.END, 5, 50);
     }
 
     @Override
@@ -57,7 +66,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with new model
-        viewHolder.setModel(model);
+        viewHolder.setModel(context, model);
     }
 
 //------------------------------------------------------------------------
@@ -89,28 +98,79 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         }
     }
 
+    private class Padding {
+        final int left;
+        final int right;
+        final int top;
+        final int bottom;
+
+        Padding(Context context, int gravity, int min, int max) {
+            if(gravity == Gravity.START) {
+                left = dpToPx(context, min);
+                right = dpToPx(context, max);
+            } else {
+                left = dpToPx(context, max);
+                right = dpToPx(context, min);
+            }
+            top = 0;
+            bottom = 0;
+        }
+
+        private int dpToPx(Context context, int dp) {
+            DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+            return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        }
+    }
+
     private class ViewHolder {
         private SMSRecord model;
+        private View rowView;
         private TextView bodyTextView;
         private TextView dateTextView;
 
         ViewHolder(View rowView) {
-            this((TextView) rowView.findViewById(R.id.body),
+            this(rowView,
+                    (TextView) rowView.findViewById(R.id.body),
                     (TextView) rowView.findViewById(R.id.date));
         }
 
-        ViewHolder(TextView snippetTextView,
+        ViewHolder(View rowView,
+                TextView snippetTextView,
                    TextView dateTextView) {
             this.model = null;
+            this.rowView = rowView;
             this.bodyTextView = snippetTextView;
             this.dateTextView = dateTextView;
         }
 
-        void setModel(SMSRecord model) {
+        void setModel(Context context, SMSRecord model) {
             this.model = model;
-            String prefix = (model.type == SMSRecord.TYPE_INBOX ? "IN: " : "OUT: ");
-            bodyTextView.setText(prefix + model.body);
-            dateTextView.setText(dateFormat.format(toDate(model.date)));
+            bodyTextView.setText(model.body);
+            Date date = toDate(model.date);
+            String text = timeFormat.format(date) + ", " + dateFormat.format(date);
+            dateTextView.setText(text);
+
+            // init alignments and color
+            Padding padding;
+            int gravity, color;
+            if(model.type == SMSRecord.TYPE_INBOX) {
+                padding = paddingStart;
+                gravity = Gravity.START;
+                color = R.color.colorIncomeSms;
+            } else {
+                padding = paddingEnd;
+                gravity = Gravity.END;
+                color = R.color.colorOutcomeSms;
+            }
+
+            // set alignments
+            ((LinearLayout) rowView).setGravity(gravity);
+            rowView.setPadding(padding.left, padding.top, padding.right, padding.bottom);
+
+            // set background color
+            View contentView = rowView.findViewById(R.id.content_shape);
+            Drawable drawable = contentView.getBackground().mutate();
+            Utils.setDrawableColor(context, drawable, color);
         }
 
         private Date toDate(long time) {

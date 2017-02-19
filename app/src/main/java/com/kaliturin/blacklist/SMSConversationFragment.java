@@ -23,6 +23,7 @@ import android.widget.ListView;
 public class SMSConversationFragment extends Fragment {
     public static String SMS_THREAD_ID = "SMS_THREAD_ID";
     private SMSConversationCursorAdapter cursorAdapter = null;
+    private ListView listView = null;
 
     public SMSConversationFragment() {
         // Required empty public constructor
@@ -52,7 +53,7 @@ public class SMSConversationFragment extends Fragment {
         });
 
         // add cursor listener to the list
-        ListView listView = (ListView) view.findViewById(R.id.rows_list);
+        listView = (ListView) view.findViewById(R.id.rows_list);
         listView.setAdapter(cursorAdapter);
 
         Bundle arguments = getArguments();
@@ -74,7 +75,7 @@ public class SMSConversationFragment extends Fragment {
 
     // Creates SMS conversation loader
     private SMSConversationLoaderCallbacks newLoader(String smsThreadId) {
-        return new SMSConversationLoaderCallbacks(getContext(), smsThreadId, cursorAdapter);
+        return new SMSConversationLoaderCallbacks(getContext(), smsThreadId, listView, cursorAdapter);
     }
 
     // SMS conversation loader
@@ -97,12 +98,15 @@ public class SMSConversationFragment extends Fragment {
     private static class SMSConversationLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
         private Context context;
         private String smsThreadId;
+        private ListView listView;
         private SMSConversationCursorAdapter cursorAdapter;
 
         SMSConversationLoaderCallbacks(Context context, String smsThreadId,
+                                        ListView listView,
                                         SMSConversationCursorAdapter cursorAdapter) {
             this.context = context;
             this.smsThreadId = smsThreadId;
+            this.listView = listView;
             this.cursorAdapter = cursorAdapter;
         }
 
@@ -113,7 +117,15 @@ public class SMSConversationFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            // apply loaded data to cursor adapter
             cursorAdapter.changeCursor(data);
+            // scroll list to bottom
+            listView.post(new Runnable() {
+                @Override
+                public void run() {
+                    listView.setSelection(cursorAdapter.getCount() - 1);
+                }
+            });
         }
 
         @Override

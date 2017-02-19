@@ -30,14 +30,14 @@
                 android:tint="@color/colorBorder"/>
 
             <TextView
-                android:id="@+id/date"
+                android:id="@+id/time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="13sp"/>
 
             <TextView
-                android:id="@+id/time"
+                android:id="@+id/date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

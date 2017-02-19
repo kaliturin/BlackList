@@ -165,8 +165,9 @@ public class JournalCursorAdapter extends CursorAdapter {
         private void setModel(JournalRecord model) {
             this.record = model;
             itemId = (int) model.id;
-            dateTextView.setText(dateFormat.format(toDate(model.time)));
-            timeTextView.setText(timeFormat.format(toDate(model.time)));
+            Date date = toDate(model.time);
+            dateTextView.setText(dateFormat.format(date));
+            timeTextView.setText(timeFormat.format(date));
 
             senderTextView.setText(model.caller);
 
