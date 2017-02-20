@@ -41,17 +41,29 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
+        // get address number
+        String number = messages[0].getDisplayOriginatingAddress();
+
         // process messages
-        if(!processMessages(context, messages)) {
-            // messages were not blocked - write them to the inbox
-            writeToInbox(context, messages);
+        if(!processMessages(context, number, messages)) {
+            // since 19 API only
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                // messages were not blocked - write them to the inbox
+                ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
+                if(db.writeSMSToInbox(context, messages)) {
+                    // get contact by number
+                    Contact contact = db.getContact(number);
+                    // get name for notification
+                    String name = (contact == null ? number : contact.name);
+                    // notify user
+                    Notification.onSmsReceived(context, name);
+                }
+            }
         }
     }
 
     // Processes messages; returns true if messages were blocked, false else
-    private boolean processMessages(Context context, SmsMessage[] messages) {
-        // get address number
-        String number = messages[0].getDisplayOriginatingAddress();
+    private boolean processMessages(Context context, String number, SmsMessage[] messages) {
 
         // private number detected
         if(isPrivateNumber(number)) {
@@ -201,13 +213,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         return (db == null ? null : db.getContacts(number, false));
     }
 
-    private void notifyUser(Context context, String name) {
-        // is show notifications
-        if(Settings.getBooleanValue(context, Settings.SHOW_SMS_NOTIFICATIONS)) {
-            Notification.onSmsNotification(context, name);
-        }
-    }
-
     // Writes record to the journal
     private void writeToJournal(Context context, String name, String number, SmsMessage[] messages) {
         if(number.equals(name)) {
@@ -228,36 +233,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         abortBroadcast();
         // write record to the journal
         writeToJournal(context, name, number, messages);
-        // notify the user
-        notifyUser(context, name);
-    }
-
-    // Writes SMS messages to the inbox
-    // Needed only for API19 and above - where only default SMS app can write to the inbox
-    private void writeToInbox(Context context, SmsMessage[] messages) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            // TODO check if redundant
-            // check write permission
-            if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return;
-
-            for (SmsMessage message : messages) {
-                ContentValues values = new ContentValues();
-                values.put(Telephony.Sms.ADDRESS, message.getDisplayOriginatingAddress());
-                values.put(Telephony.Sms.BODY, message.getMessageBody());
-                values.put(Telephony.Sms.PERSON, getPerson(context, message.getOriginatingAddress()));
-                values.put(Telephony.Sms.DATE_SENT, message.getTimestampMillis());
-                values.put(Telephony.Sms.PROTOCOL, message.getProtocolIdentifier());
-                values.put(Telephony.Sms.REPLY_PATH_PRESENT, message.isReplyPathPresent());
-                values.put(Telephony.Sms.SERVICE_CENTER, message.getServiceCenterAddress());
-                context.getApplicationContext().getContentResolver().insert(Telephony.Sms.Inbox.CONTENT_URI, values);
-            }
+        // notify user
+        if(Settings.getBooleanValue(context, Settings.SHOW_SMS_NOTIFICATIONS)) {
+            Notification.onSmsBlocked(context, name);
         }
-    }
-
-    // Lookups contact id from contacts list by number
-    private Long getPerson(Context context, String number) {
-        ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-        Contact contact = db.getContact(number);
-        return (contact != null ? contact.id : null);
     }
 }

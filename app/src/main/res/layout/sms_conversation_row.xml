@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@drawable/sms_shape"
+        android:background="@drawable/shape_sms_body"
         android:focusable="true">
 
         <TextView

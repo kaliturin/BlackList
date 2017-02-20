@@ -59,7 +59,7 @@ public class SMSConversationFragment extends Fragment {
         Bundle arguments = getArguments();
         if(arguments != null) {
             // get sms thread
-            String smsThreadId = arguments.getString(SMS_THREAD_ID);
+            int smsThreadId = arguments.getInt(SMS_THREAD_ID);
             // init and run the sms records loader
             getLoaderManager().initLoader(0, null, newLoader(smsThreadId));
         }
@@ -74,15 +74,15 @@ public class SMSConversationFragment extends Fragment {
 //----------------------------------------------------
 
     // Creates SMS conversation loader
-    private SMSConversationLoaderCallbacks newLoader(String smsThreadId) {
+    private SMSConversationLoaderCallbacks newLoader(int smsThreadId) {
         return new SMSConversationLoaderCallbacks(getContext(), smsThreadId, listView, cursorAdapter);
     }
 
     // SMS conversation loader
     private static class SMSConversationLoader extends CursorLoader {
-        private String smsThreadId;
+        private int smsThreadId;
 
-        SMSConversationLoader(Context context, String smsThreadId) {
+        SMSConversationLoader(Context context, int smsThreadId) {
             super(context);
             this.smsThreadId = smsThreadId;
         }
@@ -90,18 +90,24 @@ public class SMSConversationFragment extends Fragment {
         @Override
         public Cursor loadInBackground() {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-            return db.getSMSRecordsByThreadId(getContext(), smsThreadId, false, 0);
+            // get SMS records by thread id
+            Cursor cursor = db.getSMSRecordsByThreadId(getContext(), smsThreadId, false, 0);
+            if(cursor != null) {
+                // set SMS of the thread were read
+                db.setSMSReadByThreadId(getContext(), smsThreadId);
+            }
+            return cursor;
         }
     }
 
     // SMS conversation loader callbacks
     private static class SMSConversationLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
         private Context context;
-        private String smsThreadId;
+        private int smsThreadId;
         private ListView listView;
         private SMSConversationCursorAdapter cursorAdapter;
 
-        SMSConversationLoaderCallbacks(Context context, String smsThreadId,
+        SMSConversationLoaderCallbacks(Context context, int smsThreadId,
                                         ListView listView,
                                         SMSConversationCursorAdapter cursorAdapter) {
             this.context = context;

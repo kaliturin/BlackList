@@ -1,17 +1,22 @@
 package com.kaliturin.blacklist;
 
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.CallLog.Calls;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.telephony.SmsMessage;
 import android.util.Log;
 
 import java.util.LinkedList;
@@ -410,12 +415,14 @@ class ContactsAccessHelper {
         final long date;
         final String snippet;
         final String address;
+        final int unread;
 
-        SMSConversation(int threadId, long date, String address, String snippet) {
+        SMSConversation(int threadId, long date, String address, String snippet, int unread) {
             this.threadId = threadId;
             this.date = date;
             this.address = address;
             this.snippet = snippet;
+            this.unread = unread;
         }
     }
 
@@ -426,6 +433,7 @@ class ContactsAccessHelper {
         private final int DATE;
         private final int ADDRESS;
         private final int SNIPPET;
+        private final int UNREAD;
 
         private SMSConversationWrapper(Cursor cursor) {
             super(cursor);
@@ -434,6 +442,7 @@ class ContactsAccessHelper {
             DATE = cursor.getColumnIndex("date");
             ADDRESS = cursor.getColumnIndex("address");
             SNIPPET = cursor.getColumnIndex("snippet");
+            UNREAD = cursor.getColumnIndex("unread");
         }
 
         SMSConversation getConversation() {
@@ -441,8 +450,9 @@ class ContactsAccessHelper {
             long date = getLong(DATE);
             String address = getString(ADDRESS);
             String snippet = getString(SNIPPET);
+            int unread = getInt(UNREAD);
 
-            return new SMSConversation(threadId, date, address, snippet);
+            return new SMSConversation(threadId, date, address, snippet, unread);
         }
     }
 
@@ -465,25 +475,36 @@ class ContactsAccessHelper {
         // id, address, and date of conversation
         if(cursor != null &&
                 cursor.moveToFirst()) {
+
+            // resulting matrix cursor
             MatrixCursor matrixCursor = new MatrixCursor(
-                    new String[]{"_id", "thread_id", "snippet", "date", "address"});
+                    new String[]{"_id", "thread_id", "snippet", "address", "date", "unread"});
+
             final int THREAD_ID = cursor.getColumnIndex("thread_id");
             final int SNIPPET = cursor.getColumnIndex("snippet");
-
             do {
-                String threadId = cursor.getString(THREAD_ID);
+                int threadId = cursor.getInt(THREAD_ID);
                 String snippet = cursor.getString(SNIPPET);
+                // get the count of unread SMS in the thread
+                int unread = getSMSUnreadCountByThreadId(context, threadId);
                 // find date and address by the last SMS from the thread
                 SMSRecordCursorWrapper smsRecordCursor =
                         getSMSRecordsByThreadId(context, threadId, true, 1);
                 if(smsRecordCursor != null) {
                     SMSRecord smsRecord = smsRecordCursor.getSMSRecord();
                     smsRecordCursor.close();
-                    matrixCursor.addRow(new String[]{threadId, threadId, snippet,
-                            String.valueOf(smsRecord.date), smsRecord.address});
+
+                    // add row to the resulting cursor
+                    String sThreadId = String.valueOf(threadId);
+                    matrixCursor.addRow(new String[]{
+                            sThreadId, sThreadId, snippet,
+                            smsRecord.address,
+                            String.valueOf(smsRecord.date),
+                            String.valueOf(unread)});
                 }
             } while (cursor.moveToNext());
             cursor.close();
+            // swap cursor
             cursor = matrixCursor;
         }
 
@@ -492,7 +513,7 @@ class ContactsAccessHelper {
 
     // Selects SMS records by thread id
     @Nullable
-    SMSRecordCursorWrapper getSMSRecordsByThreadId(Context context, String threadId, boolean desc, int limit) {
+    SMSRecordCursorWrapper getSMSRecordsByThreadId(Context context, int threadId, boolean desc, int limit) {
         if(!Permissions.isGranted(context, Permissions.READ_SMS) ||
                 !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             return null;
@@ -508,6 +529,78 @@ class ContactsAccessHelper {
                 orderClause + limitClause);
 
         return (validate(cursor) ? new SMSRecordCursorWrapper(cursor) : null);
+    }
+
+    // Returns count of unread SMS by thread id
+    private int getSMSUnreadCountByThreadId(Context context, int threadId) {
+        if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
+            return 0;
+        }
+
+        Cursor cursor = contentResolver.query(
+                Uri.parse("content://sms/inbox"),
+                null,
+                " thread_id = " + threadId + " AND " +
+                " read = 0 ",
+                null,
+                null);
+
+        int count = 0;
+        if(validate(cursor)) {
+            count = cursor.getCount();
+            cursor.close();
+        }
+
+        return count;
+    }
+
+    // Sets SMS are read by thread id
+    boolean setSMSReadByThreadId(Context context, int threadId) {
+        if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
+            return false;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("read", 1);
+        contentResolver.update(
+                Uri.parse("content://sms/inbox"),
+                values,
+                " thread_id = " + threadId + " AND " +
+                " read = 0 ",
+                null);
+
+        return true;
+    }
+
+    // Deletes SMS by thread id
+    boolean deleteSMSByThreadId(Context context, int threadId) {
+        if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
+            return false;
+        }
+
+        int count = contentResolver.delete(
+                Uri.parse("content://sms"),
+                " thread_id = " + threadId,
+                null);
+
+        return (count > 0);
+    }
+
+    // Sets all SMS are seen
+    boolean setSMSSeen(Context context) {
+        if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
+            return false;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("seen", 1);
+        contentResolver.update(
+                Uri.parse("content://sms/inbox"),
+                values,
+                " seen = 0 ",
+                null);
+
+        return true;
     }
 
     // SMS record
@@ -569,6 +662,36 @@ class ContactsAccessHelper {
 
             return new SMSRecord(id, type, date, address, body);
         }
+    }
+
+    // Writes SMS messages to the inbox
+    // Needed only for API19 and newer - where only default SMS app can write to the inbox
+    @TargetApi(19)
+    boolean writeSMSToInbox(Context context, SmsMessage[] messages) {
+        // check write permission
+        if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
+
+        for (SmsMessage message : messages) {
+            // get contact by SMS address
+            Contact contact = getContact(message.getOriginatingAddress());
+
+            // create writing values
+            ContentValues values = new ContentValues();
+            values.put(Telephony.Sms.ADDRESS, message.getDisplayOriginatingAddress());
+            values.put(Telephony.Sms.BODY, message.getMessageBody());
+            values.put(Telephony.Sms.PERSON, (contact == null ? null : contact.id));
+            values.put(Telephony.Sms.DATE_SENT, message.getTimestampMillis());
+            values.put(Telephony.Sms.PROTOCOL, message.getProtocolIdentifier());
+            values.put(Telephony.Sms.REPLY_PATH_PRESENT, message.isReplyPathPresent());
+            values.put(Telephony.Sms.SERVICE_CENTER, message.getServiceCenterAddress());
+            values.put(Telephony.Sms.READ, "0");
+            values.put(Telephony.Sms.SEEN, "0");
+
+            // write SMS to Inbox
+            contentResolver.insert(Telephony.Sms.Inbox.CONTENT_URI, values);
+        }
+
+        return true;
     }
 
     private static void debug(Cursor cursor) {

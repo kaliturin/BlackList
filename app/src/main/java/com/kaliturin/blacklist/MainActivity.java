@@ -20,6 +20,11 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    public static final String ACTION_SHOW_JOURNAL = "ACTION_SHOW_JOURNAL";
+    public static final String ACTION_SHOW_SMS_CONVERSATIONS = "ACTION_SHOW_SMS_CONVERSATIONS";
+    public static final String ACTION_SHOW_SMS_SEND_TO = "android.intent.action.SENDTO";
+
     private static final String CURRENT_ITEM_ID = "CURRENT_ITEM_ID";
     private FragmentSwitcher fragmentSwitcher = new FragmentSwitcher();
 
@@ -57,10 +62,10 @@ public class MainActivity extends AppCompatActivity
             navigationView.setCheckedItem(itemId);
             fragmentSwitcher.setCurrentItemId(itemId);
         } else {
-            // process SENDTO action
+            // process actions
             String action = getIntent().getAction();
-            if(action != null && action.equals("android.intent.action.SENDTO")) {
-                // switch to SMS showing fragment
+            if(action != null && action.equals(ACTION_SHOW_SMS_SEND_TO)) {
+                // switch to SMS conversations fragment
                 navigationView.setCheckedItem(R.id.nav_sms);
                 fragmentSwitcher.switchFragment(R.id.nav_sms);
 
@@ -71,11 +76,16 @@ public class MainActivity extends AppCompatActivity
                     String number = ContactsAccessHelper.normalizeContactNumber(ssp);
                     // add it to the fragment's args
                     Bundle arguments = new Bundle();
-                    arguments.putString("NUMBER", number);
+                    arguments.putString(SendSMSFragment.NUMBER, number);
                     // open SMS sending activity
-                    CustomFragmentActivity.show(this, getString(R.string.sending_sms),
+                    CustomFragmentActivity.show(this, getString(R.string.new_message),
                             SendSMSFragment.class, arguments);
                 }
+            } else
+            if(action != null && action.equals(ACTION_SHOW_SMS_CONVERSATIONS)) {
+                // switch to SMS conversations fragment
+                navigationView.setCheckedItem(R.id.nav_sms);
+                fragmentSwitcher.switchFragment(R.id.nav_sms);
             } else {
                 // set default fragment as current
                 navigationView.setCheckedItem(R.id.nav_journal);

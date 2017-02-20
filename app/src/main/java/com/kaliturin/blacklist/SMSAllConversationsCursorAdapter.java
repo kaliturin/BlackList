@@ -93,25 +93,30 @@ class SMSAllConversationsCursorAdapter extends CursorAdapter {
         }
     }
 
+    // Holder of the view data
     private class ViewHolder {
         private SMSConversation model;
         private TextView addressTextView;
         private TextView snippetTextView;
         private TextView dateTextView;
+        private TextView unreadTextView;
 
         ViewHolder(View rowView) {
             this((TextView) rowView.findViewById(R.id.address),
                  (TextView) rowView.findViewById(R.id.snippet),
-                    (TextView) rowView.findViewById(R.id.date));
+                    (TextView) rowView.findViewById(R.id.date),
+                    (TextView) rowView.findViewById(R.id.unread_sms));
         }
 
         ViewHolder(TextView addressTextView,
                    TextView snippetTextView,
-                   TextView dateTextView) {
+                   TextView dateTextView,
+                   TextView unreadTextView) {
             this.model = null;
             this.addressTextView = addressTextView;
             this.snippetTextView = snippetTextView;
             this.dateTextView = dateTextView;
+            this.unreadTextView = unreadTextView;
         }
 
         void setModel(SMSConversation model) {
@@ -119,6 +124,13 @@ class SMSAllConversationsCursorAdapter extends CursorAdapter {
             addressTextView.setText(model.address);
             snippetTextView.setText(model.snippet);
             dateTextView.setText(dateFormat.format(toDate(model.date)));
+
+            if(model.unread > 0) {
+                unreadTextView.setText(String.valueOf(model.unread));
+                unreadTextView.setVisibility(View.VISIBLE);
+            } else {
+                unreadTextView.setVisibility(View.GONE);
+            }
         }
 
         private Date toDate(long time) {

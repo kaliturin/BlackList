@@ -97,8 +97,11 @@ public class SettingsFragment extends Fragment {
         adapter.addModel(R.string.show_calls_notifications, Settings.SHOW_CALLS_NOTIFICATIONS);
         adapter.addModel(R.string.write_calls_journal, Settings.WRITE_CALLS_JOURNAL);
 
-        ListView listView = (ListView) getView().findViewById(R.id.settings_list);
-        listView.setAdapter(adapter);
+        View view = getView();
+        if(view != null) {
+            ListView listView = (ListView) view.findViewById(R.id.settings_list);
+            listView.setAdapter(adapter);
+        }
     }
 }
 

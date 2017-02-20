@@ -140,7 +140,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
     private void notifyUser(Context context, String name) {
         // is show notifications
         if(Settings.getBooleanValue(context, Settings.SHOW_CALLS_NOTIFICATIONS)) {
-            Notification.onCallNotification(context, name);
+            Notification.onCallBlocked(context, name);
         }
     }
 

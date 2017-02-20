@@ -51,11 +51,11 @@ class Utils {
         }
     }
 
-    /** Returns app name
-     */
-    static String getApplicationName(Context context) {
-        ApplicationInfo info = context.getApplicationInfo();
-        int id = info.labelRes;
-        return id == 0 ? info.nonLocalizedLabel.toString() : context.getString(id);
-    }
+//    /** Returns app name
+//     */
+//    static String getApplicationName(Context context) {
+//        ApplicationInfo info = context.getApplicationInfo();
+//        int id = info.labelRes;
+//        return id == 0 ? info.nonLocalizedLabel.toString() : context.getString(id);
+//    }
 }

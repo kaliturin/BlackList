@@ -12,22 +12,33 @@ import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
 /**
  * Status bar notification
  */
-public class Notification {
-    public static void onCallNotification(Context context, String address) {
+class Notification {
+    static void onCallBlocked(Context context, String address) {
         showNotification(context,
-                address + " " + context.getString(R.string.is_blocked),
-                R.drawable.ic_status_call_blocked);
+                address + " " + context.getString(R.string.call_is_blocked),
+                R.drawable.ic_status_call_blocked, true);
     }
 
-    public static void onSmsNotification(Context context, String address) {
+    static void onSmsBlocked(Context context, String address) {
         showNotification(context,
-                address + " " + context.getString(R.string.is_blocked),
-                R.drawable.ic_status_sms_blocked);
+                address + " " + context.getString(R.string.message_is_blocked),
+                R.drawable.ic_status_sms, true);
     }
 
-    private static void showNotification(Context context, String message, int icon) {
+    static void onSmsReceived(Context context, String address) {
+        // TODO notify if user settings allowed
+        showNotification(context,
+                address + " " + context.getString(R.string.message_is_received),
+                R.drawable.ic_status_sms, false);
+    }
+
+    private static void showNotification(Context context, String message, int icon, boolean blocked) {
         Intent activityIntent = new Intent(context, MainActivity.class);
-        //activityIntent.setAction(MainActivity.ACTION_SHOW_JOURNAL);
+        if(blocked) {
+            activityIntent.setAction(MainActivity.ACTION_SHOW_JOURNAL);
+        } else {
+            activityIntent.setAction(MainActivity.ACTION_SHOW_SMS_CONVERSATIONS);
+        }
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -36,6 +47,7 @@ public class Notification {
         builder.setContentText(message);
         builder.setSmallIcon(icon);
         builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), icon));
+        // TODO: set vibration and ringtone
         //builder.setVibrate(new long[]{DEFAULT_VIBRATE});
         builder.setPriority(PRIORITY_MAX);
         builder.setAutoCancel(true);

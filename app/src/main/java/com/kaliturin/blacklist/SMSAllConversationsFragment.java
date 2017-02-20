@@ -12,6 +12,9 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -42,6 +45,12 @@ public class SMSAllConversationsFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -55,6 +64,17 @@ public class SMSAllConversationsFragment extends Fragment {
         // notify user if permission isn't granted
         Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_SMS);
         Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_CONTACTS);
+    }
+
+    @Override
+    public void onPause() {
+        getLoaderManager().destroyLoader(0);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         // cursor adapter
         cursorAdapter = new SMSAllConversationsCursorAdapter(getContext());
@@ -64,28 +84,73 @@ public class SMSAllConversationsFragment extends Fragment {
                 // get the clicked conversation
                 ContactsAccessHelper.SMSConversation smsConversation =
                         cursorAdapter.getSMSConversation(row);
-                // open activity with sms of the conversation
-                Bundle arguments = new Bundle();
-                arguments.putString(SMSConversationFragment.SMS_THREAD_ID,
-                        String.valueOf(smsConversation.threadId));
-                CustomFragmentActivity.show(getContext(), smsConversation.address,
-                        SMSConversationFragment.class, arguments);
+                if(smsConversation != null) {
+                    // open activity with sms of the conversation
+                    Bundle arguments = new Bundle();
+                    arguments.putInt(SMSConversationFragment.SMS_THREAD_ID, smsConversation.threadId);
+                    CustomFragmentActivity.show(getContext(), smsConversation.address,
+                            SMSConversationFragment.class, arguments);
+                }
             }
         });
 
-        // add cursor listener to the list
-        ListView listView = (ListView) view.findViewById(R.id.rows_list);
-        listView.setAdapter(cursorAdapter);
+        // on row long click listener (receives clicked row)
+        cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View row) {
+                final ContactsAccessHelper.SMSConversation smsConversation =
+                        cursorAdapter.getSMSConversation(row);
+                if(smsConversation != null) {
+                    // create menu dialog
+                    MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
+                    builder.setDialogTitle(smsConversation.address);
+                    // add menu item of sms deletion
+                    builder.addMenuItem(getString(R.string.delete_thread), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
+                            db.deleteSMSByThreadId(getContext(), smsConversation.threadId);
+                        }
+                    });
+                    builder.show();
+                }
+                return true;
+            }
+        });
 
-        // init and run the items loader
-        getLoaderManager().initLoader(0, null, newLoader());
+        View view = getView();
+        if (view != null) {
+            // add cursor listener to the list
+            ListView listView = (ListView) view.findViewById(R.id.rows_list);
+            listView.setAdapter(cursorAdapter);
+            // init and run the items loader
+            getLoaderManager().initLoader(0, null, newLoader());
+        }
     }
 
     @Override
-    public void onDestroyView() {
-        getLoaderManager().destroyLoader(0);
-        super.onDestroyView();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main, menu);
+
+        MenuItem writeSMS = menu.findItem(R.id.write_message);
+        Utils.setMenuIconTint(getContext(), writeSMS, R.color.colorAccent);
+        writeSMS.setVisible(true);
+
+        // item's 'add contact' on click listener
+        writeSMS.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                // open SMS sending activity
+                CustomFragmentActivity.show(getContext(),
+                        getString(R.string.new_message),
+                        SendSMSFragment.class, null);
+                return true;
+            }
+        });
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
+
 
 //----------------------------------------------------------------------
 
@@ -103,7 +168,13 @@ public class SMSAllConversationsFragment extends Fragment {
         @Override
         public Cursor loadInBackground() {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-            return db.getSMSConversations(getContext());
+            // get ass SMS conversations
+            Cursor cursor = db.getSMSConversations(getContext());
+            if(cursor != null) {
+                // set all SMS were seen
+                db.setSMSSeen(getContext());
+            }
+            return cursor;
         }
     }
 

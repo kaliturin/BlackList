@@ -84,7 +84,7 @@ class Permissions {
             if(label == null) {
                 label = info.nonLocalizedLabel;
             }
-            final String message = "\"" + Utils.getApplicationName(activity) + "\" " +
+            final String message = "\"" + activity.getString(R.string.app_name) + "\" " +
                     activity.getString(R.string.needs_permission) + ": " + label;
 
             activity.runOnUiThread(new Runnable() {

@@ -98,6 +98,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         }
     }
 
+    // Padding calculator
     private class Padding {
         final int left;
         final int right;
@@ -122,6 +123,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         }
     }
 
+    // Holder of the view data
     private class ViewHolder {
         private SMSRecord model;
         private View rowView;

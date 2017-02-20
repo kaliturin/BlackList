@@ -118,86 +118,7 @@ public class JournalFragment extends Fragment {
         });
 
         // on row long click listener (receives clicked row)
-        cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View row) {
-                // get contact from the clicked row
-                final JournalRecord record = cursorAdapter.getRecord(row);
-                if(record != null) {
-
-                    // find contacts in black and white lists by record's caller and number
-                    Contact blackContact = null, whiteContact = null;
-                    String number = (record.number == null ? record.caller : record.number);
-                    DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-                    if(db != null) {
-                        List<Contact> contacts = db.getContacts(number, false);
-                        for(Contact contact : contacts) {
-                            if(contact.name.equals(record.caller)) {
-                                if (contact.type == Contact.TYPE_BLACK_LIST) {
-                                    blackContact = contact;
-                                } else {
-                                    whiteContact = contact;
-                                }
-                            }
-                        }
-                    }
-
-                    // create and show menu dialog for actions with the contact
-                    MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
-                    builder.setDialogTitle(record.caller).
-                            // add menu item of record deletion
-                            addMenuItem(getString(R.string.delete_record), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    deleteItem(record.id);
-                                    reloadItems(itemsFilter);
-                                }
-                            }).
-                            // add menu item records searching
-                            addMenuItem(getString(R.string.find_similar_records), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    // find all records by record's caller
-                                    searchItems(record.caller);
-                                }
-                            });
-
-                    // if contact is found in the black list
-                    if (blackContact != null) {
-                        // add menu item of excluding the contact from the black list
-                        final long contactId = blackContact.id;
-                        builder.addMenuItem(getString(R.string.exclude_from_black), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                deleteContact(contactId);
-                            }
-                        });
-                    } else {
-                        // add menu item of adding the contact to the black list
-                        builder.addMenuItem(getString(R.string.add_to_black), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                addContactToBlackList(record.caller, record.number);
-                            }
-                        });
-                    }
-
-                    // if contact is not found in the white list
-                    if(whiteContact == null) {
-                        // add menu item of adding contact to the white list
-                        builder.addMenuItem(getString(R.string.move_to_white), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                moveContactToWhiteList(record.caller, record.number);
-                            }
-                        });
-                    }
-
-                    builder.show();
-                }
-                return true;
-            }
-        });
+        cursorAdapter.setOnLongClickListener(new OnLongClickListener());
 
         // add cursor listener to the journal list
         ListView listView = (ListView) view.findViewById(R.id.journal_list);
@@ -337,6 +258,89 @@ public class JournalFragment extends Fragment {
                                                            boolean deleteCheckedItems) {
         return new JournalItemsLoaderCallbacks(getContext(),
                 cursorAdapter, itemsFilter, deleteCheckedItems);
+    }
+
+//--------------------------------------------
+
+    // On row long click listener
+    class OnLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(View row) {
+            // get contact from the clicked row
+            final JournalRecord record = cursorAdapter.getRecord(row);
+            if(record == null) return true;
+
+            // find contacts in black and white lists by record's caller and number
+            Contact blackContact = null, whiteContact = null;
+            String number = (record.number == null ? record.caller : record.number);
+            DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+            if(db != null) {
+                List<Contact> contacts = db.getContacts(number, false);
+                for(Contact contact : contacts) {
+                    if(contact.name.equals(record.caller)) {
+                        if (contact.type == Contact.TYPE_BLACK_LIST) {
+                            blackContact = contact;
+                        } else {
+                            whiteContact = contact;
+                        }
+                    }
+                }
+            }
+
+            // create menu dialog
+            MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
+            builder.setDialogTitle(record.caller).
+                    // add menu item of record deletion
+                            addMenuItem(getString(R.string.delete_record), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            deleteItem(record.id);
+                            reloadItems(itemsFilter);
+                        }
+                    }).
+                    // add menu item records searching
+                            addMenuItem(getString(R.string.find_similar_records), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // find all records by record's caller
+                            searchItems(record.caller);
+                        }
+                    });
+
+            // if contact is found in the black list
+            if (blackContact != null) {
+                // add menu item of excluding the contact from the black list
+                final long contactId = blackContact.id;
+                builder.addMenuItem(getString(R.string.exclude_from_black), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        deleteContact(contactId);
+                    }
+                });
+            } else {
+                // add menu item of adding the contact to the black list
+                builder.addMenuItem(getString(R.string.add_to_black), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addContactToBlackList(record.caller, record.number);
+                    }
+                });
+            }
+
+            // if contact is not found in the white list
+            if(whiteContact == null) {
+                // add menu item of adding contact to the white list
+                builder.addMenuItem(getString(R.string.move_to_white), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        moveContactToWhiteList(record.caller, record.number);
+                    }
+                });
+            }
+
+            builder.show();
+            return true;
+        }
     }
 
 //--------------------------------------------
