@@ -43,7 +43,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.sms_conversation_row, parent, false);
+        View view = inflater.inflate(R.layout.row_sms_conversation, parent, false);
 
         // view holder for the row
         ViewHolder viewHolder = new ViewHolder(view);

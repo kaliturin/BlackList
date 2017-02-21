@@ -18,7 +18,7 @@ import java.util.Date;
 /**
  * Cursor adapter for all SMS conversations
  */
-class SMSAllConversationsCursorAdapter extends CursorAdapter {
+class SMSConversationsListCursorAdapter extends CursorAdapter {
     private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
     private Date datetime = new Date();
     private View.OnClickListener outerOnClickListener = null;
@@ -26,14 +26,14 @@ class SMSAllConversationsCursorAdapter extends CursorAdapter {
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
     private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
 
-    SMSAllConversationsCursorAdapter(Context context) {
+    SMSConversationsListCursorAdapter(Context context) {
         super(context, null, 0);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.sms_all_conversations_row, parent, false);
+        View view = inflater.inflate(R.layout.row_sms_conversations_list, parent, false);
 
         // view holder for the row
         ViewHolder viewHolder = new ViewHolder(view);

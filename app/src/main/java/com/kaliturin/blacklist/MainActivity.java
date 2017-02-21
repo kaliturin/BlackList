@@ -21,9 +21,9 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String ACTION_SHOW_JOURNAL = "ACTION_SHOW_JOURNAL";
-    public static final String ACTION_SHOW_SMS_CONVERSATIONS = "ACTION_SHOW_SMS_CONVERSATIONS";
-    public static final String ACTION_SHOW_SMS_SEND_TO = "android.intent.action.SENDTO";
+    public static final String ACTION_JOURNAL = "ACTION_JOURNAL";
+    public static final String ACTION_SMS_CONVERSATIONS = "ACTION_SMS_CONVERSATIONS";
+    public static final String ACTION_SMS_SEND_TO = "android.intent.action.SENDTO";
 
     private static final String CURRENT_ITEM_ID = "CURRENT_ITEM_ID";
     private FragmentSwitcher fragmentSwitcher = new FragmentSwitcher();
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             // process actions
             String action = getIntent().getAction();
-            if(action != null && action.equals(ACTION_SHOW_SMS_SEND_TO)) {
+            if(action != null && action.equals(ACTION_SMS_SEND_TO)) {
                 // switch to SMS conversations fragment
                 navigationView.setCheckedItem(R.id.nav_sms);
                 fragmentSwitcher.switchFragment(R.id.nav_sms);
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity
                             SendSMSFragment.class, arguments);
                 }
             } else
-            if(action != null && action.equals(ACTION_SHOW_SMS_CONVERSATIONS)) {
+            if(action != null && action.equals(ACTION_SMS_CONVERSATIONS)) {
                 // switch to SMS conversations fragment
                 navigationView.setCheckedItem(R.id.nav_sms);
                 fragmentSwitcher.switchFragment(R.id.nav_sms);
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity
         private ContactsFragment whiteListFragment = new ContactsFragment();
         private JournalFragment journalFragment = new JournalFragment();
         private SettingsFragment settingsFragment = new SettingsFragment();
-        private SMSAllConversationsFragment smsFragment = new SMSAllConversationsFragment();
+        private SMSConversationsListFragment smsFragment = new SMSConversationsListFragment();
         private int currentItemId;
 
         boolean onBackPressed() {
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity
                     switchFragment(whiteListFragment, arguments);
                     break;
                 case R.id.nav_sms:
-                    arguments.putString(SMSAllConversationsFragment.TITLE, getString(R.string.sms_title));
+                    arguments.putString(SMSConversationsListFragment.TITLE, getString(R.string.sms_title));
                     switchFragment(smsFragment, arguments);
                     break;
                 default:

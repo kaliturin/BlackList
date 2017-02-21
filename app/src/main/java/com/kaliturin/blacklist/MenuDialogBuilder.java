@@ -37,7 +37,7 @@ public class MenuDialogBuilder {
     public MenuDialogBuilder addMenuItem(String title, final boolean dismissOnClick,
                                          final View.OnClickListener listener) {
         LayoutInflater inflater = activity.getLayoutInflater();
-        View itemView = inflater.inflate(R.layout.menu_dialog_row, null);
+        View itemView = inflater.inflate(R.layout.row_dialog_menu, null);
         LinearLayout listLayout = (LinearLayout) getView().findViewById(R.id.items_list);
         listLayout.addView(itemView);
         itemView.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +58,7 @@ public class MenuDialogBuilder {
     public View getView() {
         if (view == null) {
             LayoutInflater inflater = activity.getLayoutInflater();
-            view = inflater.inflate(R.layout.menu_dialog, null);
+            view = inflater.inflate(R.layout.dialog_menu, null);
         }
 
         return view;

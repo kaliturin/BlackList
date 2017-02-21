@@ -68,8 +68,7 @@ class Permissions {
         return false;
     }
 
-    // TODO: test
-    // Notifies the user that permission isn't granted
+    // Notifies the user about permission isn't granted
     static void notify(@NonNull final Activity activity, @NonNull String permission) {
         PackageManager pm = activity.getPackageManager();
         PermissionInfo info = null;
@@ -100,7 +99,8 @@ class Permissions {
         ActivityCompat.requestPermissions(context, PERMISSIONS, REQUEST_CODE);
     }
 
-    static void reset() {
+    // Resets permissions results cache
+    static void resetCache() {
         permissionsResults.clear();
     }
 

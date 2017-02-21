@@ -24,7 +24,7 @@ public class SettingsFragment extends Fragment {
         public void onClick(View v) {
             Activity activity = SettingsFragment.this.getActivity();
             DefaultSMSAppHelper.askForDefaultAppChange(activity, 0);
-            Permissions.reset();
+            Permissions.resetCache();
         }
     };
 

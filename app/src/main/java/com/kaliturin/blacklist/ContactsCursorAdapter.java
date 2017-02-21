@@ -34,7 +34,7 @@ class ContactsCursorAdapter extends CursorAdapter {
         if(cursor == null) return null;
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.contacts_row, parent, false);
+        View view = inflater.inflate(R.layout.row_contacts, parent, false);
 
         // view holder for the new row
         ViewHolder viewHolder = new ViewHolder(view);

@@ -23,11 +23,11 @@ import android.widget.ListView;
 /**
  * Fragment for showing all SMS conversations
  */
-public class SMSAllConversationsFragment extends Fragment {
+public class SMSConversationsListFragment extends Fragment {
     public static String TITLE = "TITLE";
-    private SMSAllConversationsCursorAdapter cursorAdapter = null;
+    private SMSConversationsListCursorAdapter cursorAdapter = null;
 
-    public SMSAllConversationsFragment() {
+    public SMSConversationsListFragment() {
         // Required empty public constructor
     }
 
@@ -54,7 +54,7 @@ public class SMSAllConversationsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sms_all_conversations, container, false);
+        return inflater.inflate(R.layout.fragment_sms_conversations_list, container, false);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SMSAllConversationsFragment extends Fragment {
         super.onResume();
 
         // cursor adapter
-        cursorAdapter = new SMSAllConversationsCursorAdapter(getContext());
+        cursorAdapter = new SMSConversationsListCursorAdapter(getContext());
         cursorAdapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View row) {
@@ -181,10 +181,10 @@ public class SMSAllConversationsFragment extends Fragment {
     // SMS conversations loader callbacks
     private static class SMSAllConversationsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
         private Context context;
-        private SMSAllConversationsCursorAdapter cursorAdapter;
+        private SMSConversationsListCursorAdapter cursorAdapter;
 
         SMSAllConversationsLoaderCallbacks(Context context,
-                                           SMSAllConversationsCursorAdapter cursorAdapter) {
+                                           SMSConversationsListCursorAdapter cursorAdapter) {
             this.context = context;
             this.cursorAdapter = cursorAdapter;
         }

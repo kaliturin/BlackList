@@ -182,7 +182,7 @@ public class AddOrEditContactFragment extends Fragment {
                     (LinearLayout) parent.findViewById(R.id.layout_number_list);
             LayoutInflater inflater = getActivity().getLayoutInflater();
             // create new row
-            View row = inflater.inflate(R.layout.contact_number_row, numberRowsListLayout, false);
+            View row = inflater.inflate(R.layout.row_contact_number, numberRowsListLayout, false);
             // init row with number data
             setNumberType(row, type);
             setNumber(row, number);

@@ -11,8 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import java.security.Permission;
-
 /**
  * Settings array adapter
  */
@@ -37,9 +35,9 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
                 // create row by model
                 LayoutInflater inflater = LayoutInflater.from(getContext());
                 if (model.property == null && model.listener == null) {
-                    row = inflater.inflate(R.layout.settings_title, parent, false);
+                    row = inflater.inflate(R.layout.row_title_settings, parent, false);
                 } else {
-                    row = inflater.inflate(R.layout.settings_row, parent, false);
+                    row = inflater.inflate(R.layout.row_settings, parent, false);
                 }
                 setModel(row, model);
                 rowsArray.put(position, row);

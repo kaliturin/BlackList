@@ -35,9 +35,9 @@ class Notification {
     private static void showNotification(Context context, String message, int icon, boolean blocked) {
         Intent activityIntent = new Intent(context, MainActivity.class);
         if(blocked) {
-            activityIntent.setAction(MainActivity.ACTION_SHOW_JOURNAL);
+            activityIntent.setAction(MainActivity.ACTION_JOURNAL);
         } else {
-            activityIntent.setAction(MainActivity.ACTION_SHOW_SMS_CONVERSATIONS);
+            activityIntent.setAction(MainActivity.ACTION_SMS_CONVERSATIONS);
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0);
 

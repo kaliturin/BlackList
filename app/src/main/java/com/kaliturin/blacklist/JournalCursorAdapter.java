@@ -38,7 +38,7 @@ public class JournalCursorAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         // TODO remove sample data from layout
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.journal_row, parent, false);
+        View view = inflater.inflate(R.layout.row_journal, parent, false);
 
         // view holder for the row
         ViewHolder viewHolder = new ViewHolder(view);
