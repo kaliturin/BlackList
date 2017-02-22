@@ -12,6 +12,7 @@
         android:layout_weight="1"
         android:choiceMode="none"
         android:divider="@android:color/transparent"
-        android:dividerHeight="5dp"/>
+        android:dividerHeight="1dp"
+        android:visibility="invisible"/>
 
 </LinearLayout>

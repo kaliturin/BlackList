@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,8 +32,11 @@ public class CustomFragmentActivity extends AppCompatActivity {
             // setup toolbar
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(title);
+            ActionBar actionBar = getSupportActionBar();
+            if(actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setTitle(title);
+            }
         }
 
         // there is not just a screen rotation
@@ -54,7 +58,7 @@ public class CustomFragmentActivity extends AppCompatActivity {
             // put fragment int activity
             getSupportFragmentManager().
                     beginTransaction().
-                    replace(R.id.content_frame_layout, fragment).
+                    replace(R.id.frame_layout, fragment).
                     commit();
         }
     }

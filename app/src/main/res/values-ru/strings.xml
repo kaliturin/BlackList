@@ -43,6 +43,7 @@
     <string name="add_contact">Добавить контакт</string>
     <string name="adding_contact">Добавление контакта</string>
     <string name="saving">Сохранение...</string>
+    <string name="loading">Загрузка...</string>
     <string name="call_is_blocked">звонок заблокирован</string>
     <string name="message_is_blocked">сообщение заблокировано</string>
     <string name="message_is_received">сообщение получено</string>

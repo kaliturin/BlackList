@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Settings name/value container
+ * Settings name/value persistence container
  */
 
 class Settings {

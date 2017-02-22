@@ -20,6 +20,11 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 public class CallBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
+        if(!Permissions.isGranted(context, Permissions.READ_PHONE_STATE) ||
+                !Permissions.isGranted(context, Permissions.CALL_PHONE)) {
+            return;
+        }
+
         // get telephony service
         TelephonyManager telephony = (TelephonyManager)
                 context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -76,18 +81,20 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         boolean abort = false;
 
         // if number is from the contacts
-        if(Settings.getBooleanValue(context, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS)) {
+        if(Settings.getBooleanValue(context, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS) &&
+                Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.getContact(number) != null) {
+            if(db.getContact(context, number) != null) {
                 return;
             }
             abort = true;
         }
 
         // if number is from the SMS inbox
-        if(Settings.getBooleanValue(context, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX)) {
+        if(Settings.getBooleanValue(context, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX) &&
+                Permissions.isGranted(context, Permissions.READ_SMS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.containsNumberInSMSInbox(number)) {
+            if(db.containsNumberInSMSInbox(context, number)) {
                 return;
             }
             abort = true;
@@ -102,6 +109,10 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
     // Ends phone call
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void breakCall(Context context) {
+        if(!Permissions.isGranted(context, Permissions.CALL_PHONE)) {
+            return;
+        }
+
         TelephonyManager telephony = (TelephonyManager)
                 context.getSystemService(Context.TELEPHONY_SERVICE);
         try {

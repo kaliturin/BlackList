@@ -2,6 +2,7 @@ package com.kaliturin.blacklist;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,10 +41,8 @@ public class JournalCursorAdapter extends CursorAdapter {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.row_journal, parent, false);
 
-        // view holder for the row
-        ViewHolder viewHolder = new ViewHolder(view);
         // add view holder to the row
-        view.setTag(viewHolder);
+        view.setTag(new ViewHolder(view));
 
         // on click listeners for the row and checkbox (which is inside the row)
         view.setOnClickListener(rowOnClickListener);
@@ -118,14 +117,18 @@ public class JournalCursorAdapter extends CursorAdapter {
         }
     }
 
-    public JournalRecord getRecord(View row) {
-        ViewHolder viewHolder = (ViewHolder) row.getTag();
-        return (viewHolder != null ? viewHolder.record : null);
+    @Nullable
+    JournalRecord getRecord(View row) {
+        if(row != null) {
+            ViewHolder viewHolder = (ViewHolder) row.getTag();
+            return viewHolder.model;
+        }
+        return null;
     }
 
     // View holder improves scroll performance
     private class ViewHolder {
-        private JournalRecord record;
+        private JournalRecord model;
         private int itemId;
         private CheckableLinearLayout rowView;
         private ImageView iconImageView;
@@ -150,7 +153,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         ViewHolder(CheckableLinearLayout rowView, ImageView iconImageView, TextView senderTextView,
                    TextView numberTextView, TextView textTextView, TextView dateTextView,
                    TextView timeTextView, CheckBox checkBox) {
-            this.record = null;
+            this.model = null;
             this.rowView = rowView;
             this.itemId = 0;
             this.iconImageView = iconImageView;
@@ -163,7 +166,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         }
 
         private void setModel(JournalRecord model) {
-            this.record = model;
+            this.model = model;
             itemId = (int) model.id;
             Date date = toDate(model.time);
             dateTextView.setText(dateFormat.format(date));

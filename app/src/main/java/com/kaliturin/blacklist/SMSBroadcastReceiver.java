@@ -52,7 +52,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
                 if(db.writeSMSToInbox(context, messages)) {
                     // get contact by number
-                    Contact contact = db.getContact(number);
+                    Contact contact = db.getContact(context, number);
                     // get name for notification
                     String name = (contact == null ? number : contact.name);
                     // notify user
@@ -107,18 +107,20 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         boolean abort = false;
 
         // if number is from the contacts
-        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_CONTACTS)) {
+        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_CONTACTS) &&
+                Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.getContact(number) != null) {
+            if(db.getContact(context, number) != null) {
                 return false;
             }
             abort = true;
         }
 
         // if number is from the SMS inbox
-        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_INBOX)) {
+        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_INBOX) &&
+                Permissions.isGranted(context, Permissions.READ_SMS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.containsNumberInSMSInbox(number)) {
+            if(db.containsNumberInSMSInbox(context, number)) {
                 return false;
             }
             abort = true;

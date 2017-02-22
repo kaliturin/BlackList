@@ -44,6 +44,7 @@
     <string name="add_contact">Add a contact</string>
     <string name="adding_contact">Adding a contact</string>
     <string name="saving">Saving...</string>
+    <string name="loading">Loading...</string>
     <string name="call_is_blocked">call is blocked</string>
     <string name="message_is_blocked">message is blocked</string>
     <string name="message_is_received">message is received</string>

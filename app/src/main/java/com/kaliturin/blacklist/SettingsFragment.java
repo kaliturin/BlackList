@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,29 +15,15 @@ import android.widget.ListView;
  * Settings fragment
  */
 public class SettingsFragment extends Fragment {
-    public static String TITLE = "TITLE";
 
     View.OnClickListener defaultSMSAppListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             Activity activity = SettingsFragment.this.getActivity();
             DefaultSMSAppHelper.askForDefaultAppChange(activity, 0);
-            Permissions.resetCache();
+            Permissions.invalidateCache();
         }
     };
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Bundle arguments = getArguments();
-        if(arguments != null) {
-            String title = arguments.getString(TITLE);
-            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(title);
-            }
-        }
-    }
 
     public SettingsFragment() {
         // Required empty public constructor

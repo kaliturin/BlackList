@@ -2,6 +2,7 @@ package com.kaliturin.blacklist;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -133,16 +134,20 @@ class ContactsCursorAdapter extends CursorAdapter {
         }
     }
 
+    @Nullable
     Contact getContact(View row) {
-        ViewHolder viewHolder = (ViewHolder) row.getTag();
-        return (viewHolder != null ? viewHolder.contact : null);
+        if(row != null) {
+            ViewHolder viewHolder = (ViewHolder) row.getTag();
+            return viewHolder.model;
+        }
+        return null;
     }
 
     // View holder improves scroll performance
     private class ViewHolder {
         private StringBuilder sb = new StringBuilder();
 
-        private Contact contact;
+        private Contact model;
         private int itemId;
         private CheckableLinearLayout rowView;
         private TextView nameTextView;
@@ -157,7 +162,7 @@ class ContactsCursorAdapter extends CursorAdapter {
         }
 
         ViewHolder(CheckableLinearLayout rowView, TextView nameTextView, TextView numbersTextView, CheckBox checkBox) {
-            this.contact = null;
+            this.model = null;
             this.itemId = 0;
             this.rowView = rowView;
             this.nameTextView = nameTextView;
@@ -165,18 +170,18 @@ class ContactsCursorAdapter extends CursorAdapter {
             this.checkBox = checkBox;
         }
 
-        private void setModel(Context context, Contact contact) {
-            this.contact = contact;
+        private void setModel(Context context, Contact model) {
+            this.model = model;
 
-            itemId = (int) contact.id;
+            itemId = (int) model.id;
             boolean oneNumberEquals = false;
 
             // show contact name
-            String name = contact.name;
-            final int size = contact.numbers.size();
+            String name = model.name;
+            final int size = model.numbers.size();
             if (size == 1) {
-                ContactNumber number = contact.numbers.get(0);
-                if (contact.name.equals(number.number)) {
+                ContactNumber number = model.numbers.get(0);
+                if (model.name.equals(number.number)) {
                     // there is just 1 number and it equals to the contact name
                     // add number type title before the contact name
                     name = getNumberTypeTitle(context, number.type) + " " + name;
@@ -189,7 +194,7 @@ class ContactsCursorAdapter extends CursorAdapter {
             sb.setLength(0);
             if(!oneNumberEquals) {
                 for (int i = 0; i < size; i++) {
-                    ContactNumber number = contact.numbers.get(i);
+                    ContactNumber number = model.numbers.get(i);
                     sb.append(getNumberTypeTitle(context, number.type));
                     sb.append(" ");
                     sb.append(number.number);

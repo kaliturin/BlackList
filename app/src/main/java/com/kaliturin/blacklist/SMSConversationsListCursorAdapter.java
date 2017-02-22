@@ -2,6 +2,7 @@ package com.kaliturin.blacklist;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,7 +53,7 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
         // get cursor wrapper
         SMSConversationWrapper cursorWrapper = (SMSConversationWrapper) cursor;
         // get model
-        SMSConversation model = cursorWrapper.getConversation();
+        SMSConversation model = cursorWrapper.getConversation(context);
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with new model
@@ -61,9 +62,13 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
 
 //---------------------------------------------------------------------------------
 
+    @Nullable
     SMSConversation getSMSConversation(View row) {
-        ViewHolder holder = (ViewHolder) row.getTag();
-        return holder.model;
+        if(row != null) {
+            ViewHolder holder = (ViewHolder) row.getTag();
+            return holder.model;
+        }
+        return null;
     }
 
     void setOnClickListener(View.OnClickListener onClickListener) {
@@ -96,40 +101,50 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
     // Holder of the view data
     private class ViewHolder {
         private SMSConversation model;
+        private View rowView;
         private TextView addressTextView;
         private TextView snippetTextView;
         private TextView dateTextView;
         private TextView unreadTextView;
 
         ViewHolder(View rowView) {
-            this((TextView) rowView.findViewById(R.id.address),
-                 (TextView) rowView.findViewById(R.id.snippet),
+            this(rowView,
+                    (TextView) rowView.findViewById(R.id.address),
+                    (TextView) rowView.findViewById(R.id.snippet),
                     (TextView) rowView.findViewById(R.id.date),
                     (TextView) rowView.findViewById(R.id.unread_sms));
         }
 
-        ViewHolder(TextView addressTextView,
+        ViewHolder(View rowView,
+                TextView addressTextView,
                    TextView snippetTextView,
                    TextView dateTextView,
                    TextView unreadTextView) {
             this.model = null;
+            this.rowView = rowView;
             this.addressTextView = addressTextView;
             this.snippetTextView = snippetTextView;
             this.dateTextView = dateTextView;
             this.unreadTextView = unreadTextView;
         }
 
-        void setModel(SMSConversation model) {
+        void setModel(@Nullable SMSConversation model) {
             this.model = model;
-            addressTextView.setText(model.address);
-            snippetTextView.setText(model.snippet);
-            dateTextView.setText(dateFormat.format(toDate(model.date)));
-
-            if(model.unread > 0) {
-                unreadTextView.setText(String.valueOf(model.unread));
-                unreadTextView.setVisibility(View.VISIBLE);
+            if(model == null) {
+                rowView.setVisibility(View.GONE);
             } else {
-                unreadTextView.setVisibility(View.GONE);
+                rowView.setVisibility(View.VISIBLE);
+                String address = (model.person != null ? model.person : model.number);
+                addressTextView.setText(address);
+                snippetTextView.setText(model.snippet);
+                dateTextView.setText(dateFormat.format(toDate(model.date)));
+
+                if (model.unread > 0) {
+                    unreadTextView.setText(String.valueOf(model.unread));
+                    unreadTextView.setVisibility(View.VISIBLE);
+                } else {
+                    unreadTextView.setVisibility(View.GONE);
+                }
             }
         }
 

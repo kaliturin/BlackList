@@ -27,8 +27,6 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
  */
 
 public class ContactsFragment extends Fragment {
-    // bundle arguments names
-    public static String TITLE = "TITLE";
     public static final String CONTACT_TYPE = "CONTACT_TYPE";
 
     private ContactsCursorAdapter cursorAdapter = null;
@@ -38,19 +36,6 @@ public class ContactsFragment extends Fragment {
 
     public ContactsFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Bundle arguments = getArguments();
-        if(arguments != null) {
-            String title = arguments.getString(TITLE);
-            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(title);
-            }
-        }
     }
 
     @Override

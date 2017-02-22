@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Permissions check and request
+ * Permissions check and request helper
  */
 class Permissions {
     private static final String TAG = Permissions.class.getName();
@@ -43,6 +44,9 @@ class Permissions {
 
     // Checks for permission
     static boolean isGranted(@NonNull Context context, @NonNull String permission) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
         Boolean result = permissionsResults.get(permission);
         if(result == null) {
             int permissionCheck = ActivityCompat.checkSelfPermission(context, permission);
@@ -69,7 +73,7 @@ class Permissions {
     }
 
     // Notifies the user about permission isn't granted
-    static void notify(@NonNull final Activity activity, @NonNull String permission) {
+    private static void notify(@NonNull final Activity activity, @NonNull String permission) {
         PackageManager pm = activity.getPackageManager();
         PermissionInfo info = null;
         try {
@@ -96,11 +100,13 @@ class Permissions {
 
     // Checks for permissions and shows a dialog for permission granting
     static void checkAndRequest(@NonNull Activity context) {
-        ActivityCompat.requestPermissions(context, PERMISSIONS, REQUEST_CODE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(context, PERMISSIONS, REQUEST_CODE);
+        }
     }
 
     // Resets permissions results cache
-    static void resetCache() {
+    static void invalidateCache() {
         permissionsResults.clear();
     }
 

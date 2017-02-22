@@ -8,12 +8,10 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.MatrixCursor;
 import android.net.Uri;
-import android.os.Build;
+import android.provider.*;
 import android.provider.CallLog.Calls;
-import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
-import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
@@ -123,10 +121,11 @@ class ContactsAccessHelper {
     private @Nullable Contact getContact(long contactId) {
         Contact contact = null;
         ContactCursorWrapper cursor = getContactCursor(contactId);
-        if(cursor != null) {
+        if (cursor != null) {
             contact = cursor.getContact(false);
             cursor.close();
         }
+
         return contact;
     }
 
@@ -146,13 +145,18 @@ class ContactsAccessHelper {
     }
 
     @Nullable
-    Contact getContact(String number) {
+    Contact getContact(Context context, String number) {
+        if(!Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
+            return null;
+        }
+
         Contact contact = null;
         ContactCursorWrapper cursor = getContactCursor(number);
         if(cursor != null) {
             contact = cursor.getContact(false);
             cursor.close();
         }
+
         return contact;
     }
 
@@ -231,7 +235,11 @@ class ContactsAccessHelper {
 //-------------------------------------------------------------------------------------
 
     // Returns true if passed number contains in SMS inbox
-    boolean containsNumberInSMSInbox(@NonNull String number) {
+    boolean containsNumberInSMSInbox(Context context, @NonNull String number) {
+        if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
+            return false;
+        }
+
         final String ID = "_id";
         final String ADDRESS = "address";
         final String PERSON = "person";
@@ -271,8 +279,8 @@ class ContactsAccessHelper {
                 "date DESC");
 
         // now we need to filter contacts by names and fill matrix cursor
-        if(cursor != null &&
-                cursor.moveToFirst()) {
+        if(validate(cursor)) {
+            cursor.moveToFirst();
             MatrixCursor matrixCursor = new MatrixCursor(new String[]{ID, ADDRESS, PERSON});
             final int _ID = cursor.getColumnIndex(ID);
             final int _ADDRESS = cursor.getColumnIndex(ADDRESS);
@@ -352,8 +360,8 @@ class ContactsAccessHelper {
             Log.w(TAG, e);
         }
 
-        if(cursor != null &&
-                cursor.moveToFirst()) {
+        if(validate(cursor)) {
+            cursor.moveToFirst();
             // Because we cannot query distinct calls - we have queried all.
             // And now we must get rid of repeated calls with help of tree set and matrix cursor.
             MatrixCursor matrixCursor = new MatrixCursor(
@@ -413,100 +421,67 @@ class ContactsAccessHelper {
     class SMSConversation {
         final int threadId;
         final long date;
+        final String person;
+        final String number;
         final String snippet;
-        final String address;
         final int unread;
 
-        SMSConversation(int threadId, long date, String address, String snippet, int unread) {
+        SMSConversation(int threadId, long date, String person,
+                        String number, String snippet, int unread) {
             this.threadId = threadId;
             this.date = date;
-            this.address = address;
+            this.person = person;
+            this.number = number;
             this.snippet = snippet;
             this.unread = unread;
         }
     }
 
-
     // SMS conversation cursor wrapper
     class SMSConversationWrapper extends CursorWrapper {
         private final int THREAD_ID;
-        private final int DATE;
-        private final int ADDRESS;
-        private final int SNIPPET;
-        private final int UNREAD;
 
         private SMSConversationWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
             THREAD_ID = cursor.getColumnIndex("thread_id");
-            DATE = cursor.getColumnIndex("date");
-            ADDRESS = cursor.getColumnIndex("address");
-            SNIPPET = cursor.getColumnIndex("snippet");
-            UNREAD = cursor.getColumnIndex("unread");
         }
 
-        SMSConversation getConversation() {
+        @Nullable
+        SMSConversation getConversation(Context context) {
             int threadId = getInt(THREAD_ID);
-            long date = getLong(DATE);
-            String address = getString(ADDRESS);
-            String snippet = getString(SNIPPET);
-            int unread = getInt(UNREAD);
+            SMSConversation conversation = null;
 
-            return new SMSConversation(threadId, date, address, snippet, unread);
+            // get the count of unread SMS in the thread
+            int unread = getSMSUnreadCountByThreadId(context, threadId);
+            // get date and address from the last SMS of the thread
+            SMSRecordCursorWrapper cursor = getSMSRecordsByThreadId(context, threadId, true, 1);
+            if(cursor != null) {
+                SMSRecord sms = cursor.getSMSRecord(context);
+                conversation = new SMSConversation(threadId, sms.date,
+                        sms.person, sms.number, sms.body, unread);
+                cursor.close();
+            }
+
+            return conversation;
         }
     }
 
     // Returns SMS conversation cursor wrapper
     @Nullable
     SMSConversationWrapper getSMSConversations(Context context) {
-        if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
+        if(!Permissions.isGranted(context, Permissions.READ_SMS) ||
+                !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             return null;
         }
 
         // select available conversation's data
         Cursor cursor = contentResolver.query(
                 Uri.parse("content://sms/conversations"),
-                null,
+                new String[]{"thread_id as _id", "thread_id"},
                 null,
                 null,
                 "date DESC");
-
-        // create new matrix cursor that combines selected conversation's data with
-        // id, address, and date of conversation
-        if(cursor != null &&
-                cursor.moveToFirst()) {
-
-            // resulting matrix cursor
-            MatrixCursor matrixCursor = new MatrixCursor(
-                    new String[]{"_id", "thread_id", "snippet", "address", "date", "unread"});
-
-            final int THREAD_ID = cursor.getColumnIndex("thread_id");
-            final int SNIPPET = cursor.getColumnIndex("snippet");
-            do {
-                int threadId = cursor.getInt(THREAD_ID);
-                String snippet = cursor.getString(SNIPPET);
-                // get the count of unread SMS in the thread
-                int unread = getSMSUnreadCountByThreadId(context, threadId);
-                // find date and address by the last SMS from the thread
-                SMSRecordCursorWrapper smsRecordCursor =
-                        getSMSRecordsByThreadId(context, threadId, true, 1);
-                if(smsRecordCursor != null) {
-                    SMSRecord smsRecord = smsRecordCursor.getSMSRecord();
-                    smsRecordCursor.close();
-
-                    // add row to the resulting cursor
-                    String sThreadId = String.valueOf(threadId);
-                    matrixCursor.addRow(new String[]{
-                            sThreadId, sThreadId, snippet,
-                            smsRecord.address,
-                            String.valueOf(smsRecord.date),
-                            String.valueOf(unread)});
-                }
-            } while (cursor.moveToNext());
-            cursor.close();
-            // swap cursor
-            cursor = matrixCursor;
-        }
 
         return (validate(cursor) ? new SMSConversationWrapper(cursor) : null);
     }
@@ -522,10 +497,10 @@ class ContactsAccessHelper {
         String orderClause = (desc ? " date DESC " : " date ASC ");
         String limitClause = (limit > 0 ? " LIMIT " + limit : "");
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms/"),
+                Uri.parse("content://sms"),
                 null,
-                " thread_id = " + threadId,
-                null,
+                " thread_id = ? ",
+                new String[]{String.valueOf(threadId)},
                 orderClause + limitClause);
 
         return (validate(cursor) ? new SMSRecordCursorWrapper(cursor) : null);
@@ -539,22 +514,26 @@ class ContactsAccessHelper {
 
         Cursor cursor = contentResolver.query(
                 Uri.parse("content://sms/inbox"),
-                null,
-                " thread_id = " + threadId + " AND " +
-                " read = 0 ",
-                null,
+                new String[]{"COUNT(_id)"},
+                " thread_id = ? AND " +
+                " read = ? ",
+                new String[]{
+                        String.valueOf(threadId),
+                        String.valueOf(0)
+                },
                 null);
 
         int count = 0;
         if(validate(cursor)) {
-            count = cursor.getCount();
+            cursor.moveToFirst();
+            count = cursor.getInt(0);
             cursor.close();
         }
 
         return count;
     }
 
-    // Sets SMS are read by thread id
+    // Marks SMS are read by thread id
     boolean setSMSReadByThreadId(Context context, int threadId) {
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return false;
@@ -565,9 +544,12 @@ class ContactsAccessHelper {
         contentResolver.update(
                 Uri.parse("content://sms/inbox"),
                 values,
-                " thread_id = " + threadId + " AND " +
-                " read = 0 ",
-                null);
+                " thread_id = ? AND " +
+                " read = ? ",
+                new String[]{
+                        String.valueOf(threadId),
+                        String.valueOf(0)
+                });
 
         return true;
     }
@@ -580,13 +562,13 @@ class ContactsAccessHelper {
 
         int count = contentResolver.delete(
                 Uri.parse("content://sms"),
-                " thread_id = " + threadId,
-                null);
+                " thread_id = ? ",
+                new String[]{String.valueOf(threadId)});
 
         return (count > 0);
     }
 
-    // Sets all SMS are seen
+    // Marks all SMS are seen
     boolean setSMSSeen(Context context) {
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return false;
@@ -597,10 +579,33 @@ class ContactsAccessHelper {
         contentResolver.update(
                 Uri.parse("content://sms/inbox"),
                 values,
-                " seen = 0 ",
-                null);
+                " seen = ? ",
+                new String[]{String.valueOf(0)});
 
         return true;
+    }
+
+    // Selects SMS thread id by phone number
+    int getThreadIdByNumber(Context context, String number) {
+        if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
+            return -1;
+        }
+
+        Cursor cursor = contentResolver.query(
+                Uri.parse("content://sms"),
+                new String[]{"thread_id"},
+                " address = ? ",
+                new String[]{number},
+                "date DESC LIMIT 1 ");
+
+        int threadId = -1;
+        if(validate(cursor)) {
+            cursor.moveToFirst();
+            threadId = cursor.getInt(0);
+            cursor.close();
+        }
+
+        return threadId;
     }
 
     // SMS record
@@ -610,14 +615,16 @@ class ContactsAccessHelper {
         final long id;
         final int type;
         final long date;
-        final String address;
+        final String person;
+        final String number;
         final String body;
 
-        SMSRecord(long id, int type, long date, String address, String body) {
+        SMSRecord(long id, int type, long date, String person, String number, String body) {
             this.id = id;
             this.type = type;
             this.date = date;
-            this.address = address;
+            this.person = person;
+            this.number = number;
             this.body = body;
         }
     }
@@ -627,8 +634,8 @@ class ContactsAccessHelper {
         private final int ID;
         private final int TYPE;
         private final int DATE;
-        private final int ADDRESS;
         private final int PERSON;
+        private final int NUMBER;
         private final int BODY;
 
         private SMSRecordCursorWrapper(Cursor cursor) {
@@ -637,30 +644,31 @@ class ContactsAccessHelper {
             ID = cursor.getColumnIndex("_id");
             TYPE = cursor.getColumnIndex("type");
             DATE = cursor.getColumnIndex("date");
-            ADDRESS = cursor.getColumnIndex("address");
+            NUMBER = cursor.getColumnIndex("address");
             PERSON = cursor.getColumnIndex("person");
             BODY = cursor.getColumnIndex("body");
         }
 
-        SMSRecord getSMSRecord() {
+        SMSRecord getSMSRecord(Context context) {
             long id = getLong(ID);
             int type = getInt(TYPE);
             long date = getLong(DATE);
-            String address = getString(ADDRESS);
+            String number = getString(NUMBER);
+            String body = getString(BODY);
+            String person = null;
             Contact contact;
             if(!isNull(PERSON)) {
                 // if person is defined - get contact name
                 long contactId = getLong(PERSON);
                 contact = getContact(contactId);
             } else {
-                contact = getContact(address);
+                contact = getContact(context, number);
             }
             if(contact != null) {
-                address = contact.name;
+                person = contact.name;
             }
-            String body = getString(BODY);
 
-            return new SMSRecord(id, type, date, address, body);
+            return new SMSRecord(id, type, date, person, number, body);
         }
     }
 
@@ -673,7 +681,7 @@ class ContactsAccessHelper {
 
         for (SmsMessage message : messages) {
             // get contact by SMS address
-            Contact contact = getContact(message.getOriginatingAddress());
+            Contact contact = getContact(context, message.getOriginatingAddress());
 
             // create writing values
             ContentValues values = new ContentValues();
@@ -694,6 +702,8 @@ class ContactsAccessHelper {
         return true;
     }
 
+//---------------------------------------------------------------------
+
     private static void debug(Cursor cursor) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cursor.getColumnCount(); i++) {
@@ -705,7 +715,7 @@ class ContactsAccessHelper {
     }
 
     /*
-    SMS table row example:
+    SMS table row sample:
     [_id]=6
     [thread_id]=5
     [address]=123

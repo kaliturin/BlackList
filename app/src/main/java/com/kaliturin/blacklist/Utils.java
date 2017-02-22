@@ -44,7 +44,8 @@ class Utils {
         } else
         if (drawable instanceof GradientDrawable) {
             ((GradientDrawable)drawable).setColor(color);
-        } else if (drawable instanceof ColorDrawable) {
+        } else
+        if (drawable instanceof ColorDrawable) {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 ((ColorDrawable) drawable).setColor(color);
             }

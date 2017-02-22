@@ -3,15 +3,17 @@ package com.kaliturin.blacklist;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -21,12 +23,19 @@ import android.widget.ListView;
  * Fragment for showing one SMS conversation
  */
 public class SMSConversationFragment extends Fragment {
-    public static String SMS_THREAD_ID = "SMS_THREAD_ID";
+    public static String THREAD_ID = "THREAD_ID";
+
     private SMSConversationCursorAdapter cursorAdapter = null;
     private ListView listView = null;
 
     public SMSConversationFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -59,7 +68,7 @@ public class SMSConversationFragment extends Fragment {
         Bundle arguments = getArguments();
         if(arguments != null) {
             // get sms thread
-            int smsThreadId = arguments.getInt(SMS_THREAD_ID);
+            int smsThreadId = arguments.getInt(THREAD_ID);
             // init and run the sms records loader
             getLoaderManager().initLoader(0, null, newLoader(smsThreadId));
         }
@@ -71,72 +80,121 @@ public class SMSConversationFragment extends Fragment {
         super.onDestroyView();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main, menu);
+
+        MenuItem writeSMS = menu.findItem(R.id.write_message);
+        Utils.setMenuIconTint(getContext(), writeSMS, R.color.colorAccent);
+        writeSMS.setVisible(true);
+
+        writeSMS.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                // get showed first sms
+                View row = listView.getChildAt(0);
+                ContactsAccessHelper.SMSRecord sms = cursorAdapter.getSMSRecord(row);
+                if(sms != null) {
+                    // put arguments for SMS sending fragment
+                    Bundle arguments = new Bundle();
+                    arguments.putString(SendSMSFragment.PERSON, sms.person);
+                    arguments.putString(SendSMSFragment.NUMBER, sms.number);
+                    // open activity with fragment
+                    CustomFragmentActivity.show(getContext(),
+                            getString(R.string.new_message),
+                            SendSMSFragment.class, arguments);
+                }
+                return true;
+            }
+        });
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
 //----------------------------------------------------
 
     // Creates SMS conversation loader
-    private SMSConversationLoaderCallbacks newLoader(int smsThreadId) {
-        return new SMSConversationLoaderCallbacks(getContext(), smsThreadId, listView, cursorAdapter);
+    private ConversationLoaderCallbacks newLoader(int smsThreadId) {
+        return new ConversationLoaderCallbacks(getContext(), smsThreadId, listView, cursorAdapter);
     }
 
     // SMS conversation loader
-    private static class SMSConversationLoader extends CursorLoader {
-        private int smsThreadId;
+    private static class ConversationLoader extends CursorLoader {
+        private int threadId;
 
-        SMSConversationLoader(Context context, int smsThreadId) {
+        ConversationLoader(Context context, int threadId) {
             super(context);
-            this.smsThreadId = smsThreadId;
+            this.threadId = threadId;
         }
 
         @Override
         public Cursor loadInBackground() {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
             // get SMS records by thread id
-            Cursor cursor = db.getSMSRecordsByThreadId(getContext(), smsThreadId, false, 0);
-            if(cursor != null) {
-                // set SMS of the thread were read
-                db.setSMSReadByThreadId(getContext(), smsThreadId);
-            }
-            return cursor;
+            return db.getSMSRecordsByThreadId(getContext(), threadId, false, 0);
         }
     }
 
     // SMS conversation loader callbacks
-    private static class SMSConversationLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static class ConversationLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
         private Context context;
-        private int smsThreadId;
+        private int threadId;
         private ListView listView;
         private SMSConversationCursorAdapter cursorAdapter;
 
-        SMSConversationLoaderCallbacks(Context context, int smsThreadId,
-                                        ListView listView,
-                                        SMSConversationCursorAdapter cursorAdapter) {
+        ConversationLoaderCallbacks(Context context, int threadId,
+                                    ListView listView,
+                                    SMSConversationCursorAdapter cursorAdapter) {
             this.context = context;
-            this.smsThreadId = smsThreadId;
+            this.threadId = threadId;
             this.listView = listView;
             this.cursorAdapter = cursorAdapter;
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return new SMSConversationLoader(context, smsThreadId);
+            return new ConversationLoader(context, threadId);
         }
 
         @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             // apply loaded data to cursor adapter
-            cursorAdapter.changeCursor(data);
+            cursorAdapter.changeCursor(cursor);
+
             // scroll list to bottom
             listView.post(new Runnable() {
                 @Override
                 public void run() {
                     listView.setSelection(cursorAdapter.getCount() - 1);
+                    listView.setVisibility(View.VISIBLE);
                 }
             });
+
+            if(cursor != null) {
+                // mark SMS of the thread are read
+                SMSReadMarker marker = new SMSReadMarker(context);
+                marker.execute(threadId);
+            }
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
+        }
+    }
+
+    // Async task - marks SMS of the thread are read
+    private static class SMSReadMarker extends AsyncTask<Integer, Void, Void> {
+        private Context context;
+        SMSReadMarker(Context context) {
+            this.context = context;
+        }
+        @Override
+        protected Void doInBackground(Integer... params) {
+            int threadId = params[0];
+            ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
+            db.setSMSReadByThreadId(context, threadId);
+            return null;
         }
     }
 }

@@ -3,6 +3,7 @@ package com.kaliturin.blacklist;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -62,7 +63,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         // get cursor wrapper
         SMSRecordCursorWrapper cursorWrapper = (SMSRecordCursorWrapper) cursor;
         // get model
-        SMSRecord model = cursorWrapper.getSMSRecord();
+        SMSRecord model = cursorWrapper.getSMSRecord(context);
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with new model
@@ -70,6 +71,15 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
     }
 
 //------------------------------------------------------------------------
+
+    @Nullable
+    SMSRecord getSMSRecord(View row) {
+        if(row != null) {
+            ViewHolder holder = (ViewHolder) row.getTag();
+            return holder.model;
+        }
+        return null;
+    }
 
     void setOnClickListener(View.OnClickListener onClickListener) {
         this.outerOnClickListener = onClickListener;
@@ -97,6 +107,8 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             }
         }
     }
+
+//------------------------------------------------------------------------
 
     // Padding calculator
     private class Padding {
@@ -129,18 +141,22 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         private View rowView;
         private TextView bodyTextView;
         private TextView dateTextView;
+        private View contentView;
 
         ViewHolder(View rowView) {
             this(rowView,
+                    rowView.findViewById(R.id.content_shape),
                     (TextView) rowView.findViewById(R.id.body),
                     (TextView) rowView.findViewById(R.id.date));
         }
 
         ViewHolder(View rowView,
-                TextView snippetTextView,
+                   View contentView,
+                   TextView snippetTextView,
                    TextView dateTextView) {
             this.model = null;
             this.rowView = rowView;
+            this.contentView = contentView;
             this.bodyTextView = snippetTextView;
             this.dateTextView = dateTextView;
         }
@@ -170,7 +186,6 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             rowView.setPadding(padding.left, padding.top, padding.right, padding.bottom);
 
             // set background color
-            View contentView = rowView.findViewById(R.id.content_shape);
             Drawable drawable = contentView.getBackground().mutate();
             Utils.setDrawableColor(context, drawable, color);
         }

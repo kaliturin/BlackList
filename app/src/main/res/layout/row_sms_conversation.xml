@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingEnd="50dp"
     android:paddingRight="50dp"
     android:paddingStart="5dp"
@@ -24,7 +24,7 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:textColor="@color/colorText"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/date"
@@ -34,7 +34,12 @@
             android:paddingRight="8dp"
             android:layout_gravity="end"
             android:textColor="@color/colorText"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:background="@android:color/transparent" />
 
 </LinearLayout>
