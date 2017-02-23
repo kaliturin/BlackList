@@ -22,9 +22,7 @@ import android.widget.ListView;
 /**
  * Fragment for showing one SMS conversation
  */
-public class SMSConversationFragment extends Fragment {
-    public static String THREAD_ID = "THREAD_ID";
-
+public class SMSConversationFragment extends Fragment implements FragmentArguments {
     private SMSConversationCursorAdapter cursorAdapter = null;
     private ListView listView = null;
 
@@ -68,9 +66,10 @@ public class SMSConversationFragment extends Fragment {
         Bundle arguments = getArguments();
         if(arguments != null) {
             // get sms thread
-            int smsThreadId = arguments.getInt(THREAD_ID);
+            int threadId = arguments.getInt(THREAD_ID);
+            int unreadCount = arguments.getInt(UNREAD_COUNT);
             // init and run the sms records loader
-            getLoaderManager().initLoader(0, null, newLoader(smsThreadId));
+            getLoaderManager().initLoader(0, null, newLoader(threadId, unreadCount));
         }
     }
 
@@ -97,8 +96,8 @@ public class SMSConversationFragment extends Fragment {
                 if(sms != null) {
                     // put arguments for SMS sending fragment
                     Bundle arguments = new Bundle();
-                    arguments.putString(SendSMSFragment.PERSON, sms.person);
-                    arguments.putString(SendSMSFragment.NUMBER, sms.number);
+                    arguments.putString(PERSON, sms.person);
+                    arguments.putString(NUMBER, sms.number);
                     // open activity with fragment
                     CustomFragmentActivity.show(getContext(),
                             getString(R.string.new_message),
@@ -114,8 +113,9 @@ public class SMSConversationFragment extends Fragment {
 //----------------------------------------------------
 
     // Creates SMS conversation loader
-    private ConversationLoaderCallbacks newLoader(int smsThreadId) {
-        return new ConversationLoaderCallbacks(getContext(), smsThreadId, listView, cursorAdapter);
+    private ConversationLoaderCallbacks newLoader(int threadId, int unreadCount) {
+        return new ConversationLoaderCallbacks(getContext(),
+                threadId, unreadCount, listView, cursorAdapter);
     }
 
     // SMS conversation loader
@@ -139,14 +139,15 @@ public class SMSConversationFragment extends Fragment {
     private static class ConversationLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
         private Context context;
         private int threadId;
+        private int unreadCount;
         private ListView listView;
         private SMSConversationCursorAdapter cursorAdapter;
 
-        ConversationLoaderCallbacks(Context context, int threadId,
-                                    ListView listView,
+        ConversationLoaderCallbacks(Context context, int threadId, int unreadCount, ListView listView,
                                     SMSConversationCursorAdapter cursorAdapter) {
             this.context = context;
             this.threadId = threadId;
+            this.unreadCount = unreadCount;
             this.listView = listView;
             this.cursorAdapter = cursorAdapter;
         }
@@ -170,10 +171,10 @@ public class SMSConversationFragment extends Fragment {
                 }
             });
 
-            if(cursor != null) {
-                // mark SMS of the thread are read
-                SMSReadMarker marker = new SMSReadMarker(context);
-                marker.execute(threadId);
+            // is there unread sms in the thread
+            if(unreadCount > 0) {
+                // mark sms ot the thread are read
+                new SMSReadMarker(context).execute(threadId);
             }
         }
 
@@ -184,11 +185,13 @@ public class SMSConversationFragment extends Fragment {
     }
 
     // Async task - marks SMS of the thread are read
-    private static class SMSReadMarker extends AsyncTask<Integer, Void, Void> {
+    static class SMSReadMarker extends AsyncTask<Integer, Void, Void> {
         private Context context;
+
         SMSReadMarker(Context context) {
             this.context = context;
         }
+
         @Override
         protected Void doInBackground(Integer... params) {
             int threadId = params[0];

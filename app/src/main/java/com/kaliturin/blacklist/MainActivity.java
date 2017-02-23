@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
@@ -61,27 +62,29 @@ public class MainActivity extends AppCompatActivity
         if(savedInstanceState != null) {
             // current navigation menu item
             itemId = savedInstanceState.getInt(CURRENT_ITEM_ID);
+            // select drawer's menu item
+            navigationView.setCheckedItem(itemId);
+            fragmentSwitcher.setCurrentItemId(itemId);
         } else {
             // process actions
-            String action = getIntent().getAction();
-            if(action != null && action.equals(ACTION_SMS_SEND_TO)) {
-                // switch to SMS conversations fragment
-                itemId = R.id.nav_sms;
-                // show sending SMS activity
+            if(isAction(ACTION_SMS_SEND_TO)) {
+                // show SMS sending activity
                 showSendSMSActivity();
+                // switch to SMS conversations fragment in main activity
+                itemId = R.id.nav_sms;
             } else
-            if(action != null && action.equals(ACTION_SMS_CONVERSATIONS)) {
-                // switch to SMS conversations fragment
+            if(isAction(ACTION_SMS_CONVERSATIONS)) {
+                // switch to SMS conversations fragment in main activity
                 itemId = R.id.nav_sms;
             } else {
-                // set default fragment as current
+                // switch to journal fragment in main activity
                 itemId = R.id.nav_journal;
             }
+            // select drawer's menu item
+            navigationView.setCheckedItem(itemId);
+            // switch to chosen fragment
+            fragmentSwitcher.switchFragment(itemId);
         }
-
-        // switch to chosen fragment
-        fragmentSwitcher.switchFragment(itemId);
-        navigationView.setCheckedItem(itemId);
     }
 
     @Override
@@ -144,8 +147,13 @@ public class MainActivity extends AppCompatActivity
         return super.onKeyUp(keyCode, event);
     }
 
+    boolean isAction(String name) {
+        String action = getIntent().getAction();
+        return (action != null && action.equals(name));
+    }
+
     // Switcher of activity's fragments
-    private class FragmentSwitcher {
+    private class FragmentSwitcher implements FragmentArguments {
         private final String CURRENT_FRAGMENT = "CURRENT_FRAGMENT";
         private ContactsFragment blackListFragment = new ContactsFragment();
         private ContactsFragment whiteListFragment = new ContactsFragment();
@@ -170,45 +178,42 @@ public class MainActivity extends AppCompatActivity
 
         // Switches fragment by navigation menu item
         void switchFragment(@IdRes int itemId) {
-            switchFragment(itemId, new Bundle());
-        }
-
-        // Switches fragment by navigation menu item
-        void switchFragment(@IdRes int itemId, Bundle arguments) {
             setCurrentItemId(itemId);
+            Bundle arguments = new Bundle();
             switch (itemId) {
                 case R.id.nav_journal:
-                    switchFragment(journalFragment, R.string.journal_title, arguments);
+                    arguments.putString(TITLE, getString(R.string.journal_title));
+                    switchFragment(journalFragment, arguments);
                     break;
                 case R.id.nav_black_list:
-                    arguments.putInt(ContactsFragment.CONTACT_TYPE, Contact.TYPE_BLACK_LIST);
-                    switchFragment(blackListFragment, R.string.black_list_title, arguments);
+                    arguments.putString(TITLE, getString(R.string.black_list_title));
+                    arguments.putInt(CONTACT_TYPE, Contact.TYPE_BLACK_LIST);
+                    switchFragment(blackListFragment, arguments);
                     break;
                 case R.id.nav_white_list:
-                    arguments.putInt(ContactsFragment.CONTACT_TYPE, Contact.TYPE_WHITE_LIST);
-                    switchFragment(whiteListFragment, R.string.white_list_title, arguments);
+                    arguments.putString(TITLE, getString(R.string.white_list_title));
+                    arguments.putInt(CONTACT_TYPE, Contact.TYPE_WHITE_LIST);
+                    switchFragment(whiteListFragment, arguments);
                     break;
                 case R.id.nav_sms:
-                    switchFragment(smsFragment, R.string.sms_title, arguments);
+                    arguments.putString(TITLE, getString(R.string.sms_title));
+                    switchFragment(smsFragment, arguments);
                     break;
                 default:
-                    switchFragment(settingsFragment, R.string.settings_title, arguments);
+                    arguments.putString(TITLE, getString(R.string.settings_title));
+                    switchFragment(settingsFragment, arguments);
                     break;
             }
         }
 
         // Switches to passed fragment
-        private void switchFragment(Fragment fragment, @StringRes int titleId, Bundle arguments) {
+        private void switchFragment(Fragment fragment, Bundle arguments) {
             // replace the current showed fragment
             Fragment current = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
             if (current != fragment) {
                 fragment.setArguments(arguments);
                 getSupportFragmentManager().beginTransaction().
                         replace(R.id.frame_layout, fragment, CURRENT_FRAGMENT).commit();
-            }
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(getString(titleId));
             }
         }
 
@@ -240,17 +245,21 @@ public class MainActivity extends AppCompatActivity
             // get SMS thread id by phone number
             int threadId = db.getThreadIdByNumber(this, number);
             if(threadId >= 0) {
+                // get the count of unread sms of the thread
+                int unreadCount = db.getSMSUnreadCountByThreadId(this, threadId);
+
                 // open thread's SMS conversation activity
                 Bundle arguments = new Bundle();
-                arguments.putInt(SMSConversationFragment.THREAD_ID, threadId);
+                arguments.putInt(FragmentArguments.THREAD_ID, threadId);
+                arguments.putInt(FragmentArguments.UNREAD_COUNT, unreadCount);
                 String title = (person != null ? person : number);
                 CustomFragmentActivity.show(this, title, SMSConversationFragment.class, arguments);
             }
 
             // open SMS sending activity
             Bundle arguments = new Bundle();
-            arguments.putString(SendSMSFragment.PERSON, person);
-            arguments.putString(SendSMSFragment.NUMBER, number);
+            arguments.putString(FragmentArguments.PERSON, person);
+            arguments.putString(FragmentArguments.NUMBER, number);
             String title = getString(R.string.new_message);
             CustomFragmentActivity.show(this, title, SendSMSFragment.class, arguments);
         }

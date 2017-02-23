@@ -14,10 +14,7 @@ import android.widget.TextView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SendSMSFragment extends Fragment {
-    public static final String PERSON = "PERSON";
-    public static final String NUMBER = "NUMBER";
-
+public class SendSMSFragment extends Fragment implements FragmentArguments {
     public SendSMSFragment() {
         // Required empty public constructor
     }

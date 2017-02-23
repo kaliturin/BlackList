@@ -29,7 +29,7 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecord;
 /**
  * Fragment for the journal (blocked calls/sms list) representation
  */
-public class JournalFragment extends Fragment {
+public class JournalFragment extends Fragment implements FragmentArguments {
     private JournalCursorAdapter cursorAdapter = null;
     private CustomSnackBar snackBar = null;
     private String itemsFilter = null;
@@ -38,6 +38,17 @@ public class JournalFragment extends Fragment {
 
     public JournalFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // set activity title
+        Bundle arguments = getArguments();
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (arguments != null && actionBar != null) {
+            actionBar.setTitle(arguments.getString(TITLE));
+        }
     }
 
     @Override

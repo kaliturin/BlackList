@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +16,7 @@ import android.widget.ListView;
 /**
  * Settings fragment
  */
-public class SettingsFragment extends Fragment {
-
+public class SettingsFragment extends Fragment implements FragmentArguments {
     View.OnClickListener defaultSMSAppListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -27,6 +28,17 @@ public class SettingsFragment extends Fragment {
 
     public SettingsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // set activity title
+        Bundle arguments = getArguments();
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (arguments != null && actionBar != null) {
+            actionBar.setTitle(arguments.getString(TITLE));
+        }
     }
 
     @Override

@@ -450,20 +450,7 @@ class ContactsAccessHelper {
         @Nullable
         SMSConversation getConversation(Context context) {
             int threadId = getInt(THREAD_ID);
-            SMSConversation conversation = null;
-
-            // get the count of unread SMS in the thread
-            int unread = getSMSUnreadCountByThreadId(context, threadId);
-            // get date and address from the last SMS of the thread
-            SMSRecordCursorWrapper cursor = getSMSRecordsByThreadId(context, threadId, true, 1);
-            if(cursor != null) {
-                SMSRecord sms = cursor.getSMSRecord(context);
-                conversation = new SMSConversation(threadId, sms.date,
-                        sms.person, sms.number, sms.body, unread);
-                cursor.close();
-            }
-
-            return conversation;
+            return getSMSConversationByThreadId(context, threadId);
         }
     }
 
@@ -484,6 +471,30 @@ class ContactsAccessHelper {
                 "date DESC");
 
         return (validate(cursor) ? new SMSConversationWrapper(cursor) : null);
+    }
+
+    // Returns SMS conversation by thread id
+    @Nullable
+    SMSConversation getSMSConversationByThreadId(Context context, int threadId) {
+        if(!Permissions.isGranted(context, Permissions.READ_SMS) ||
+                !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
+            return null;
+        }
+
+        SMSConversation smsConversation = null;
+
+        // get the count of unread SMS in the thread
+        int unread = getSMSUnreadCountByThreadId(context, threadId);
+        // get date and address from the last SMS of the thread
+        SMSRecordCursorWrapper cursor = getSMSRecordsByThreadId(context, threadId, true, 1);
+        if(cursor != null) {
+            SMSRecord sms = cursor.getSMSRecord(context);
+            smsConversation = new SMSConversation(threadId, sms.date,
+                    sms.person, sms.number, sms.body, unread);
+            cursor.close();
+        }
+
+        return smsConversation;
     }
 
     // Selects SMS records by thread id
@@ -507,7 +518,7 @@ class ContactsAccessHelper {
     }
 
     // Returns count of unread SMS by thread id
-    private int getSMSUnreadCountByThreadId(Context context, int threadId) {
+    int getSMSUnreadCountByThreadId(Context context, int threadId) {
         if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
             return 0;
         }

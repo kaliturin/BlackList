@@ -11,6 +11,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,20 +20,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 
 /**
  * Fragment for showing all SMS conversations
  */
-public class SMSConversationsListFragment extends Fragment {
+public class SMSConversationsListFragment extends Fragment implements FragmentArguments {
+    private static final String LIST_POSITION = "LIST_POSITION";
+
     private SMSConversationsListCursorAdapter cursorAdapter = null;
     private ListView listView = null;
-    private int listViewPosition = 0;
-    private ProgressDialog progressBar = null;
 
     public SMSConversationsListFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // set activity title
+        Bundle arguments = getArguments();
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (arguments != null && actionBar != null) {
+            actionBar.setTitle(arguments.getString(TITLE));
+        }
     }
 
     @Override
@@ -54,76 +66,38 @@ public class SMSConversationsListFragment extends Fragment {
         // notify user if permission isn't granted
         Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_SMS);
         Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_CONTACTS);
-    }
-
-    @Override
-    public void onPause() {
-        if(listView != null) {
-            listViewPosition = listView.getFirstVisiblePosition();
-            listView.setVisibility(View.INVISIBLE);
-        }
-        getLoaderManager().destroyLoader(0);
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        progressBar = new ProgressDialog(getContext());
-        progressBar.setTitle(getString(R.string.loading));
-        progressBar.show();
 
         // cursor adapter
         cursorAdapter = new SMSConversationsListCursorAdapter(getContext());
-        cursorAdapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View row) {
-                // get the clicked conversation
-                ContactsAccessHelper.SMSConversation sms = cursorAdapter.getSMSConversation(row);
-                if(sms != null) {
-                    // open activity with all the SMS of the conversation
-                    Bundle arguments = new Bundle();
-                    arguments.putInt(SMSConversationFragment.THREAD_ID, sms.threadId);
-                    String title = (sms.person != null ? sms.person : sms.number);
-                    CustomFragmentActivity.show(getContext(), title,
-                            SMSConversationFragment.class, arguments);
-                }
-            }
-        });
-
+        // on row click listener (receives clicked row)
+        cursorAdapter.setOnClickListener(new OnRowClickListener());
         // on row long click listener (receives clicked row)
-        cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View row) {
-                final ContactsAccessHelper.SMSConversation smsConversation =
-                        cursorAdapter.getSMSConversation(row);
-                if(smsConversation != null) {
-                    // create menu dialog
-                    MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
-                    builder.setDialogTitle(smsConversation.person);
-                    // add menu item of sms deletion
-                    builder.addMenuItem(getString(R.string.delete_thread), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-                            db.deleteSMSByThreadId(getContext(), smsConversation.threadId);
-                        }
-                    });
-                    builder.show();
-                }
-                return true;
-            }
-        });
+        cursorAdapter.setOnLongClickListener(new OnRowLongClickListener());
 
-        View view = getView();
-        if (view != null) {
-            // add cursor listener to the list
-            listView = (ListView) view.findViewById(R.id.rows_list);
-            listView.setAdapter(cursorAdapter);
-            // init and run the items loader
-            getLoaderManager().initLoader(0, null, newLoader());
+        // add cursor listener to the list
+        listView = (ListView) view.findViewById(R.id.rows_list);
+        listView.setAdapter(cursorAdapter);
+
+        // get saved list position
+        int listPosition = 0;
+        if(savedInstanceState != null) {
+            listPosition = savedInstanceState.getInt(LIST_POSITION);
         }
+
+        // load SMS conversations to the list
+        loadSMSConversations(listPosition);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
+    }
+
+    @Override
+    public void onDestroyView() {
+       getLoaderManager().destroyLoader(0);
+       super.onDestroyView();
     }
 
     @Override
@@ -150,10 +124,79 @@ public class SMSConversationsListFragment extends Fragment {
 
 //----------------------------------------------------------------------
 
+    // On row click listener
+    class OnRowClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View row) {
+            // get the clicked conversation
+            ContactsAccessHelper.SMSConversation sms = cursorAdapter.getSMSConversation(row);
+            if(sms != null) {
+                // open activity with all the SMS of the conversation
+                Bundle arguments = new Bundle();
+                arguments.putInt(THREAD_ID, sms.threadId);
+                String title = (sms.person != null ? sms.person : sms.number);
+                CustomFragmentActivity.show(getContext(), title,
+                        SMSConversationFragment.class, arguments);
+
+                // is there any unread sms in the thread
+                if(sms.unread > 0) {
+                    // in async task mark sms of the thread are read
+                    new SMSConversationFragment.SMSReadMarker(getContext()) {
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            // when marking is completed - reload the items of the sms list
+                            int listPosition = listView.getFirstVisiblePosition();
+                            loadSMSConversations(listPosition);
+                        }
+                    }.execute(sms.threadId);
+                }
+            }
+        }
+    }
+
+    // On row long click listener
+    class OnRowLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(View row) {
+            final ContactsAccessHelper.SMSConversation smsConversation =
+                    cursorAdapter.getSMSConversation(row);
+            if(smsConversation != null) {
+                // create menu dialog
+                MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
+                builder.setDialogTitle(smsConversation.person);
+                // add menu item of sms deletion
+                builder.addMenuItem(getString(R.string.delete_thread), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
+                        db.deleteSMSByThreadId(getContext(), smsConversation.threadId);
+                    }
+                });
+                builder.show();
+            }
+            return true;
+        }
+    }
+
+//----------------------------------------------------------------------
+
+    // Loads SMS conversations to the list view
+    private void loadSMSConversations(int listPosition) {
+        int loaderId = 0;
+        ConversationsLoaderCallbacks callbacks = newLoaderCallbacks(listView, listPosition);
+        LoaderManager manager = getLoaderManager();
+        if (manager.getLoader(loaderId) == null) {
+            // init and run the items loader
+            manager.initLoader(loaderId, null, callbacks);
+        } else {
+            // restart loader
+            manager.restartLoader(loaderId, null, callbacks);
+        }
+    }
+
     // Creates SMS conversations loader
-    private ConversationsLoaderCallbacks newLoader() {
-        return new ConversationsLoaderCallbacks(getContext(),
-                progressBar, listView, listViewPosition, cursorAdapter);
+    private ConversationsLoaderCallbacks newLoaderCallbacks(ListView listView, int listPosition) {
+        return new ConversationsLoaderCallbacks(getContext(), listView, listPosition, cursorAdapter);
     }
 
     // SMS conversations loader
@@ -164,8 +207,8 @@ public class SMSConversationsListFragment extends Fragment {
 
         @Override
         public Cursor loadInBackground() {
-            ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
             // get all SMS conversations
+            ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
             return db.getSMSConversations(getContext());
         }
     }
@@ -174,22 +217,24 @@ public class SMSConversationsListFragment extends Fragment {
     private static class ConversationsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
         private Context context;
         private ListView listView;
+        private int listPosition;
         private ProgressDialog progressBar;
-        private int listViewPosition;
         private SMSConversationsListCursorAdapter cursorAdapter;
 
-        ConversationsLoaderCallbacks(Context context, ProgressDialog progressBar,
-                                     ListView listView, int listViewPosition,
+        ConversationsLoaderCallbacks(Context context, ListView listView, int listPosition,
                                      SMSConversationsListCursorAdapter cursorAdapter) {
             this.context = context;
-            this.progressBar = progressBar;
             this.listView = listView;
-            this.listViewPosition = listViewPosition;
+            this.listPosition = listPosition;
             this.cursorAdapter = cursorAdapter;
+            this.progressBar = new ProgressDialog(context);
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            progressBar.setMessage(context.getString(R.string.loading));
+            progressBar.setCancelable(true);
+            progressBar.show();
             return new ConversationsLoader(context);
         }
 
@@ -202,7 +247,7 @@ public class SMSConversationsListFragment extends Fragment {
                 listView.post(new Runnable() {
                     @Override
                     public void run() {
-                        listView.setSelection(listViewPosition);
+                        listView.setSelection(listPosition);
                         listView.setVisibility(View.VISIBLE);
                     }
                 });
@@ -210,27 +255,29 @@ public class SMSConversationsListFragment extends Fragment {
 
             if(cursor != null) {
                 // mark all SMS are seen
-                SMSSeenMarker marker = new SMSSeenMarker(context);
-                marker.execute();
+                new SMSSeenMarker(context).execute();
             }
 
-            if(progressBar != null) {
-                progressBar.dismiss();
-            }
+            progressBar.dismiss();
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
+            progressBar.dismiss();
         }
     }
 
-    // Async task - sets all SMS are seen
+//----------------------------------------------------------------------
+
+    // Async task - marks all SMS are seen
     private static class SMSSeenMarker extends AsyncTask<Void, Void, Void> {
         private Context context;
+
         SMSSeenMarker(Context context) {
             this.context = context;
         }
+
         @Override
         protected Void doInBackground(Void... params) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
@@ -238,5 +285,4 @@ public class SMSConversationsListFragment extends Fragment {
             return null;
         }
     }
-
 }

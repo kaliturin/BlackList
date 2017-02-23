@@ -24,10 +24,7 @@ import java.util.List;
 /**
  * Fragment for adding or editing contact
  */
-public class AddOrEditContactFragment extends Fragment {
-    public static final String CONTACT_ID = "CONTACT_ID";
-    public static final String CONTACT_TYPE = "CONTACT_TYPE";
-
+public class AddOrEditContactFragment extends Fragment implements FragmentArguments {
     private int contactType = 0;
     private int contactId = -1;
 

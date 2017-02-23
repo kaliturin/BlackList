@@ -32,11 +32,7 @@ import java.util.List;
  * Fragment for representation the list of contacts to choose
  * which one is adding to the black/white list
  */
-public class AddContactsFragment extends Fragment {
-    // bundle arguments names
-    public static final String CONTACT_TYPE = "CONTACT_TYPE";
-    public static final String SOURCE_TYPE = "SOURCE_TYPE";
-
+public class AddContactsFragment extends Fragment implements FragmentArguments {
     private ContactsCursorAdapter cursorAdapter = null;
     private CustomSnackBar snackBar = null;
     private ContactSourceType sourceType = null;
@@ -290,7 +286,6 @@ public class AddContactsFragment extends Fragment {
             this.contactList = contactList;
 
             progressBar = new ProgressDialog(context);
-            progressBar.setTitle(getString(R.string.saving));
             progressBar.setCancelable(true);
             progressBar.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override
@@ -329,14 +324,14 @@ public class AddContactsFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            progressBar.setMessage("0%");
+            progressBar.setMessage(getString(R.string.saving) + " 0%");
             progressBar.show();
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
             progressBar.setProgress(values[0]);
-            progressBar.setMessage("" + values[0] + "%");
+            progressBar.setMessage(getString(R.string.saving) + " " + values[0] + "%");
         }
     }
 }

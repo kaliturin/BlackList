@@ -14,9 +14,7 @@ import com.kaliturin.blacklist.ContactsAccessHelper.ContactSourceType;
  * Fragment for representation the menu of the contacts sources
  * for choosing where add contact from
  */
-public class AddContactsMenuFragment extends Fragment {
-    // bundle argument name
-    public static final String CONTACT_TYPE = "CONTACT_TYPE";
+public class AddContactsMenuFragment extends Fragment implements FragmentArguments {
     private int contactType = 0;
 
     // On menu items click listener
@@ -55,12 +53,12 @@ public class AddContactsMenuFragment extends Fragment {
                 Class<? extends Fragment> fragmentClass;
                 if (sourceType != null) {
                     // create fragment of adding contacts from inbox/calls
-                    arguments.putInt(AddContactsFragment.CONTACT_TYPE, contactType);
-                    arguments.putSerializable(AddContactsFragment.SOURCE_TYPE, sourceType);
+                    arguments.putInt(CONTACT_TYPE, contactType);
+                    arguments.putSerializable(SOURCE_TYPE, sourceType);
                     fragmentClass = AddContactsFragment.class;
                 } else {
                     // create fragment of adding contacts manually
-                    arguments.putInt(AddOrEditContactFragment.CONTACT_TYPE, contactType);
+                    arguments.putInt(CONTACT_TYPE, contactType);
                     fragmentClass = AddOrEditContactFragment.class;
                 }
 

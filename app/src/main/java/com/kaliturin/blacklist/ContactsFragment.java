@@ -26,9 +26,7 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
  * Contacts fragment (black/white list)
  */
 
-public class ContactsFragment extends Fragment {
-    public static final String CONTACT_TYPE = "CONTACT_TYPE";
-
+public class ContactsFragment extends Fragment implements FragmentArguments {
     private ContactsCursorAdapter cursorAdapter = null;
     private CustomSnackBar snackBar = null;
     private int contactType = 0;
@@ -36,6 +34,17 @@ public class ContactsFragment extends Fragment {
 
     public ContactsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // set activity title
+        Bundle arguments = getArguments();
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (arguments != null && actionBar != null) {
+            actionBar.setTitle(arguments.getString(TITLE));
+        }
     }
 
     @Override
@@ -215,7 +224,7 @@ public class ContactsFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 // set current type of contacts (black/white list)
                 Bundle arguments = new Bundle();
-                arguments.putInt(AddContactsMenuFragment.CONTACT_TYPE, contactType);
+                arguments.putInt(CONTACT_TYPE, contactType);
                 // open the dialog activity with the contacts menu fragment
                 String title = getString(R.string.add_contact);
                 CustomFragmentActivity.show(getActivity(), title,
@@ -287,8 +296,8 @@ public class ContactsFragment extends Fragment {
     // Opens fragment for contact editing
     private void editContact(long id) {
         Bundle arguments = new Bundle();
-        arguments.putInt(AddOrEditContactFragment.CONTACT_ID, (int)id);
-        arguments.putInt(AddOrEditContactFragment.CONTACT_TYPE, contactType);
+        arguments.putInt(CONTACT_ID, (int)id);
+        arguments.putInt(CONTACT_TYPE, contactType);
         CustomFragmentActivity.show(getActivity(), getString(R.string.editing_contact),
                 AddOrEditContactFragment.class, arguments, 0);
     }
