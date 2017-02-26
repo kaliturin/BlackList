@@ -14,6 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingTop="3dp"
             android:paddingLeft="8dp"
             android:paddingRight="8dp">
 
@@ -21,10 +22,10 @@
                 android:id="@+id/edit_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:background="@drawable/selector_edit_text"
                 android:maxLength="100"
-                android:hint="@string/contact_name">
-                <requestFocus />
-            </EditText>
+                android:hint="@string/contact_name" />
 
             <LinearLayout
                 android:id="@+id/layout_number_list"
@@ -52,6 +53,7 @@
                     android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:clickable="false"
+                    android:contentDescription="@string/add_contact"
                     android:src="@drawable/ic_add"
                     android:tint="@color/colorAccent" />
 

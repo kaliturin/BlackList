@@ -41,6 +41,7 @@
     <string name="cancel">ОТМЕНИТЬ</string>
     <string name="add">ДОБАВИТЬ</string>
     <string name="add_contact">Добавить контакт</string>
+    <string name="add_number">Добавить номер</string>
     <string name="adding_contact">Добавление контакта</string>
     <string name="saving">Сохранение...</string>
     <string name="loading">Загрузка...</string>
@@ -69,11 +70,14 @@
     <string name="move_to_white">Поместить контакт в Белый список</string>
     <string name="move_to_black">Поместить контакт в Чёрный список</string>
     <string name="set_as_default_sms_app">Уcтановить как приложение для работы с SMS по умолчанию (необходимо для блокировки SMS в версиях Android 4.4 и последующих)</string>
-    <string name="symbols">Символы</string>
+    <string name="digits_symbols">Цифры/Символы</string>
     <string name="new_message">Новое сообщение</string>
     <string name="needs_permission">требует разрешение</string>
     <string name="delete_thread">Удалить ветвь</string>
     <string name="write_message">Написать сообщение</string>
+    <string name="add_from_contacts">Добавить из контактов</string>
+    <string name="message">Cообщение</string>
+    <string name="send">Отпр.</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>

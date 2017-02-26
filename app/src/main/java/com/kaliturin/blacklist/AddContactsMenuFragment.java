@@ -11,9 +11,10 @@ import com.kaliturin.blacklist.ContactsAccessHelper.ContactSourceType;
 
 
 /**
- * Fragment for representation the menu of the contacts sources
- * for choosing where add contact from
+ * Fragment for representation of the menu of contacts sources
+ * for choosing where from to add a contact
  */
+@Deprecated
 public class AddContactsMenuFragment extends Fragment implements FragmentArguments {
     private int contactType = 0;
 

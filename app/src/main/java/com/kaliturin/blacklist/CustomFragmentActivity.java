@@ -72,17 +72,17 @@ public class CustomFragmentActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // check for result code from the child activity
-        // (which could be started from a child fragment of the current activity)
-        if (resultCode == RESULT_OK) {
-            // a child activity has done an action - close the current activity
-            setResult(resultCode);
-            finish();
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        // check for result code from the child activity
+//        // (which could be started from a child fragment of the current activity)
+//        if (resultCode == RESULT_OK) {
+//            // a child activity has done an action - close the current activity
+//            setResult(resultCode);
+//            finish();
+//        }
+//    }
 
     // Opens activity with fragment and waiting for result
     public static void show(Activity context, String activityTitle,
@@ -90,6 +90,14 @@ public class CustomFragmentActivity extends AppCompatActivity {
                             Bundle fragmentArguments, int requestCode) {
         Intent intent = getIntent(context, activityTitle, fragmentClass, fragmentArguments);
         context.startActivityForResult(intent, requestCode);
+    }
+
+    // Opens activity with fragment and waiting for result
+    public static void show(Context context, Fragment parent, String activityTitle,
+                            Class<? extends Fragment> fragmentClass,
+                            Bundle fragmentArguments, int requestCode) {
+        Intent intent = getIntent(context, activityTitle, fragmentClass, fragmentArguments);
+        parent.startActivityForResult(intent, requestCode);
     }
 
     // Opens activity with fragment

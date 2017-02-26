@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
     private View.OnLongClickListener outerOnLongClickListener = null;
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
     private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
+    private SparseArray<SMSConversation> smsConversationCache = new SparseArray<>();
 
     SMSConversationsListCursorAdapter(Context context) {
         super(context, null, 0);
@@ -50,18 +52,42 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        // get cursor wrapper
-        SMSConversationWrapper cursorWrapper = (SMSConversationWrapper) cursor;
-        // get model
-        SMSConversation model = cursorWrapper.getConversation(context);
+        // try to get a model from the cache
+        int itemId = (int) getItemId(cursor.getPosition());
+        SMSConversation model = smsConversationCache.get(itemId);
+        if(model == null) {
+            // get cursor wrapper
+            SMSConversationWrapper cursorWrapper = (SMSConversationWrapper) cursor;
+            // get model
+            model = cursorWrapper.getConversation(context);
+            // put it to the cache
+            smsConversationCache.put(itemId, model);
+        }
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with new model
         viewHolder.setModel(model);
     }
 
+    @Override
+    public void changeCursor(Cursor cursor) {
+        invalidateCache();
+        super.changeCursor(cursor);
+    }
+
 //---------------------------------------------------------------------------------
 
+    // Clears the cache
+    void invalidateCache() {
+        smsConversationCache.clear();
+    }
+
+    // Removes particular item from the cache
+    void invalidateCache(int itemId) {
+        smsConversationCache.remove(itemId);
+    }
+
+    // Returns sms conversation by passed row
     @Nullable
     SMSConversation getSMSConversation(View row) {
         if(row != null) {

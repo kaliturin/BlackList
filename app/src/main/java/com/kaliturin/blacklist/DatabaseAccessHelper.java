@@ -153,6 +153,11 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             " ORDER BY " + Column.TIME +
                             " DESC";
 
+            static final String SELECT_BY_ID =
+                    "SELECT * " +
+                            " FROM " + JournalTable.NAME +
+                            " WHERE _id = ? ";
+
             static final String SELECT_FILTER_BY_CALLER =
                     "SELECT * " +
                             " FROM " + JournalTable.NAME +
@@ -206,6 +211,33 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             String text = getString(TEXT);
             return new JournalRecord(id, time, caller, number, text);
         }
+    }
+
+    // Selects journal record by id
+    @Nullable
+    JournalRecord getJournalRecordById(long id) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT_BY_ID,
+                new String[]{String.valueOf(id)});
+
+        JournalRecord record = null;
+        if(validate(cursor)) {
+            cursor.moveToFirst();
+            final int TIME = cursor.getColumnIndex(JournalTable.Column.TIME);
+            final int CALLER = cursor.getColumnIndex(JournalTable.Column.CALLER);
+            final int NUMBER = cursor.getColumnIndex(JournalTable.Column.NUMBER);
+            final int TEXT = cursor.getColumnIndex(JournalTable.Column.TEXT);
+
+            long time = cursor.getLong(TIME);
+            String caller = cursor.getString(CALLER);
+            String number = cursor.getString(NUMBER);
+            String text = cursor.getString(TEXT);
+            record = new JournalRecord(id, time, caller, number, text);
+
+            cursor.close();
+        }
+
+        return record;
     }
 
     // Selects all journal records

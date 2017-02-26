@@ -96,12 +96,12 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                 if(sms != null) {
                     // put arguments for SMS sending fragment
                     Bundle arguments = new Bundle();
-                    arguments.putString(PERSON, sms.person);
-                    arguments.putString(NUMBER, sms.number);
+                    arguments.putString(CONTACT_NAME, sms.person);
+                    arguments.putString(CONTACT_NUMBER, sms.number);
                     // open activity with fragment
                     CustomFragmentActivity.show(getContext(),
                             getString(R.string.new_message),
-                            SendSMSFragment.class, arguments);
+                            SMSSendFragment.class, arguments);
                 }
                 return true;
             }

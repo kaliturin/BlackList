@@ -7,6 +7,7 @@ import android.content.pm.PermissionInfo;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ class Permissions {
     static final String RECEIVE_SMS = "android.permission.RECEIVE_SMS";
     static final String WRITE_SMS = "android.permission.WRITE_SMS";
     static final String READ_SMS = "android.permission.READ_SMS";
+    static final String SEND_SMS = "android.permission.SEND_SMS";
     static final String CALL_PHONE = "android.permission.CALL_PHONE";
     static final String READ_PHONE_STATE = "android.permission.READ_PHONE_STATE";
     static final String READ_CONTACTS = "android.permission.READ_CONTACTS";
@@ -36,6 +38,7 @@ class Permissions {
             RECEIVE_SMS,
             WRITE_SMS,
             READ_SMS,
+            SEND_SMS,
             CALL_PHONE,
             READ_PHONE_STATE,
             READ_CONTACTS,
@@ -49,7 +52,7 @@ class Permissions {
         }
         Boolean result = permissionsResults.get(permission);
         if(result == null) {
-            int permissionCheck = ActivityCompat.checkSelfPermission(context, permission);
+            int permissionCheck = ContextCompat.checkSelfPermission(context, permission);
             result = (permissionCheck == PackageManager.PERMISSION_GRANTED);
             permissionsResults.put(permission, result);
         }

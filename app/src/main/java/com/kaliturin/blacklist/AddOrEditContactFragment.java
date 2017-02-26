@@ -174,29 +174,31 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
     // Adds row to the phones list
     private void numberListAddRow(String number, int type) {
         View parent = getView();
-        if(parent != null) {
-            final LinearLayout numberRowsListLayout =
-                    (LinearLayout) parent.findViewById(R.id.layout_number_list);
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            // create new row
-            View row = inflater.inflate(R.layout.row_contact_number, numberRowsListLayout, false);
-            // init row with number data
-            setNumberType(row, type);
-            setNumber(row, number);
-            // int 'row remove' button
-            ImageButton buttonRemove = (ImageButton) row.findViewById(R.id.button_remove);
-            buttonRemove.setTag(row);
-            buttonRemove.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    numberRowsListLayout.removeView((View)v.getTag());
-                }
-            });
-            // save row
-            numberRowsListLayout.addView(row);
-            // scroll list down
-            moveScroll(parent);
+        if(parent == null) {
+            return;
         }
+        final LinearLayout numberRowsListLayout =
+                (LinearLayout) parent.findViewById(R.id.layout_number_list);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        // create new row
+        View row = inflater.inflate(R.layout.row_contact_number, numberRowsListLayout, false);
+        // save row
+        numberRowsListLayout.addView(row);
+        // init row with number data
+        setNumberType(row, type);
+        setNumber(row, number);
+        // init 'row remove' button
+        ImageButton buttonRemove = (ImageButton) row.findViewById(R.id.button_remove);
+        buttonRemove.setTag(row);
+        buttonRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                numberRowsListLayout.removeView((View)v.getTag());
+            }
+        });
+        // scroll list down
+        moveScroll(parent);
+        setFocus(row);
     }
 
     private void moveScroll(View parent) {
@@ -205,6 +207,16 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
             @Override
             public void run() {
                 scroll.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
+    }
+
+    private void setFocus(final View row) {
+        row.post(new Runnable() {
+            @Override
+            public void run() {
+                EditText numberEdit = (EditText) row.findViewById(R.id.edit_number);
+                numberEdit.requestFocus();
             }
         });
     }

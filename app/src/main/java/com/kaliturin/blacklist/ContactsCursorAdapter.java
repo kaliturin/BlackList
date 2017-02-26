@@ -134,6 +134,14 @@ class ContactsCursorAdapter extends CursorAdapter {
         }
     }
 
+    boolean isItemChecked(View row) {
+        if(row != null) {
+            ViewHolder viewHolder = (ViewHolder) row.getTag();
+            return viewHolder.isChecked();
+        }
+        return false;
+    }
+
     @Nullable
     Contact getContact(View row) {
         if(row != null) {

@@ -42,6 +42,7 @@
     <string name="cancel">CANCEL</string>
     <string name="add">ADD</string>
     <string name="add_contact">Add a contact</string>
+    <string name="add_number">Add a number</string>
     <string name="adding_contact">Adding a contact</string>
     <string name="saving">Saving...</string>
     <string name="loading">Loading...</string>
@@ -70,11 +71,14 @@
     <string name="move_to_white">Move the contact to the White list</string>
     <string name="move_to_black">Move the contact to the Black list</string>
     <string name="set_as_default_sms_app">Set as default SMS application (needed for SMS blocking since Android 4.4 and later)</string>
-    <string name="symbols">Symbols</string>
+    <string name="digits_symbols">Digits/symbols</string>
     <string name="new_message">New message</string>
     <string name="needs_permission">needs the permission</string>
     <string name="delete_thread">Delete the thread</string>
     <string name="write_message">Write message</string>
+    <string name="add_from_contacts">Add from contacts</string>
+    <string name="message">Message</string>
+    <string name="send">Send</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>

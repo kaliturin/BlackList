@@ -1,5 +1,6 @@
 package com.kaliturin.blacklist;
 
+import android.support.v4.util.LongSparseArray;
 import android.util.SparseBooleanArray;
 
 import java.util.List;
@@ -116,7 +117,7 @@ public class IdentifiersContainer implements Cloneable {
     public IdentifiersContainer clone() {
         try {
             return (IdentifiersContainer) super.clone();
-        } catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException ignored) {
         }
         return null;
     }

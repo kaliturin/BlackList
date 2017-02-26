@@ -5,17 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
@@ -258,10 +255,10 @@ public class MainActivity extends AppCompatActivity
 
             // open SMS sending activity
             Bundle arguments = new Bundle();
-            arguments.putString(FragmentArguments.PERSON, person);
-            arguments.putString(FragmentArguments.NUMBER, number);
+            arguments.putString(FragmentArguments.CONTACT_NAME, person);
+            arguments.putString(FragmentArguments.CONTACT_NUMBER, number);
             String title = getString(R.string.new_message);
-            CustomFragmentActivity.show(this, title, SendSMSFragment.class, arguments);
+            CustomFragmentActivity.show(this, title, SMSSendFragment.class, arguments);
         }
     }
 }

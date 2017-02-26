@@ -21,6 +21,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.kaliturin.blacklist.ContactsAccessHelper.SMSConversation;
+
 
 /**
  * Fragment for showing all SMS conversations
@@ -89,6 +91,11 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
@@ -114,7 +121,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 // open SMS sending activity
                 CustomFragmentActivity.show(getContext(),
                         getString(R.string.new_message),
-                        SendSMSFragment.class, null);
+                        SMSSendFragment.class, null);
                 return true;
             }
         });
@@ -127,9 +134,9 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
     // On row click listener
     class OnRowClickListener implements View.OnClickListener {
         @Override
-        public void onClick(View row) {
+        public void onClick(final View row) {
             // get the clicked conversation
-            ContactsAccessHelper.SMSConversation sms = cursorAdapter.getSMSConversation(row);
+            final SMSConversation sms = cursorAdapter.getSMSConversation(row);
             if(sms != null) {
                 // open activity with all the SMS of the conversation
                 Bundle arguments = new Bundle();
@@ -142,11 +149,12 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 if(sms.unread > 0) {
                     // in async task mark sms of the thread are read
                     new SMSConversationFragment.SMSReadMarker(getContext()) {
+                        // when marking is completed
                         @Override
                         protected void onPostExecute(Void aVoid) {
-                            // when marking is completed - reload the items of the sms list
-                            int listPosition = listView.getFirstVisiblePosition();
-                            loadSMSConversations(listPosition);
+                            // refresh cached item
+                            cursorAdapter.invalidateCache(sms.threadId);
+                            cursorAdapter.notifyDataSetChanged();
                         }
                     }.execute(sms.threadId);
                 }
@@ -158,21 +166,21 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
     class OnRowLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View row) {
-            final ContactsAccessHelper.SMSConversation smsConversation =
-                    cursorAdapter.getSMSConversation(row);
-            if(smsConversation != null) {
+            final SMSConversation sms = cursorAdapter.getSMSConversation(row);
+            if(sms != null) {
                 // create menu dialog
-                MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
-                builder.setDialogTitle(smsConversation.person);
+                MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+                String title = (sms.person != null ? sms.person : sms.number);
+                dialog.setTitle(title);
                 // add menu item of sms deletion
-                builder.addMenuItem(getString(R.string.delete_thread), new View.OnClickListener() {
+                dialog.addItem(R.string.delete_thread, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-                        db.deleteSMSByThreadId(getContext(), smsConversation.threadId);
+                        db.deleteSMSByThreadId(getContext(), sms.threadId);
                     }
                 });
-                builder.show();
+                dialog.show();
             }
             return true;
         }

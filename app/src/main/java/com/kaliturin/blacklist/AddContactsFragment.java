@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import android.widget.ListView;
 
 import com.kaliturin.blacklist.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
+import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
 
 import java.util.List;
 
@@ -37,6 +39,8 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     private CustomSnackBar snackBar = null;
     private ContactSourceType sourceType = null;
     private int contactType = 0;
+    private boolean singleNumberMode = false;
+    private LongSparseArray<String> contactIdToNumber = new LongSparseArray<>();
 
     public AddContactsFragment() {
         // Required empty public constructor
@@ -56,6 +60,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         if(arguments != null) {
             contactType = arguments.getInt(CONTACT_TYPE);
             sourceType = (ContactSourceType) arguments.getSerializable(SOURCE_TYPE);
+            singleNumberMode = arguments.getBoolean(SINGLE_NUMBER_MODE);
         }
 
         // Inflate the layout for this fragment
@@ -63,7 +68,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
@@ -85,7 +90,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
                     public void onClick(View v) {
                         snackBar.dismiss();
                         // write checked contacts to the DB
-                        writeCheckedContacts();
+                        addCheckedContacts();
                     }
                 });
         // "Cancel button" button
@@ -103,11 +108,18 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         cursorAdapter = new ContactsCursorAdapter(getContext());
         cursorAdapter.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View row) {
                 if (cursorAdapter.hasCheckedItems()) {
                     snackBar.show();
                 } else {
                     snackBar.dismiss();
+                }
+
+                if(singleNumberMode && cursorAdapter.isItemChecked(row)) {
+                    Contact contact = cursorAdapter.getContact(row);
+                    if(contact != null && contact.numbers.size() > 1) {
+                        askForContactNumber(contact);
+                    }
                 }
             }
         });
@@ -171,8 +183,27 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
 //-------------------------------------------------------------------
 
+    // Opens menu dialog with list of contact's numbers to choose
+    private void askForContactNumber(final Contact contact) {
+        MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+        dialog.setTitle(contact.name);
+        for(ContactNumber number : contact.numbers) {
+            dialog.addItem(number.number, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String number = (String) v.getTag();
+                    if(number != null) {
+                        contactIdToNumber.put(contact.id, number);
+                    }
+                }
+            }).setItemTag(number.number);
+        }
+        dialog.show();
+    }
+
     // Clears all items selection
     private void clearCheckedItems() {
+        contactIdToNumber.clear();
         if(cursorAdapter != null) {
             cursorAdapter.setAllItemsChecked(false);
         }
@@ -180,6 +211,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Sets all items selected
     private void setCheckedAllItems() {
+        contactIdToNumber.clear();
         if(cursorAdapter != null) {
             cursorAdapter.setAllItemsChecked(true);
         }
@@ -193,6 +225,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Reloads items
     private void reloadItems(String itemsFilter) {
+        contactIdToNumber.clear();
         dismissSnackBar();
         getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter));
     }
@@ -265,12 +298,17 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     }
 
     // Writes checked contacts to the database
-    private void writeCheckedContacts() {
+    private void addCheckedContacts() {
+        // get list of contacts and write it to the DB
+        List<Contact> contacts = cursorAdapter.extractCheckedContacts();
+        addContacts(contacts, contactIdToNumber);
+    }
+
+    // Writes checked contacts to the database
+    protected void addContacts(List<Contact> contacts, LongSparseArray<String> contactIdToNumber) {
         // if permission is granted
         if(!Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE)) {
-            // get list of contacts and write it to the DB
-            List<Contact> contactList = cursorAdapter.extractCheckedContacts();
-            ContactsWriter writer = new ContactsWriter(getContext(), contactType, contactList);
+            ContactsWriter writer = new ContactsWriter(getContext(), contactType, contacts);
             writer.execute();
         }
     }

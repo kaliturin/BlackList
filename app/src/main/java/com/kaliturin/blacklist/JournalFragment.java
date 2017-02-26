@@ -285,10 +285,10 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             }
 
             // create menu dialog
-            MenuDialogBuilder builder = new MenuDialogBuilder(getActivity());
-            builder.setDialogTitle(record.caller).
+            MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+            dialog.setTitle(record.caller).
                     // add menu item of record deletion
-                            addMenuItem(getString(R.string.delete_record), new View.OnClickListener() {
+                            addItem(R.string.delete_record, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             deleteItem(record.id);
@@ -296,7 +296,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                         }
                     }).
                     // add menu item records searching
-                            addMenuItem(getString(R.string.find_similar_records), new View.OnClickListener() {
+                            addItem(R.string.find_similar_records, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             // find all records by record's caller
@@ -308,7 +308,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             if (blackContact != null) {
                 // add menu item of excluding the contact from the black list
                 final long contactId = blackContact.id;
-                builder.addMenuItem(getString(R.string.exclude_from_black), new View.OnClickListener() {
+                dialog.addItem(R.string.exclude_from_black, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         deleteContact(contactId);
@@ -316,7 +316,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                 });
             } else {
                 // add menu item of adding the contact to the black list
-                builder.addMenuItem(getString(R.string.add_to_black), new View.OnClickListener() {
+                dialog.addItem(R.string.add_to_black, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         addContactToBlackList(record.caller, record.number);
@@ -327,7 +327,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             // if contact is not found in the white list
             if(whiteContact == null) {
                 // add menu item of adding contact to the white list
-                builder.addMenuItem(getString(R.string.move_to_white), new View.OnClickListener() {
+                dialog.addItem(R.string.move_to_white, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         moveContactToWhiteList(record.caller, record.number);
@@ -335,7 +335,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                 });
             }
 
-            builder.show();
+            dialog.show();
             return true;
         }
     }

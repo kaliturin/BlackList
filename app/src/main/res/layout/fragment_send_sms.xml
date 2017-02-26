@@ -2,26 +2,129 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/colorPrimary"
-    tools:context="com.kaliturin.blacklist.SendSMSFragment">
+    android:orientation="vertical"
+    tools:context="com.kaliturin.blacklist.SMSSendFragment">
 
-    <EditText
-        android:id="@+id/edit_person"
+    <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLength="100"
-        android:hint="@string/contact_name">
-        <requestFocus />
-    </EditText>
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <EditText
-        android:id="@+id/edit_number"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLength="100"
-        android:hint="@string/phone_number">
-        <requestFocus />
-    </EditText>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
+
+            <LinearLayout
+                android:id="@+id/contacts_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edit_number"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="3dp"
+                    android:layout_gravity="center"
+                    android:hint="@string/phone_number"
+                    android:background="@drawable/selector_edit_text"
+                    android:maxLength="100">
+
+                    <requestFocus />
+                </EditText>
+
+                <ImageButton
+                    android:id="@+id/button_add_contact"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/add_contact"
+                    android:src="@drawable/ic_add"
+                    android:tint="@color/colorAccent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/view_add_contact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@drawable/selector_control"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:text="@string/add_from_contacts" />
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:contentDescription="@string/add_from_contacts"
+                    android:src="@drawable/ic_add"
+                    android:tint="@color/colorAccent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/text_message"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:padding="3dp"
+                    android:minLines="5"
+                    android:gravity="top|start"
+                    android:background="@drawable/selector_edit_text"
+                    android:hint="@string/message" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/text_message_length"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="3dp"
+                        android:text="160/1" />
+
+                    <Button
+                        android:id="@+id/button_send"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:text="@string/send" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
