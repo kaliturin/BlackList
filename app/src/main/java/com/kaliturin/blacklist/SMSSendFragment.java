@@ -81,21 +81,23 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
         // put contact number to edit text
         final EditText numberEdit = (EditText) view.findViewById(R.id.edit_number);
 
-        // add contact from edit text button
-        View addContactButton = view.findViewById(R.id.button_add_contact);
-        addContactButton.setOnClickListener(new View.OnClickListener() {
+        // add number from edit text
+        View addButton = view.findViewById(R.id.button_add_number);
+        addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String number = numberEdit.getText().toString().trim();
                 if(!number.isEmpty()) {
                     addRowToContactsViewList(number);
                     numberEdit.setText("");
+                } else {
+                    showAddContactsMenuDialog();
                 }
             }
         });
 
-        // add contact from contacts list button
-        View addContactView = view.findViewById(R.id.view_add_contact);
+        // add contact from contacts list
+        View addContactView = view.findViewById(R.id.button_add_contact);
         addContactView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
