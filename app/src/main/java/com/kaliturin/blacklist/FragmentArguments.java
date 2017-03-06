@@ -14,4 +14,5 @@ interface FragmentArguments {
     String CONTACT_ID = "CONTACT_ID";
     String UNREAD_COUNT = "UNREAD_COUNT";
     String SINGLE_NUMBER_MODE = "SINGLE_NUMBER_MODE";
+    String SMS_MESSAGE_BODY = "SMS_MESSAGE_BODY";
 }

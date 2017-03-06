@@ -484,11 +484,11 @@ class ContactsAccessHelper {
         SMSConversation smsConversation = null;
 
         // get the count of unread SMS in the thread
-        int unread = getSMSUnreadCountByThreadId(context, threadId);
+        int unread = getSMSMessagesUnreadCountByThreadId(context, threadId);
         // get date and address from the last SMS of the thread
-        SMSRecordCursorWrapper cursor = getSMSRecordsByThreadId(context, threadId, true, 1);
+        SMSMessageCursorWrapper cursor = getSMSMessagesByThreadId(context, threadId, true, 1);
         if(cursor != null) {
-            SMSRecord sms = cursor.getSMSRecord(context);
+            SMSMessage sms = cursor.getSMSMessage(context);
             smsConversation = new SMSConversation(threadId, sms.date,
                     sms.person, sms.number, sms.body, unread);
             cursor.close();
@@ -497,9 +497,9 @@ class ContactsAccessHelper {
         return smsConversation;
     }
 
-    // Selects SMS records by thread id
+    // Selects SMS messages by thread id
     @Nullable
-    SMSRecordCursorWrapper getSMSRecordsByThreadId(Context context, int threadId, boolean desc, int limit) {
+    SMSMessageCursorWrapper getSMSMessagesByThreadId(Context context, int threadId, boolean desc, int limit) {
         if(!Permissions.isGranted(context, Permissions.READ_SMS) ||
                 !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             return null;
@@ -514,11 +514,11 @@ class ContactsAccessHelper {
                 new String[]{String.valueOf(threadId)},
                 orderClause + limitClause);
 
-        return (validate(cursor) ? new SMSRecordCursorWrapper(cursor) : null);
+        return (validate(cursor) ? new SMSMessageCursorWrapper(cursor) : null);
     }
 
-    // Returns count of unread SMS by thread id
-    int getSMSUnreadCountByThreadId(Context context, int threadId) {
+    // Returns count of unread SMS messages by thread id
+    int getSMSMessagesUnreadCountByThreadId(Context context, int threadId) {
         if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
             return 0;
         }
@@ -544,15 +544,15 @@ class ContactsAccessHelper {
         return count;
     }
 
-    // Marks SMS are read by thread id
-    boolean setSMSReadByThreadId(Context context, int threadId) {
+    // Marks SMS messages are read by thread id
+    boolean setSMSMessagesReadByThreadId(Context context, int threadId) {
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return false;
         }
 
         ContentValues values = new ContentValues();
         values.put("read", 1);
-        contentResolver.update(
+        return contentResolver.update(
                 Uri.parse("content://sms/inbox"),
                 values,
                 " thread_id = ? AND " +
@@ -560,13 +560,11 @@ class ContactsAccessHelper {
                 new String[]{
                         String.valueOf(threadId),
                         String.valueOf(0)
-                });
-
-        return true;
+                }) > 0;
     }
 
-    // Deletes SMS by thread id
-    boolean deleteSMSByThreadId(Context context, int threadId) {
+    // Deletes SMS messages by thread id
+    boolean deleteSMSMessagesByThreadId(Context context, int threadId) {
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return false;
         }
@@ -579,25 +577,37 @@ class ContactsAccessHelper {
         return (count > 0);
     }
 
-    // Marks all SMS are seen
-    boolean setSMSSeen(Context context) {
+    // Deletes SMS message by id
+    boolean deleteSMSMessageById(Context context, long id) {
+        if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
+            return false;
+        }
+
+        int count = contentResolver.delete(
+                Uri.parse("content://sms"),
+                " _id = ? ",
+                new String[]{String.valueOf(id)});
+
+        return (count > 0);
+    }
+
+    // Marks all SMS messages are seen
+    boolean setSMSMessagesSeen(Context context) {
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return false;
         }
 
         ContentValues values = new ContentValues();
         values.put("seen", 1);
-        contentResolver.update(
+        return contentResolver.update(
                 Uri.parse("content://sms/inbox"),
                 values,
                 " seen = ? ",
-                new String[]{String.valueOf(0)});
-
-        return true;
+                new String[]{String.valueOf(0)}) > 0;
     }
 
     // Selects SMS thread id by phone number
-    int getThreadIdByNumber(Context context, String number) {
+    int getSMSThreadIdByNumber(Context context, String number) {
         if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
             return -1;
         }
@@ -619,8 +629,8 @@ class ContactsAccessHelper {
         return threadId;
     }
 
-    // SMS record
-    class SMSRecord {
+    // SMS message
+    class SMSMessage {
         static final int TYPE_INBOX = 1;
 
         final long id;
@@ -630,7 +640,7 @@ class ContactsAccessHelper {
         final String number;
         final String body;
 
-        SMSRecord(long id, int type, long date, String person, String number, String body) {
+        SMSMessage(long id, int type, long date, String person, String number, String body) {
             this.id = id;
             this.type = type;
             this.date = date;
@@ -640,8 +650,8 @@ class ContactsAccessHelper {
         }
     }
 
-    // SMS record cursor wrapper
-    class SMSRecordCursorWrapper extends CursorWrapper {
+    // SMS message cursor wrapper
+    class SMSMessageCursorWrapper extends CursorWrapper {
         private final int ID;
         private final int TYPE;
         private final int DATE;
@@ -649,7 +659,7 @@ class ContactsAccessHelper {
         private final int NUMBER;
         private final int BODY;
 
-        private SMSRecordCursorWrapper(Cursor cursor) {
+        private SMSMessageCursorWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
             ID = cursor.getColumnIndex("_id");
@@ -660,7 +670,7 @@ class ContactsAccessHelper {
             BODY = cursor.getColumnIndex("body");
         }
 
-        SMSRecord getSMSRecord(Context context) {
+        SMSMessage getSMSMessage(Context context) {
             long id = getLong(ID);
             int type = getInt(TYPE);
             long date = getLong(DATE);
@@ -679,14 +689,14 @@ class ContactsAccessHelper {
                 person = contact.name;
             }
 
-            return new SMSRecord(id, type, date, person, number, body);
+            return new SMSMessage(id, type, date, person, number, body);
         }
     }
 
     // Writes SMS messages to the inbox
     // Needed only for API19 and newer - where only default SMS app can write to the inbox
     @TargetApi(19)
-    boolean writeSMSToInbox(Context context, SmsMessage[] messages) {
+    boolean writeSMSMessageToInbox(Context context, SmsMessage[] messages) {
         // check write permission
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
 

@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.kaliturin.blacklist.ContactsAccessHelper.SMSRecord;
-import com.kaliturin.blacklist.ContactsAccessHelper.SMSRecordCursorWrapper;
+import com.kaliturin.blacklist.ContactsAccessHelper.SMSMessage;
+import com.kaliturin.blacklist.ContactsAccessHelper.SMSMessageCursorWrapper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -61,9 +61,9 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // get cursor wrapper
-        SMSRecordCursorWrapper cursorWrapper = (SMSRecordCursorWrapper) cursor;
+        SMSMessageCursorWrapper cursorWrapper = (SMSMessageCursorWrapper) cursor;
         // get model
-        SMSRecord model = cursorWrapper.getSMSRecord(context);
+        SMSMessage model = cursorWrapper.getSMSMessage(context);
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with new model
@@ -73,7 +73,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
 //------------------------------------------------------------------------
 
     @Nullable
-    SMSRecord getSMSRecord(View row) {
+    SMSMessage getSMSMessage(View row) {
         if(row != null) {
             ViewHolder holder = (ViewHolder) row.getTag();
             return holder.model;
@@ -137,7 +137,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
 
     // Holder of the view data
     private class ViewHolder {
-        private SMSRecord model;
+        private SMSMessage model;
         private View rowView;
         private TextView bodyTextView;
         private TextView dateTextView;
@@ -161,7 +161,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             this.dateTextView = dateTextView;
         }
 
-        void setModel(Context context, SMSRecord model) {
+        void setModel(Context context, SMSMessage model) {
             this.model = model;
             bodyTextView.setText(model.body);
             Date date = toDate(model.date);
@@ -170,14 +170,18 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
 
             // init alignments and color
             Padding padding;
-            int gravity, color;
-            if(model.type == SMSRecord.TYPE_INBOX) {
+            int gravity;
+            int color;
+            //int drawableId;
+            if(model.type == SMSMessage.TYPE_INBOX) {
                 padding = paddingStart;
                 gravity = Gravity.START;
+                //drawableId = R.drawable.bubble_in;
                 color = R.color.colorIncomeSms;
             } else {
                 padding = paddingEnd;
                 gravity = Gravity.END;
+                //drawableId = R.drawable.bubble_out;
                 color = R.color.colorOutcomeSms;
             }
 
@@ -186,6 +190,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             rowView.setPadding(padding.left, padding.top, padding.right, padding.bottom);
 
             // set background color
+            //Utils.setDrawable(context, contentView, drawableId);
             Drawable drawable = contentView.getBackground().mutate();
             Utils.setDrawableColor(context, drawable, color);
         }

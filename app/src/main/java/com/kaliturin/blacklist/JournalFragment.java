@@ -4,6 +4,7 @@ package com.kaliturin.blacklist;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -30,9 +31,10 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecord;
  * Fragment for the journal (blocked calls/sms list) representation
  */
 public class JournalFragment extends Fragment implements FragmentArguments {
+    private InternalEventBroadcast internalEventBroadcast = null;
     private JournalCursorAdapter cursorAdapter = null;
     private CustomSnackBar snackBar = null;
-    private String itemsFilter = null;
+    private String itemsFilter = "";
     private SearchView searchView = null;
     private MenuItem itemSearch = null;
 
@@ -101,6 +103,17 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             }
         });
 
+        // init internal broadcast event receiver
+        internalEventBroadcast = new InternalEventBroadcast() {
+            @Override
+            public void onJournalWrite() {
+                clearSearchView();
+                // reload list view items
+                reloadItems("");
+            }
+        };
+        internalEventBroadcast.register(getContext());
+
         // journal cursor adapter
         cursorAdapter = new JournalCursorAdapter(getContext());
         cursorAdapter.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +141,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
     @Override
     public void onDestroyView() {
         getLoaderManager().destroyLoader(0);
+        internalEventBroadcast.unregister(getContext());
         super.onDestroyView();
     }
 
@@ -166,7 +180,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                reloadItems(null);
+                reloadItems("");
                 return true;
             }
         });
@@ -177,7 +191,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 //-------------------------------------------------------------------
 
     // Moves contact to the white list
-    // TODO consider to run it from thread
+    // TODO consider to run it in thread
     private void moveContactToWhiteList(String caller, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
         if(db != null) {
@@ -186,7 +200,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
     }
 
     // Adds contact to the black list
-    // TODO consider to run it from thread
+    // TODO consider to run it in thread
     private void addContactToBlackList(String caller, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
         if(db != null) {
@@ -238,13 +252,26 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         return snackBar != null && snackBar.dismiss();
     }
 
+    // Clears search view
+    private void clearSearchView() {
+        if(searchView != null && itemSearch != null) {
+            if(searchView.getQuery().length() > 0) {
+                searchView.setQuery("", false);
+            }
+            MenuItemCompat.collapseActionView(itemSearch);
+        }
+    }
+
     // Deletes all checked items
     private void deleteCheckedItems() {
         getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, true));
     }
 
     // Reloads items
-    private void reloadItems(String itemsFilter) {
+    private void reloadItems(@NonNull String itemsFilter) {
+        if(this.itemsFilter.equals(itemsFilter)) {
+            return;
+        }
         this.itemsFilter = itemsFilter;
         dismissSnackBar();
         getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, false));

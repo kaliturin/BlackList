@@ -34,6 +34,7 @@ class MenuDialogBuilder {
     MenuDialogBuilder setTitle(String title) {
         TextView titleView = (TextView) getView().findViewById(R.id.dialog_title);
         titleView.setText(title);
+        titleView.setVisibility(View.VISIBLE);
         return this;
     }
 

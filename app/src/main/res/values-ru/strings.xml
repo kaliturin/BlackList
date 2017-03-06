@@ -78,6 +78,10 @@
     <string name="add_from_contacts">Добавить из контактов</string>
     <string name="message">Cообщение</string>
     <string name="send">Отпр.</string>
+    <string name="Delete_message">Удалить сообщение</string>
+    <string name="Copy_message">Скопировать текст</string>
+    <string name="Forward_message">Переслать сообщение</string>
+    <string name="Copied_to_clipboard">"Скопировано в буфер обмена"</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>

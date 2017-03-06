@@ -162,7 +162,11 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         }
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
         if(db != null) {
-            db.addJournalRecord(System.currentTimeMillis(), name, number, null);
+            // write to the journal
+            if(db.addJournalRecord(System.currentTimeMillis(), name, number, null) >= 0) {
+                // send broadcast message
+                InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WRITE);
+            }
         }
     }
 

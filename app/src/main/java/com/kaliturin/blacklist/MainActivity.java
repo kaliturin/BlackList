@@ -144,6 +144,8 @@ public class MainActivity extends AppCompatActivity
         return super.onKeyUp(keyCode, event);
     }
 
+//----------------------------------------------------------------------------
+
     boolean isAction(String name) {
         String action = getIntent().getAction();
         return (action != null && action.equals(name));
@@ -226,39 +228,41 @@ public class MainActivity extends AppCompatActivity
 
     private void showSendSMSActivity() {
         Uri uri = getIntent().getData();
-        if (uri != null) {
-            // get phone number where to send the SMS
-            String ssp = uri.getSchemeSpecificPart();
-            String number = ContactsAccessHelper.normalizeContactNumber(ssp);
-
-            // find person by phone number in contacts
-            String person = null;
-            ContactsAccessHelper db = ContactsAccessHelper.getInstance(this);
-            Contact contact = db.getContact(this, number);
-            if (contact != null) {
-                person = contact.name;
-            }
-
-            // get SMS thread id by phone number
-            int threadId = db.getThreadIdByNumber(this, number);
-            if(threadId >= 0) {
-                // get the count of unread sms of the thread
-                int unreadCount = db.getSMSUnreadCountByThreadId(this, threadId);
-
-                // open thread's SMS conversation activity
-                Bundle arguments = new Bundle();
-                arguments.putInt(FragmentArguments.THREAD_ID, threadId);
-                arguments.putInt(FragmentArguments.UNREAD_COUNT, unreadCount);
-                String title = (person != null ? person : number);
-                CustomFragmentActivity.show(this, title, SMSConversationFragment.class, arguments);
-            }
-
-            // open SMS sending activity
-            Bundle arguments = new Bundle();
-            arguments.putString(FragmentArguments.CONTACT_NAME, person);
-            arguments.putString(FragmentArguments.CONTACT_NUMBER, number);
-            String title = getString(R.string.new_message);
-            CustomFragmentActivity.show(this, title, SMSSendFragment.class, arguments);
+        if (uri == null) {
+            return;
         }
+        // get phone number where to send the SMS
+        String ssp = uri.getSchemeSpecificPart();
+        String number = ContactsAccessHelper.normalizeContactNumber(ssp);
+
+        // find person by phone number in contacts
+        String person = null;
+        ContactsAccessHelper db = ContactsAccessHelper.getInstance(this);
+        Contact contact = db.getContact(this, number);
+        if (contact != null) {
+            person = contact.name;
+        }
+
+        // get SMS thread id by phone number
+        int threadId = db.getSMSThreadIdByNumber(this, number);
+        if(threadId >= 0) {
+            // get the count of unread sms of the thread
+            int unreadCount = db.getSMSMessagesUnreadCountByThreadId(this, threadId);
+
+            // open thread's SMS conversation activity
+            Bundle arguments = new Bundle();
+            arguments.putInt(FragmentArguments.THREAD_ID, threadId);
+            arguments.putInt(FragmentArguments.UNREAD_COUNT, unreadCount);
+            arguments.putString(FragmentArguments.CONTACT_NUMBER, number);
+            String title = (person != null ? person : number);
+            CustomFragmentActivity.show(this, title, SMSConversationFragment.class, arguments);
+        }
+
+        // open SMS sending activity
+        Bundle arguments = new Bundle();
+        arguments.putString(FragmentArguments.CONTACT_NAME, person);
+        arguments.putString(FragmentArguments.CONTACT_NUMBER, number);
+        String title = getString(R.string.new_message);
+        CustomFragmentActivity.show(this, title, SMSSendFragment.class, arguments);
     }
 }

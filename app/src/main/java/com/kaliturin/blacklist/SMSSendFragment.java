@@ -54,6 +54,9 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // message body edit
+        final EditText messageText = (EditText) view.findViewById(R.id.text_message);
+
         if(savedInstanceState != null) {
             // restore numbers list
             List<String> list = savedInstanceState.getStringArrayList(CONTACTS_LIST);
@@ -75,13 +78,15 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                     }
                     addRowToContactsViewList(contact);
                 }
+                String body = arguments.getString(SMS_MESSAGE_BODY);
+                if(body != null) {
+                    messageText.setText(body);
+                }
             }
         }
 
-        // put contact number to edit text
+        // phone number edit
         final EditText numberEdit = (EditText) view.findViewById(R.id.edit_number);
-
-        // add number from edit text
         View addButton = view.findViewById(R.id.button_add_number);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,10 +110,8 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
             }
         });
 
-        // message body length info
+        // message text changed listener
         final TextView lengthMessageText = (TextView) view.findViewById(R.id.text_message_length);
-        // message body edit
-        final EditText messageText = (EditText) view.findViewById(R.id.text_message);
         messageText.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -140,7 +143,6 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                 sendSMSMessage();
             }
         });
-
     }
 
     @Override
@@ -178,6 +180,11 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
         View view = getView();
         if(view == null) {
             return false;
+        }
+
+        // if contacts is already added
+        if(contactsStringList.contains(contact)) {
+            return true;
         }
 
         // get contact's number and name

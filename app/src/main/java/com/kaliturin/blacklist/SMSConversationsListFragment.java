@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -30,6 +31,7 @@ import com.kaliturin.blacklist.ContactsAccessHelper.SMSConversation;
 public class SMSConversationsListFragment extends Fragment implements FragmentArguments {
     private static final String LIST_POSITION = "LIST_POSITION";
 
+    private InternalEventBroadcast internalEventBroadcast = null;
     private SMSConversationsListCursorAdapter cursorAdapter = null;
     private ListView listView = null;
 
@@ -80,6 +82,23 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         listView = (ListView) view.findViewById(R.id.rows_list);
         listView.setAdapter(cursorAdapter);
 
+        // init internal broadcast event receiver
+        internalEventBroadcast = new InternalEventBroadcast() {
+            @Override
+            public void onSMSInboxWrite(@NonNull String number) {
+                // SMS Inbox was changed - reload list view items
+                loadListViewItems();
+            }
+
+            @Override
+            public void onSMSInboxRead(int threadId) {
+                // SMS thread from the Inbox was read - refresh cached list view items
+                cursorAdapter.invalidateCache(threadId);
+                cursorAdapter.notifyDataSetChanged();
+            }
+        };
+        internalEventBroadcast.register(getContext());
+
         // get saved list position
         int listPosition = 0;
         if(savedInstanceState != null) {
@@ -87,12 +106,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         }
 
         // load SMS conversations to the list
-        loadSMSConversations(listPosition);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+        loadListViewItems(listPosition);
     }
 
     @Override
@@ -103,8 +117,9 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
 
     @Override
     public void onDestroyView() {
-       getLoaderManager().destroyLoader(0);
-       super.onDestroyView();
+        getLoaderManager().destroyLoader(0);
+        internalEventBroadcast.unregister(getContext());
+        super.onDestroyView();
     }
 
     @Override
@@ -141,23 +156,11 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 // open activity with all the SMS of the conversation
                 Bundle arguments = new Bundle();
                 arguments.putInt(THREAD_ID, sms.threadId);
+                arguments.putInt(UNREAD_COUNT, sms.unread);
+                arguments.putString(CONTACT_NUMBER, sms.number);
                 String title = (sms.person != null ? sms.person : sms.number);
                 CustomFragmentActivity.show(getContext(), title,
                         SMSConversationFragment.class, arguments);
-
-                // is there any unread sms in the thread
-                if(sms.unread > 0) {
-                    // in async task mark sms of the thread are read
-                    new SMSConversationFragment.SMSReadMarker(getContext()) {
-                        // when marking is completed
-                        @Override
-                        protected void onPostExecute(Void aVoid) {
-                            // refresh cached item
-                            cursorAdapter.invalidateCache(sms.threadId);
-                            cursorAdapter.notifyDataSetChanged();
-                        }
-                    }.execute(sms.threadId);
-                }
             }
         }
     }
@@ -177,7 +180,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                     @Override
                     public void onClick(View v) {
                         ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-                        db.deleteSMSByThreadId(getContext(), sms.threadId);
+                        db.deleteSMSMessagesByThreadId(getContext(), sms.threadId);
                     }
                 });
                 dialog.show();
@@ -189,9 +192,18 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
 //----------------------------------------------------------------------
 
     // Loads SMS conversations to the list view
-    private void loadSMSConversations(int listPosition) {
+    private void loadListViewItems() {
+        int listPosition = listView.getFirstVisiblePosition();
+        loadListViewItems(listPosition);
+    }
+
+    // Loads SMS conversations to the list view
+    private void loadListViewItems(int listPosition) {
         int loaderId = 0;
-        ConversationsLoaderCallbacks callbacks = newLoaderCallbacks(listView, listPosition);
+        ConversationsLoaderCallbacks callbacks =
+                new ConversationsLoaderCallbacks(getContext(),
+                        listView, listPosition, cursorAdapter);
+
         LoaderManager manager = getLoaderManager();
         if (manager.getLoader(loaderId) == null) {
             // init and run the items loader
@@ -200,11 +212,6 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
             // restart loader
             manager.restartLoader(loaderId, null, callbacks);
         }
-    }
-
-    // Creates SMS conversations loader
-    private ConversationsLoaderCallbacks newLoaderCallbacks(ListView listView, int listPosition) {
-        return new ConversationsLoaderCallbacks(getContext(), listView, listPosition, cursorAdapter);
     }
 
     // SMS conversations loader
@@ -289,7 +296,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         @Override
         protected Void doInBackground(Void... params) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            db.setSMSSeen(context);
+            db.setSMSMessagesSeen(context);
             return null;
         }
     }

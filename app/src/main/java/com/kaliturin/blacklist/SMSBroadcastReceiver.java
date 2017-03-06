@@ -1,12 +1,10 @@
 package com.kaliturin.blacklist;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Telephony;
 import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
 
@@ -50,7 +48,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 // messages were not blocked - write them to the inbox
                 ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-                if(db.writeSMSToInbox(context, messages)) {
+                if(db.writeSMSMessageToInbox(context, messages)) {
+                    // send broadcast event
+                    InternalEventBroadcast.sendSMSInboxWrite(context, number);
                     // get contact by number
                     Contact contact = db.getContact(context, number);
                     // get name for notification
@@ -134,7 +134,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         return abort;
     }
 
-    private String getAction() {
+    public static String getAction() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ?
                 SMS_DELIVER : SMS_RECEIVED);
     }
@@ -223,7 +223,11 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         String text = getSMSMessageBody(context, messages);
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
         if(db != null) {
-            db.addJournalRecord(System.currentTimeMillis(), name, number, text);
+            // write to the journal
+            if(db.addJournalRecord(System.currentTimeMillis(), name, number, text) >= 0) {
+                // send broadcast message
+                InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WRITE);
+            }
         }
     }
 

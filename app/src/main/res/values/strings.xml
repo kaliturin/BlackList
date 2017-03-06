@@ -79,6 +79,10 @@
     <string name="add_from_contacts">Add from contacts</string>
     <string name="message">Message</string>
     <string name="send">Send</string>
+    <string name="Delete_message">Delete the message</string>
+    <string name="Copy_message">Copy the message</string>
+    <string name="Forward_message">Forward the message</string>
+    <string name="Copied_to_clipboard">"Copied to the clipboard"</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>
