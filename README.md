@@ -1,0 +1,1 @@
+Blacklist is Android application which allows to block unwanted calls and SMS messages.
