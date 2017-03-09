@@ -307,7 +307,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     // Writes checked contacts to the database
     protected void addContacts(List<Contact> contacts, LongSparseArray<String> contactIdToNumber) {
         // if permission is granted
-        if(!Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+        if(!Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
             ContactsWriter writer = new ContactsWriter(getContext(), contactType, contacts);
             writer.execute();
         }

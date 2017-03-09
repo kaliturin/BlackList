@@ -83,6 +83,13 @@
     <string name="Copy_message">Copy the message</string>
     <string name="Forward_message">Forward the message</string>
     <string name="Copied_to_clipboard">"Copied to the clipboard"</string>
+    <string name="SMS_is_sent">"SMS is sent"</string>
+    <string name="Generic_failure">"Generic failure"</string>
+    <string name="No_service">"No service"</string>
+    <string name="Null_PDU">"Null PDU"</string>
+    <string name="Radio_off">"Radio is off"</string>
+    <string name="SMS_is_delivered">"SMS is delivered"</string>
+    <string name="SMS_is_not_delivered">"SMS isn't delivered"</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>

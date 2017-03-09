@@ -48,7 +48,7 @@ public class AddContactsMenuFragment extends Fragment implements FragmentArgumen
             }
 
             // if permission is granted
-            if(!Permissions.notifyIfNotGranted(getActivity(), permission)) {
+            if(!Permissions.notifyIfNotGranted(getContext(), permission)) {
                 // permission is granted
                 Bundle arguments = new Bundle();
                 Class<? extends Fragment> fragmentClass;

@@ -20,28 +20,31 @@ public class InternalEventBroadcast extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // invoke the callback correspondent to the received event
+        // get action type
         String actionType = intent.getStringExtra(EVENT_TYPE);
-        if (actionType != null) {
-            if (actionType.equals(JOURNAL_WRITE)) {
+        if (actionType == null) {
+            return;
+        }
+        // invoke the callback correspondent to the received event
+        switch (actionType) {
+            case JOURNAL_WRITE:
                 onJournalWrite();
-            } else
-            if (actionType.equals(SMS_INBOX_WRITE)) {
+                break;
+            case SMS_INBOX_WRITE:
                 String number = intent.getStringExtra(CONTACT_NUMBER);
                 if(number != null) {
                     onSMSInboxWrite(number);
                 }
-            } else
-            if (actionType.equals(SMS_INBOX_READ)) {
+                break;
+            case SMS_INBOX_READ:
                 int threadId = intent.getIntExtra(THREAD_ID, 0);
                 onSMSInboxRead(threadId);
-            }
+                break;
         }
     }
 
     public void register(Context context) {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(InternalEventBroadcast.class.getName());
+        IntentFilter filter = new IntentFilter(InternalEventBroadcast.class.getName());
         context.registerReceiver(this, filter);
     }
 

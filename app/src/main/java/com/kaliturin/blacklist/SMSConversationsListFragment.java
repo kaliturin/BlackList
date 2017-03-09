@@ -68,8 +68,8 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         super.onViewCreated(view, savedInstanceState);
 
         // notify user if permission isn't granted
-        Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_SMS);
-        Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_CONTACTS);
+        Permissions.notifyIfNotGranted(getContext(), Permissions.READ_SMS);
+        Permissions.notifyIfNotGranted(getContext(), Permissions.READ_CONTACTS);
 
         // cursor adapter
         cursorAdapter = new SMSConversationsListCursorAdapter(getContext());

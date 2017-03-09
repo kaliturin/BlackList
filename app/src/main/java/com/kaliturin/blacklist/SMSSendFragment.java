@@ -55,7 +55,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
         super.onViewCreated(view, savedInstanceState);
 
         // message body edit
-        final EditText messageText = (EditText) view.findViewById(R.id.text_message);
+        final EditText messageEdit = (EditText) view.findViewById(R.id.text_message);
 
         if(savedInstanceState != null) {
             // restore numbers list
@@ -80,7 +80,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                 }
                 String body = arguments.getString(SMS_MESSAGE_BODY);
                 if(body != null) {
-                    messageText.setText(body);
+                    messageEdit.setText(body);
                 }
             }
         }
@@ -112,11 +112,11 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
 
         // message text changed listener
         final TextView lengthMessageText = (TextView) view.findViewById(R.id.text_message_length);
-        messageText.addTextChangedListener(new TextWatcherAdapter() {
+        messageEdit.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
                 // detect unicode characters and get max length of sms
-                Editable editable = messageText.getText();
+                Editable editable = messageEdit.getText();
                 int length = editable.length();
                 int maxLength = SMS_LENGTH;
                 for(int i=0; i<length; i++) {
@@ -171,7 +171,25 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
 
 //-------------------------------------------------------------
 
+    // Sends SMS message
     boolean sendSMSMessage() {
+        if(!Permissions.isGranted(getContext(), Permissions.SEND_SMS)) {
+            return false;
+        }
+
+        View view = getView();
+        if(view == null) {
+            return false;
+        }
+
+        EditText messageEdit = (EditText) getView().findViewById(R.id.text_message);
+        String text = messageEdit.getText().toString();
+        if(text.isEmpty()) {
+            return false;
+        }
+
+
+
         return false;
     }
 
@@ -279,7 +297,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     private void showAddContactsActivity(String permission,
                                          ContactSourceType sourceType, @StringRes int titleId) {
         // if permission isn't granted
-        if (Permissions.notifyIfNotGranted(getActivity(), permission)) {
+        if (Permissions.notifyIfNotGranted(getContext(), permission)) {
             return;
         }
 

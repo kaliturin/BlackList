@@ -59,25 +59,25 @@ class Permissions {
         return result;
     }
 
-    // Checks for permissions and notifies if they aren't granted
-    static void notifyIfNotGranted(@NonNull Activity activity) {
+    // Checks for permissions and notifies the user if they aren't granted
+    static void notifyIfNotGranted(@NonNull Context context) {
         for(String permission : PERMISSIONS) {
-            notifyIfNotGranted(activity, permission);
+            notifyIfNotGranted(context, permission);
         }
     }
 
     // Checks for permission and notifies if it isn't granted
-    static boolean notifyIfNotGranted(@NonNull Activity activity, @NonNull String permission) {
-        if(!isGranted(activity, permission)) {
-            notify(activity, permission);
+    static boolean notifyIfNotGranted(@NonNull Context context, @NonNull String permission) {
+        if(!isGranted(context, permission)) {
+            notify(context, permission);
             return true;
         }
         return false;
     }
 
-    // Notifies the user about permission isn't granted
-    private static void notify(@NonNull final Activity activity, @NonNull String permission) {
-        PackageManager pm = activity.getPackageManager();
+    // Notifies the user if permission isn't granted
+    private static void notify(@NonNull Context context, @NonNull String permission) {
+        PackageManager pm = context.getPackageManager();
         PermissionInfo info = null;
         try {
             info = pm.getPermissionInfo(permission, PackageManager.GET_META_DATA);
@@ -90,14 +90,10 @@ class Permissions {
             if(label == null) {
                 label = info.nonLocalizedLabel;
             }
-            final String message = "\"" + activity.getString(R.string.app_name) + "\" " +
-                    activity.getString(R.string.needs_permission) + ": " + label;
+            String message = "\"" + context.getString(R.string.app_name) + "\" " +
+                    context.getString(R.string.needs_permission) + ": " + label;
 
-            activity.runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
-                }
-            });
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
     }
 

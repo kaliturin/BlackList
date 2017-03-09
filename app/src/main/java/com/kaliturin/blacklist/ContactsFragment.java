@@ -70,7 +70,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE);
+        Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE);
 
         // snack bar
         snackBar = new CustomSnackBar(view, R.id.snack_bar);
@@ -422,7 +422,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
     private void showAddContactsActivity(String permission,
                                         ContactSourceType sourceType, @StringRes int titleId) {
         // if permission isn't granted
-        if (Permissions.notifyIfNotGranted(getActivity(), permission)) {
+        if (Permissions.notifyIfNotGranted(getContext(), permission)) {
             return;
         }
 

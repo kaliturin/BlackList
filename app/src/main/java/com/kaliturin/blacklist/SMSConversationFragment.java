@@ -52,7 +52,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         super.onViewCreated(view, savedInstanceState);
 
         // notify user if permission isn't granted
-        Permissions.notifyIfNotGranted(getActivity(), Permissions.READ_SMS);
+        Permissions.notifyIfNotGranted(getContext(), Permissions.READ_SMS);
 
         // init internal broadcast event receiver
         internalEventBroadcast = new InternalEventBroadcast() {

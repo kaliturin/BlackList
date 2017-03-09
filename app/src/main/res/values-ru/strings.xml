@@ -82,6 +82,13 @@
     <string name="Copy_message">Скопировать текст</string>
     <string name="Forward_message">Переслать сообщение</string>
     <string name="Copied_to_clipboard">"Скопировано в буфер обмена"</string>
+    <string name="SMS_is_sent">"SMS отправлено"</string>
+    <string name="Generic_failure">"Общая ошибка"</string>
+    <string name="No_service">"Сервис недоступен"</string>
+    <string name="Null_PDU">"PDU равен нулю"</string>
+    <string name="Radio_off">"Нет связи"</string>
+    <string name="SMS_is_delivered">"SMS доставлено"</string>
+    <string name="SMS_is_not_delivered">"SMS не доставлено"</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>

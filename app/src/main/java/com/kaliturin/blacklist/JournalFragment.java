@@ -69,7 +69,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Permissions.notifyIfNotGranted(getActivity(), Permissions.WRITE_EXTERNAL_STORAGE);
+        Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE);
 
         // snack bar
         snackBar = new CustomSnackBar(view, R.id.snack_bar);
