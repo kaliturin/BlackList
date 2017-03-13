@@ -12,6 +12,7 @@ import android.provider.*;
 import android.provider.CallLog.Calls;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
@@ -35,7 +36,7 @@ class ContactsAccessHelper {
     private ContentResolver contentResolver = null;
 
     private ContactsAccessHelper(Context context) {
-        contentResolver = context.getContentResolver();
+        contentResolver = context.getApplicationContext().getContentResolver();
     }
 
     public static synchronized ContactsAccessHelper getInstance(Context context) {
@@ -606,7 +607,7 @@ class ContactsAccessHelper {
                 new String[]{String.valueOf(0)}) > 0;
     }
 
-    // Selects SMS thread id by phone number
+    // Returns SMS thread id by phone number or -1 on error
     int getSMSThreadIdByNumber(Context context, String number) {
         if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
             return -1;
@@ -693,8 +694,8 @@ class ContactsAccessHelper {
         }
     }
 
-    // Writes SMS messages to the inbox
-    // Needed only for API19 and newer - where only default SMS app can write to the inbox
+    // Writes SMS messages to the Inbox
+    // Needed only since API19 - where only default SMS app can write to the Inbox
     @TargetApi(19)
     boolean writeSMSMessageToInbox(Context context, SmsMessage[] messages) {
         // check write permission
@@ -719,6 +720,29 @@ class ContactsAccessHelper {
             // write SMS to Inbox
             contentResolver.insert(Telephony.Sms.Inbox.CONTENT_URI, values);
         }
+
+        return true;
+    }
+
+    // Writes SMS message to the Outbox
+    // Needed only since API19 - where only default SMS app can write to the Outbox
+    @TargetApi(19)
+    boolean writeSMSMessageToOutbox(Context context, long time, String number, String message) {
+        // check write permission
+        if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
+
+        // get contact by SMS address
+        Contact contact = getContact(context, number);
+
+        // create writing values
+        ContentValues values = new ContentValues();
+        values.put(Telephony.Sms.ADDRESS, number);
+        values.put(Telephony.Sms.BODY, message);
+        values.put(Telephony.Sms.PERSON, (contact == null ? null : contact.id));
+        values.put(Telephony.Sms.DATE_SENT, time);
+
+        // write SMS to Inbox
+        contentResolver.insert(Telephony.Sms.Outbox.CONTENT_URI, values);
 
         return true;
     }

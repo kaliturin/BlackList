@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.kaliturin.blacklist.ContactsAccessHelper.SMSConversation;
 
@@ -85,13 +86,22 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         // init internal broadcast event receiver
         internalEventBroadcast = new InternalEventBroadcast() {
             @Override
-            public void onSMSInboxWrite(@NonNull String number) {
-                // SMS Inbox was changed - reload list view items
-                loadListViewItems();
+            public void onSMSWasWritten(@NonNull String phoneNumber) {
+                // SMS thread from the Inbox/Outbox was read -
+                ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
+                int threadId = db.getSMSThreadIdByNumber(getContext(), phoneNumber);
+                if(threadId >= 0 &&
+                    // refresh cached list view items
+                    cursorAdapter.invalidateCache(threadId)) {
+                    cursorAdapter.notifyDataSetChanged();
+                } else {
+                    // reload all list view items
+                    loadListViewItems();
+                }
             }
 
             @Override
-            public void onSMSInboxRead(int threadId) {
+            public void onSMSWasRead(int threadId) {
                 // SMS thread from the Inbox was read - refresh cached list view items
                 cursorAdapter.invalidateCache(threadId);
                 cursorAdapter.notifyDataSetChanged();
@@ -179,8 +189,17 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 dialog.addItem(R.string.delete_thread, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-                        db.deleteSMSMessagesByThreadId(getContext(), sms.threadId);
+                        if(DefaultSMSAppHelper.isDefault(getContext())) {
+                            // remove SMS thread
+                            ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
+                            if(db.deleteSMSMessagesByThreadId(getContext(), sms.threadId)) {
+                                // reload list
+                                loadListViewItems();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), R.string.Need_default_SMS_app,
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 dialog.show();

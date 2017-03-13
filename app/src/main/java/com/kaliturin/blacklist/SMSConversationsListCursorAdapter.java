@@ -82,9 +82,13 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
         smsConversationCache.clear();
     }
 
-    // Removes particular item from the cache
-    void invalidateCache(int itemId) {
+    // Removes particular item from the cache (if exists)
+    boolean invalidateCache(int itemId) {
+        if(smsConversationCache.get(itemId) == null) {
+            return false;
+        }
         smsConversationCache.remove(itemId);
+        return true;
     }
 
     // Returns sms conversation by passed row

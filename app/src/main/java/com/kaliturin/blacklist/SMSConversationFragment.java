@@ -57,11 +57,11 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         // init internal broadcast event receiver
         internalEventBroadcast = new InternalEventBroadcast() {
             @Override
-            public void onSMSInboxWrite(@NonNull String number) {
+            public void onSMSWasWritten(@NonNull String phoneNumber) {
                 Bundle arguments = getArguments();
                 if(arguments != null) {
-                    String contactNumber = arguments.getString(CONTACT_NUMBER);
-                    if(contactNumber != null && contactNumber.equals(number)) {
+                    String number = arguments.getString(CONTACT_NUMBER);
+                    if(number != null && number.equals(phoneNumber)) {
                         // reload sms messages in the list
                         loadListViewItems(END_OF_LIST, 1);
                     }
@@ -85,11 +85,17 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                 dialog.addItem(R.string.Delete_message, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-                        db.deleteSMSMessageById(getContext(), sms.id);
-                        // reload sms messages in the list
-                        int listPosition = listView.getFirstVisiblePosition();
-                        loadListViewItems(listPosition, 0);
+                        if(!DefaultSMSAppHelper.isDefault(getContext())) {
+                            Toast.makeText(getContext(), R.string.Need_default_SMS_app,
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
+                            if (db.deleteSMSMessageById(getContext(), sms.id)) {
+                                // reload sms messages in the list
+                                int listPosition = listView.getFirstVisiblePosition();
+                                loadListViewItems(listPosition, 0);
+                            }
+                        }
                     }
                 });
                 // 'copy text' to clipboard
@@ -289,7 +295,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
             if(db.setSMSMessagesReadByThreadId(context, threadId)) {
                 // send broadcast event that SMS thread was read
-                InternalEventBroadcast.sendSMSInboxRead(context, threadId);
+                InternalEventBroadcast.sendSMSWasRead(context, threadId);
             }
             return null;
         }

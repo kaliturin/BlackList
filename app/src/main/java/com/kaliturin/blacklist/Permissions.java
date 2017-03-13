@@ -77,6 +77,7 @@ class Permissions {
 
     // Notifies the user if permission isn't granted
     private static void notify(@NonNull Context context, @NonNull String permission) {
+        context = context.getApplicationContext();
         PackageManager pm = context.getPackageManager();
         PermissionInfo info = null;
         try {

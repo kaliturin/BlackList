@@ -106,7 +106,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         // init internal broadcast event receiver
         internalEventBroadcast = new InternalEventBroadcast() {
             @Override
-            public void onJournalWrite() {
+            public void onJournalWasWritten() {
                 clearSearchView();
                 // reload list view items
                 reloadItems("");

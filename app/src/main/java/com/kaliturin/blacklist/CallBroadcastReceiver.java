@@ -165,7 +165,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             // write to the journal
             if(db.addJournalRecord(System.currentTimeMillis(), name, number, null) >= 0) {
                 // send broadcast message
-                InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WRITE);
+                InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WAS_WRITTEN);
             }
         }
     }

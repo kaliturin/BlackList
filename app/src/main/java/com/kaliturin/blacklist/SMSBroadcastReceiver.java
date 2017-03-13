@@ -50,7 +50,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
                 if(db.writeSMSMessageToInbox(context, messages)) {
                     // send broadcast event
-                    InternalEventBroadcast.sendSMSInboxWrite(context, number);
+                    InternalEventBroadcast.sendSMSWasWritten(context, number);
                     // get contact by number
                     Contact contact = db.getContact(context, number);
                     // get name for notification
@@ -226,7 +226,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             // write to the journal
             if(db.addJournalRecord(System.currentTimeMillis(), name, number, text) >= 0) {
                 // send broadcast message
-                InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WRITE);
+                InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WAS_WRITTEN);
             }
         }
     }

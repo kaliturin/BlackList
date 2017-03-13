@@ -90,6 +90,9 @@
     <string name="Radio_off">"Radio is off"</string>
     <string name="SMS_is_delivered">"SMS is delivered"</string>
     <string name="SMS_is_not_delivered">"SMS isn't delivered"</string>
+    <string name="Message_text_is_not_defined">"Message text is not defined"</string>
+    <string name="Address_is_not_defined">"Address is not defined"</string>
+    <string name="Need_default_SMS_app">"Need default SMS application permissions"</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>
