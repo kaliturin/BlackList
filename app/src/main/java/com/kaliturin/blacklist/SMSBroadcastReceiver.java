@@ -22,6 +22,8 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        long timeReceived = System.currentTimeMillis();
+
         // check action
         String action = intent.getAction();
         if(action == null || !action.equals(getAction())) {
@@ -48,7 +50,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 // messages were not blocked - write them to the inbox
                 ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-                if(db.writeSMSMessageToInbox(context, messages)) {
+                if(db.writeSMSMessageToInbox(context, messages, timeReceived)) {
                     // send broadcast event
                     InternalEventBroadcast.sendSMSWasWritten(context, number);
                     // get contact by number

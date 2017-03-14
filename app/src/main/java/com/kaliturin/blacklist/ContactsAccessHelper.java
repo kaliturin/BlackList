@@ -695,9 +695,9 @@ class ContactsAccessHelper {
     }
 
     // Writes SMS messages to the Inbox
-    // Needed only since API19 - where only default SMS app can write to the Inbox
+    // Needed only since API19 - where only default SMS app can write to content resolver
     @TargetApi(19)
-    boolean writeSMSMessageToInbox(Context context, SmsMessage[] messages) {
+    boolean writeSMSMessageToInbox(Context context, SmsMessage[] messages, long timeReceived) {
         // check write permission
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
 
@@ -710,10 +710,12 @@ class ContactsAccessHelper {
             values.put(Telephony.Sms.ADDRESS, message.getDisplayOriginatingAddress());
             values.put(Telephony.Sms.BODY, message.getMessageBody());
             values.put(Telephony.Sms.PERSON, (contact == null ? null : contact.id));
+            values.put(Telephony.Sms.DATE, timeReceived);
             values.put(Telephony.Sms.DATE_SENT, message.getTimestampMillis());
             values.put(Telephony.Sms.PROTOCOL, message.getProtocolIdentifier());
             values.put(Telephony.Sms.REPLY_PATH_PRESENT, message.isReplyPathPresent());
             values.put(Telephony.Sms.SERVICE_CENTER, message.getServiceCenterAddress());
+            values.put(Telephony.Sms.SUBJECT, message.getPseudoSubject());
             values.put(Telephony.Sms.READ, "0");
             values.put(Telephony.Sms.SEEN, "0");
 
@@ -725,24 +727,34 @@ class ContactsAccessHelper {
     }
 
     // Writes SMS message to the Outbox
-    // Needed only since API19 - where only default SMS app can write to the Outbox
+    // Needed only since API19 - where only default SMS app can write to content resolver
     @TargetApi(19)
-    boolean writeSMSMessageToOutbox(Context context, long time, String number, String message) {
+    boolean writeSMSMessageToOutbox(Context context, String number, String message, long timeSent) {
+        return writeSMSMessage(context, Telephony.Sms.Outbox.CONTENT_URI, number, message, timeSent);
+    }
+
+    // Writes SMS message to the Sent box
+    // Needed only since API19 - where only default SMS app can write to content resolver
+    @TargetApi(19)
+    boolean writeSMSMessageToSentBox(Context context, String number, String message, long timeSent) {
+        return writeSMSMessage(context, Telephony.Sms.Sent.CONTENT_URI, number, message, timeSent);
+    }
+
+    // Writes SMS message
+    // Needed only since API19 - where only default SMS app can write to content resolver
+    @TargetApi(19)
+    private boolean writeSMSMessage(Context context, Uri uri, String number, String message, long timeSent) {
         // check write permission
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
-
         // get contact by SMS address
         Contact contact = getContact(context, number);
-
-        // create writing values
+        // write SMS
         ContentValues values = new ContentValues();
         values.put(Telephony.Sms.ADDRESS, number);
         values.put(Telephony.Sms.BODY, message);
         values.put(Telephony.Sms.PERSON, (contact == null ? null : contact.id));
-        values.put(Telephony.Sms.DATE_SENT, time);
-
-        // write SMS to Inbox
-        contentResolver.insert(Telephony.Sms.Outbox.CONTENT_URI, values);
+        values.put(Telephony.Sms.DATE_SENT, timeSent);
+        contentResolver.insert(uri, values);
 
         return true;
     }

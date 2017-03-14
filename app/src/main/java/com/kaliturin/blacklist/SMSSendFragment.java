@@ -37,7 +37,9 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     private static final String CONTACT_NUMBERS = "CONTACT_NUMBERS";
     private static final String CONTACT_NAMES = "CONTACT_NAMES";
     private static final int SMS_LENGTH = 160;
+    private static final int SMS_LENGTH2 = 153;
     private static final int SMS_LENGTH_UNICODE = 70;
+    private static final int SMS_LENGTH2_UNICODE = 67;
     private ContactsContainer contactsContainer = new ContactsContainer();
 
     public SMSSendFragment() {
@@ -117,21 +119,33 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                // detect unicode characters and get max length of sms
                 Editable editable = messageEdit.getText();
-                int length = editable.length();
-                int maxLength = SMS_LENGTH;
-                for(int i=0; i<length; i++) {
+                int messageLength = editable.length();
+
+                // is there unicode character in the message?
+                boolean unicode = false;
+                for(int i=0; i<messageLength; i++) {
                     char c = editable.charAt(i);
                     if (Character.UnicodeBlock.of(c) != Character.UnicodeBlock.BASIC_LATIN) {
-                        maxLength = SMS_LENGTH_UNICODE;
+                        unicode = true;
+                        break;
                     }
                 }
 
-                // create message body length info
-                int m = maxLength - length%maxLength;
-                int n = length/maxLength + 1;
-                String text = "" + m + "/" + n;
+                // get max length of sms part depending on encoding and full length
+                int length1 = (unicode ? SMS_LENGTH_UNICODE : SMS_LENGTH);
+                int length2 = (unicode ? SMS_LENGTH2_UNICODE : SMS_LENGTH2);
+                int partMaxLength = (messageLength > length1 ? length2 : length1);
+                // create current length status info
+                int partsNumber = messageLength/partMaxLength + 1;
+                int partLength = partMaxLength - messageLength % partMaxLength;
+                // correct length info for second part
+                if(partsNumber == 2 && partLength == partMaxLength) {
+                    partLength = length1 - (length1 - length2) * 2;
+                }
+
+                // show current length status info
+                String text = "" + partLength + "/" + partsNumber;
                 lengthMessageText.setText(text);
             }
         });
@@ -201,7 +215,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
 
         // TODO do it in a thread
         // send SMS message to the all contacts in container
-        SMSSendHelper smsSendHelper = SMSSendHelper.getInstance();
+        SMSSendHelper smsSendHelper = new SMSSendHelper();
         List<String> numbers = contactsContainer.getNumbers();
         for(String number : numbers) {
             smsSendHelper.sendSMS(getContext(), number, message);
