@@ -25,8 +25,12 @@ class Settings {
     static final String BLOCK_SMS_NOT_FROM_CONTACTS = "BLOCK_SMS_NOT_FROM_CONTACTS";
     static final String BLOCK_SMS_NOT_FROM_INBOX = "BLOCK_SMS_NOT_FROM_INBOX";
     static final String BLOCK_HIDDEN_SMS = "BLOCK_HIDDEN_SMS";
-    static final String SHOW_SMS_NOTIFICATIONS = "SHOW_SMS_NOTIFICATIONS";
+    static final String BLOCKED_SMS_STATUS_NOTIFICATION = "BLOCKED_SMS_STATUS_NOTIFICATION";
     static final String WRITE_SMS_JOURNAL  = "WRITE_SMS_JOURNAL";
+    static final String BLOCKED_SMS_SOUND_NOTIFICATION = "BLOCKED_SMS_SOUND_NOTIFICATION";
+    static final String RECEIVED_SMS_SOUND_NOTIFICATION = "RECEIVED_SMS_SOUND_NOTIFICATION";
+    static final String BLOCKED_SMS_RINGTONE = "BLOCKED_SMS_RINGTONE";
+    static final String RECEIVED_SMS_RINGTONE = "RECEIVED_SMS_RINGTONE";
 
     static final String DEFAULT_SMS_APP_NATIVE_PACKAGE = "DEFAULT_SMS_APP_NATIVE_PACKAGE";
 
@@ -84,8 +88,10 @@ class Settings {
         map.put(BLOCK_SMS_NOT_FROM_CONTACTS, FALSE);
         map.put(BLOCK_SMS_NOT_FROM_INBOX, FALSE);
         map.put(BLOCK_HIDDEN_SMS, FALSE);
-        map.put(SHOW_SMS_NOTIFICATIONS, TRUE);
+        map.put(BLOCKED_SMS_STATUS_NOTIFICATION, TRUE);
         map.put(WRITE_SMS_JOURNAL, TRUE);
+        map.put(BLOCKED_SMS_SOUND_NOTIFICATION, FALSE);
+        map.put(RECEIVED_SMS_SOUND_NOTIFICATION, TRUE);
 
         for(Map.Entry<String, String> entry : map.entrySet()) {
             String setting = entry.getKey();

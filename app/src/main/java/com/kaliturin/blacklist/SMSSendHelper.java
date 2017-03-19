@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.telephony.SmsManager;
-import android.util.SparseIntArray;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -20,15 +19,15 @@ import java.util.Set;
  * Sends SMS and processes the results of sending
  */
 
-public class SMSSendHelper {
+class SMSSendHelper {
+    private static final String PHONE_NUMBER = "PHONE_NUMBER";
     private static final String MESSAGE_PART = "MESSAGE_PART";
     private static final String MESSAGE_PART_ID = "MESSAGE_PART_ID";
-
+    private static final String MESSAGE_PARTS = "MESSAGE_PARTS";
     private Set<BroadcastReceiver> receivers = new HashSet<>();
-    private PendingResult pendingResult = null;
 
     // Sends SMS
-    public boolean sendSMS(Context context, @NonNull String phoneNumber, @NonNull String message) {
+    boolean sendSMS(Context context, @NonNull String phoneNumber, @NonNull String message) {
         if(phoneNumber.isEmpty() || message.isEmpty()) {
             return false;
         }
@@ -36,63 +35,65 @@ public class SMSSendHelper {
         // get application context
         context = context.getApplicationContext();
 
-        // clean from the previous usage
-        clean(context);
-
         // divide message into parts
         SmsManager smsManager = SmsManager.getDefault();
-        ArrayList<String> parts = smsManager.divideMessage(message);
-        ArrayList<PendingIntent> sentIntents = new ArrayList<>(parts.size());
-        ArrayList<PendingIntent> deliveryIntents = new ArrayList<>(parts.size());
-
-        // prepare operation pending result
-        pendingResult = new PendingResult(phoneNumber, message,
-                System.currentTimeMillis(), parts.size());
+        ArrayList<String> messageParts = smsManager.divideMessage(message);
+        ArrayList<PendingIntent> sentIntents = new ArrayList<>(messageParts.size());
+        ArrayList<PendingIntent> deliveryIntents = new ArrayList<>(messageParts.size());
+        long timeSent = System.currentTimeMillis();
 
         // create intents and result receivers for each part of message
-        for(int i=0; i<parts.size(); i++) {
-            String part = parts.get(i);
+        for(int i=0; i<messageParts.size(); i++) {
+            String messagePart = messageParts.get(i);
+            int messagePartId = i+1;
 
             // create on sent SMS receiver
-            final ResultReceiver sentReceiver = new ResultReceiver() {
+            ResultReceiver receiver = new ResultReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
+                    onSMSPartSent(context, intent, getResultCode());
                     receivers.remove(this);
                     context.unregisterReceiver(this);
-                    onSMSPartSent(context, intent, getResultCode());
                 }
             };
+            receivers.add(receiver);
 
             // create unique intent name and register receiver
-            String intentName = "SMS_SENT" + "_" + hashCode() + "_" + i;
-            PendingIntent pendingIntent = sentReceiver.register(context, intentName, part, i+1);
+            String intentName = "SMS_SENT" + "_" + hashCode() + "_" + timeSent + "_" + messagePartId;
+            PendingIntent pendingIntent = receiver.register(context, intentName,
+                    phoneNumber, messagePart, messagePartId, messageParts.size());
             sentIntents.add(pendingIntent);
 
             // create on delivery SMS receiver
-            ResultReceiver deliveryReceiver = new ResultReceiver() {
+            receiver = new ResultReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
+                    onSMSPartDelivery(context, intent, getResultCode());
                     receivers.remove(this);
                     context.unregisterReceiver(this);
-                    onSMSPartDelivery(context, intent, getResultCode());
                 }
             };
+            receivers.add(receiver);
 
             // create unique intent name and register receiver
-            intentName = "SMS_DELIVERED" + "_" + hashCode() + "_" + i;
-            pendingIntent = deliveryReceiver.register(context, intentName, part, i+1);
+            intentName = "SMS_DELIVERED" + "_" + hashCode() + "_" + timeSent + "_" + messagePartId;
+            pendingIntent = receiver.register(context, intentName,
+                    phoneNumber, messagePart, messagePartId, messageParts.size());
             deliveryIntents.add(pendingIntent);
         }
 
         // send multipart message
-        smsManager.sendMultipartTextMessage(phoneNumber, null, parts, sentIntents, deliveryIntents);
+        smsManager.sendMultipartTextMessage(phoneNumber, null, messageParts, sentIntents, deliveryIntents);
+
+        // write the sent SMS to the Outbox
+        writeSMSToOutbox(context, phoneNumber, message, timeSent);
 
         return true;
     }
 
     // Is calling on SMS part sending results received
-    public void onSMSPartSent(Context context, Intent intent, int result) {
-        int stringId = 0;
+    private void onSMSPartSent(Context context, Intent intent, int result) {
+        int stringId = R.string.Unknown_error;
         switch (result) {
             case Activity.RESULT_OK:
                 stringId = R.string.SMS_is_sent;
@@ -111,24 +112,13 @@ public class SMSSendHelper {
                 break;
         }
 
-        // update pending result
-        if(pendingResult != null) {
-            pendingResult.onSMSPartSent(context, intent, result);
-        }
-
         // notify user about sending
         showNotification(context, intent, stringId);
     }
 
-    // Is calling on all SMS parts sending results received
-    public void onSMSSent(Context context, PendingResult result) {
-        // write the sent SMS to the Outbox
-        writeSMSToOutbox(context, result);
-    }
-
     /** Is calling on SMS part delivery result received **/
-    public void onSMSPartDelivery(Context context, Intent intent, int result) {
-        int stringId = 0;
+    private void onSMSPartDelivery(Context context, Intent intent, int result) {
+        int stringId = R.string.Unknown_error;
         switch (result) {
             case Activity.RESULT_OK:
                 stringId = R.string.SMS_is_delivered;
@@ -138,17 +128,8 @@ public class SMSSendHelper {
                 break;
         }
 
-        // update pending result
-        if(pendingResult != null) {
-            pendingResult.onSMSPartDelivery(context, intent, result);
-        }
-
         // notify user about delivery
         showNotification(context, intent, stringId);
-    }
-
-    /** Is calling on all SMS delivery results received **/
-    public void onSMSDelivery(Context context, PendingResult result) {
     }
 
     /** Cleans pending results **/
@@ -158,21 +139,19 @@ public class SMSSendHelper {
             context.unregisterReceiver(receiver);
         }
         receivers.clear();
-        pendingResult = null;
     }
 
     /** Shows notification on SMS sent/delivery **/
-    public void showNotification(Context context, Intent intent, @StringRes int stringId) {
-        if(stringId == 0) {
-            return;
-        }
+    private void showNotification(Context context, Intent intent, @StringRes int stringId) {
         // create message with SMS part id if it is defined
         String text = context.getString(stringId);
-        if(pendingResult.phoneNumber != null) {
-            text = pendingResult.phoneNumber + " : " + text;
+        String phoneNumber = intent.getStringExtra(PHONE_NUMBER);
+        if(phoneNumber != null) {
+            text = phoneNumber + " : " + text;
         }
-        int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
-        if(messagePartId > 0) {
+        int messageParts = intent.getIntExtra(MESSAGE_PARTS, 0);
+        if(messageParts > 1) {
+            int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
             text += " [" + messagePartId + "]";
         }
         // TODO consider to user NotificationManager
@@ -180,70 +159,30 @@ public class SMSSendHelper {
     }
 
     // Writes the sent SMS to the Outbox
-    private void writeSMSToOutbox(Context context, PendingResult result) {
+    private void writeSMSToOutbox(Context context, String phoneNumber, String message, long timeSent) {
         // is app isn't default - the SMS will be written by the system
         if(DefaultSMSAppHelper.isDefault(context)) {
             // write the sent SMS to the Outbox
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            db.writeSMSMessageToOutbox(context, result.phoneNumber, result.message, result.timeSent);
+            db.writeSMSMessageToOutbox(context, phoneNumber, message, timeSent);
         }
 
         // send internal event message
-        InternalEventBroadcast.sendSMSWasWritten(context, result.phoneNumber);
-    }
-
-    /** SMS sending operation pending result **/
-    public class PendingResult {
-        final SparseIntArray sentResults = new SparseIntArray();
-        final SparseIntArray deliveryResults = new SparseIntArray();
-        final String phoneNumber;
-        final String message;
-        final long timeSent;
-        final int messageParts;
-
-        PendingResult(String phoneNumber, String message, long timeSent, int messageParts) {
-            this.phoneNumber = phoneNumber;
-            this.message = message;
-            this.timeSent = timeSent;
-            this.messageParts = messageParts;
-        }
-
-        void onSMSPartSent(Context context, Intent intent, int result) {
-            // save sent result
-            int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
-            if (messagePartId > 0) {
-                sentResults.put(messagePartId, result);
-            }
-            // notify all results were received
-            if (sentResults.size() == messageParts) {
-                onSMSSent(context, this);
-            }
-        }
-
-        void onSMSPartDelivery(Context context, Intent intent, int result) {
-            // save delivery result
-            int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
-            if(messagePartId > 0) {
-                deliveryResults.put(messagePartId, result);
-            }
-            // notify if all result were received
-            if(deliveryResults.size() == messageParts) {
-                onSMSDelivery(context, this);
-            }
-        }
+        InternalEventBroadcast.sendSMSWasWritten(context, phoneNumber);
     }
 
     // Sending SMS action results receiver
     private abstract class ResultReceiver extends BroadcastReceiver {
-        PendingIntent register(Context context, String intentName, String messagePart,
-                               int messagePartId) {
+        PendingIntent register(Context context, String intentName, String phoneNumber,
+                               String messagePart, int messagePartId, int messageParts) {
             // register receiver
             context.registerReceiver(this, new IntentFilter(intentName));
-            receivers.add(this);
             // create pending intent
             Intent intent = new Intent(intentName);
+            intent.putExtra(PHONE_NUMBER, phoneNumber);
             intent.putExtra(MESSAGE_PART, messagePart);
             intent.putExtra(MESSAGE_PART_ID, messagePartId);
+            intent.putExtra(MESSAGE_PARTS, messageParts);
             return PendingIntent.getBroadcast(context, 0, intent, 0);
         }
     }

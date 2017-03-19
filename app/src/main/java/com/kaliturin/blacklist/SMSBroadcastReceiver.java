@@ -242,7 +242,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // write record to the journal
         writeToJournal(context, name, number, messages);
         // notify user
-        if(Settings.getBooleanValue(context, Settings.SHOW_SMS_NOTIFICATIONS)) {
+        if(Settings.getBooleanValue(context, Settings.BLOCKED_SMS_STATUS_NOTIFICATION)) {
             Notification.onSmsBlocked(context, name);
         }
     }

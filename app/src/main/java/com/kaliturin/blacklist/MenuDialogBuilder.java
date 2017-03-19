@@ -1,7 +1,7 @@
 package com.kaliturin.blacklist;
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
@@ -14,19 +14,19 @@ import android.widget.TextView;
  * Builder of a dialog with a items list menu
  */
 class MenuDialogBuilder {
-    private Activity activity;
+    private Context context;
     private View view;
     private Dialog dialog;
     private LinearLayout listLayout;
 
-    MenuDialogBuilder(@NonNull Activity activity) {
-        this.activity = activity;
+    MenuDialogBuilder(@NonNull Context context) {
+        this.context = context;
         this.listLayout = (LinearLayout) getView().findViewById(R.id.items_list);
     }
 
     // Sets the title of the dialog
     MenuDialogBuilder setTitle(@StringRes int titleId) {
-        String title = activity.getString(titleId);
+        String title = context.getString(titleId);
         return setTitle(title);
     }
 
@@ -40,7 +40,7 @@ class MenuDialogBuilder {
 
     // Adds the new item to the menu list with title and click listener
     MenuDialogBuilder addItem(@StringRes int titleId, final View.OnClickListener listener) {
-        String title = activity.getString(titleId);
+        String title = context.getString(titleId);
         return addItem(title, true, listener);
     }
 
@@ -52,7 +52,7 @@ class MenuDialogBuilder {
     // Adds the new item to the menu list with title and click listener
     MenuDialogBuilder addItem(String title, final boolean dismissOnClick,
                               final View.OnClickListener listener) {
-        LayoutInflater inflater = activity.getLayoutInflater();
+        LayoutInflater inflater = LayoutInflater.from(context);
         View itemView = inflater.inflate(R.layout.row_dialog_menu, null);
         listLayout.addView(itemView);
         itemView.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +81,7 @@ class MenuDialogBuilder {
     // Returns the dialog's view
     View getView() {
         if (view == null) {
-            LayoutInflater inflater = activity.getLayoutInflater();
+            LayoutInflater inflater = LayoutInflater.from(context);
             view = inflater.inflate(R.layout.dialog_menu, null);
         }
 
@@ -91,7 +91,7 @@ class MenuDialogBuilder {
     // Returns the dialog
     Dialog getDialog() {
         if (dialog == null) {
-            dialog = new AlertDialog.Builder(activity).setView(getView()).create();
+            dialog = new AlertDialog.Builder(context).setView(getView()).create();
         }
         return dialog;
     }

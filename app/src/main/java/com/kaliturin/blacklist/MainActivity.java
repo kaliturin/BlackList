@@ -181,25 +181,25 @@ public class MainActivity extends AppCompatActivity
             Bundle arguments = new Bundle();
             switch (itemId) {
                 case R.id.nav_journal:
-                    arguments.putString(TITLE, getString(R.string.journal_title));
+                    arguments.putString(TITLE, getString(R.string.Journal));
                     switchFragment(journalFragment, arguments);
                     break;
                 case R.id.nav_black_list:
-                    arguments.putString(TITLE, getString(R.string.black_list_title));
+                    arguments.putString(TITLE, getString(R.string.Black_list));
                     arguments.putInt(CONTACT_TYPE, Contact.TYPE_BLACK_LIST);
                     switchFragment(blackListFragment, arguments);
                     break;
                 case R.id.nav_white_list:
-                    arguments.putString(TITLE, getString(R.string.white_list_title));
+                    arguments.putString(TITLE, getString(R.string.White_list));
                     arguments.putInt(CONTACT_TYPE, Contact.TYPE_WHITE_LIST);
                     switchFragment(whiteListFragment, arguments);
                     break;
                 case R.id.nav_sms:
-                    arguments.putString(TITLE, getString(R.string.sms_title));
+                    arguments.putString(TITLE, getString(R.string.SMS_messages));
                     switchFragment(smsFragment, arguments);
                     break;
                 default:
-                    arguments.putString(TITLE, getString(R.string.settings_title));
+                    arguments.putString(TITLE, getString(R.string.Settings));
                     switchFragment(settingsFragment, arguments);
                     break;
             }

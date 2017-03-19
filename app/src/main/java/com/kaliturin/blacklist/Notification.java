@@ -56,3 +56,27 @@ class Notification {
         notificationManager.notify(0, builder.build());
     }
 }
+
+
+/*
+
+Ringtone ringtone = RingtoneManager.getRingtone(context, Settings.System.DEFAULT_RINGTONE_URI);
+
+*/
+
+/*
+
+AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+switch (am.getRingerMode()) {
+    case AudioManager.RINGER_MODE_SILENT:
+        Log.i("MyApp","Silent mode");
+        break;
+    case AudioManager.RINGER_MODE_VIBRATE:
+        Log.i("MyApp","Vibrate mode");
+        break;
+    case AudioManager.RINGER_MODE_NORMAL:
+        Log.i("MyApp","Normal mode");
+        break;
+}
+
+ */

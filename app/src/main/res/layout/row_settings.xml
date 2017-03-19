@@ -30,7 +30,9 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:clickable="false"
-            android:theme="@style/AppTheme.CheckBox" />
+            android:theme="@style/AppTheme.CheckBox"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </LinearLayout>

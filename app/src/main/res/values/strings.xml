@@ -6,7 +6,8 @@
     <string name="navigation_drawer_close">Close the navigation drawer</string>
     <string name="action_settings">Settings</string>
 
-    <string name="CALLS">CALLS</string>
+    <string name="Calls_blocking">Calls blocking</string>
+    <string name="Calls_notification">Calls notification</string>
     <string name="block_calls">Block calls from the Black list</string>
     <string name="block_all_calls">Block all calls</string>
     <string name="block_calls_not_from_contacts">Block calls not from the Contacts list</string>
@@ -14,8 +15,9 @@
     <string name="block_hidden_calls">Block private calls numbers</string>
     <string name="show_calls_notifications">Show blocked calls notifications</string>
     <string name="write_calls_journal">Write blocked calls to the journal</string>
+    <string name="Notify_with_sound_received_SMS">"Notify with sound when SMS was received"</string>
+    <string name="Notify_with_sound_blocked_SMS">"Notify with sound when SMS was blocked"</string>
 
-    <string name="SMS">SMS</string>
     <string name="block_sms">Block SMS from the Black list</string>
     <string name="block_all_sms">Block all SMS</string>
     <string name="block_sms_not_from_contacts">Block SMS not from the Contacts list</string>
@@ -32,11 +34,11 @@
     <string name="calls_list">List of calls</string>
     <string name="sms_inbox_list">List of inbox SMS</string>
 
-    <string name="black_list_title">Black list</string>
-    <string name="white_list_title">White list</string>
-    <string name="journal_title">Journal</string>
-    <string name="settings_title">Settings</string>
-    <string name="sms_title">SMS</string>
+    <string name="Black_list">Black list</string>
+    <string name="White_list">White list</string>
+    <string name="Journal">Journal</string>
+    <string name="Settings">Settings</string>
+    <string name="SMS_messages">SMS messages</string>
     <string name="select_all">SELECT ALL</string>
     <string name="delete">DELETE</string>
     <string name="cancel">CANCEL</string>
@@ -71,6 +73,9 @@
     <string name="move_to_white">Move the contact to the White list</string>
     <string name="move_to_black">Move the contact to the Black list</string>
     <string name="set_as_default_sms_app">Set as default SMS application (needed for SMS blocking since Android 4.4 and later)</string>
+    <string name="SMS_default_app">SMS default application</string>
+    <string name="SMS_blocking">SMS blocking</string>
+    <string name="SMS_notification">SMS notification</string>
     <string name="digits_symbols">Digits/symbols</string>
     <string name="new_message">New message</string>
     <string name="needs_permission">needs the permission</string>
@@ -82,17 +87,19 @@
     <string name="Delete_message">Delete the message</string>
     <string name="Copy_message">Copy the message</string>
     <string name="Forward_message">Forward the message</string>
-    <string name="Copied_to_clipboard">"Copied to the clipboard"</string>
-    <string name="SMS_is_sent">"SMS is sent"</string>
-    <string name="Generic_failure">"Generic failure"</string>
-    <string name="No_service">"No service"</string>
-    <string name="Null_PDU">"Null PDU"</string>
-    <string name="Radio_off">"Radio is off"</string>
-    <string name="SMS_is_delivered">"SMS is delivered"</string>
-    <string name="SMS_is_not_delivered">"SMS isn't delivered"</string>
-    <string name="Message_text_is_not_defined">"Message text is not defined"</string>
-    <string name="Address_is_not_defined">"Address is not defined"</string>
-    <string name="Need_default_SMS_app">"Need default SMS application permissions"</string>
+    <string name="Copied_to_clipboard">Copied to the clipboard</string>
+    <string name="SMS_is_sent">SMS is sent</string>
+    <string name="Generic_failure">Generic failure</string>
+    <string name="No_service">No service</string>
+    <string name="Null_PDU">Null PDU</string>
+    <string name="Radio_off">Radio is off</string>
+    <string name="SMS_is_delivered">SMS is delivered</string>
+    <string name="SMS_is_not_delivered">SMS isn not delivered</string>
+    <string name="Message_text_is_not_defined">Message text is not defined</string>
+    <string name="Address_is_not_defined">Address is not defined</string>
+    <string name="Need_default_SMS_app">Need default SMS application permissions</string>
+    <string name="Unknown_error">Unknown error</string>
+    <string name="Ringtone_picker">Ringtone picker</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>
@@ -100,8 +107,5 @@
         <item>ends with:</item>
         <item>contains:</item>
     </string-array>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
