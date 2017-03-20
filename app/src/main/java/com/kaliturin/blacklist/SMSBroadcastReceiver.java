@@ -47,7 +47,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // process messages
         if(!processMessages(context, number, messages)) {
             // since 19 API only
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if(DefaultSMSAppHelper.isAvailable()) {
                 // messages were not blocked - write them to the inbox
                 ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
                 if(db.writeSMSMessageToInbox(context, messages, timeReceived)) {
@@ -137,8 +137,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     }
 
     public static String getAction() {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ?
-                SMS_DELIVER : SMS_RECEIVED);
+        return (DefaultSMSAppHelper.isAvailable() ? SMS_DELIVER : SMS_RECEIVED);
     }
 
     private Contact findContactByType(List<Contact> contacts, int contactType) {
@@ -242,8 +241,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // write record to the journal
         writeToJournal(context, name, number, messages);
         // notify user
-        if(Settings.getBooleanValue(context, Settings.BLOCKED_SMS_STATUS_NOTIFICATION)) {
-            Notification.onSmsBlocked(context, name);
-        }
+        Notification.onSmsBlocked(context, name);
     }
 }

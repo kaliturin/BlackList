@@ -72,14 +72,14 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         adapter = new SettingsArrayAdapter(getContext());
 
         // default sms feature is available
-        boolean isSmsDefaultAvailable = DefaultSMSAppHelper.isAvailable();
+        boolean isDefaultSmsAppAvailable = DefaultSMSAppHelper.isAvailable();
         // current app is default sms app
-        boolean isSmsDefault = DefaultSMSAppHelper.isDefault(getContext());
+        boolean isDefaultSmsApp = DefaultSMSAppHelper.isDefault(getContext());
 
-        if(isSmsDefaultAvailable) {
+        if(isDefaultSmsAppAvailable) {
             // show sms default app switch
             adapter.addTitle(R.string.SMS_default_app);
-            adapter.addCheckbox(R.string.set_as_default_sms_app, isSmsDefault,
+            adapter.addCheckbox(R.string.set_as_default_sms_app, isDefaultSmsApp,
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -90,41 +90,45 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                     });
         }
 
-        if (!isSmsDefaultAvailable || isSmsDefault) {
+        if (isDefaultSmsApp) {
             // sms blocking settings
             adapter.addTitle(R.string.SMS_blocking);
             adapter.addCheckbox(R.string.block_all_sms, Settings.BLOCK_ALL_SMS);
             adapter.addCheckbox(R.string.block_sms, Settings.BLOCK_SMS_FROM_BLACK_LIST);
-            adapter.addCheckbox(R.string.block_hidden_sms, Settings.BLOCK_HIDDEN_SMS);
             adapter.addCheckbox(R.string.block_sms_not_from_contacts, Settings.BLOCK_SMS_NOT_FROM_CONTACTS);
             adapter.addCheckbox(R.string.block_sms_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
+            adapter.addCheckbox(R.string.block_hidden_sms, Settings.BLOCK_HIDDEN_SMS);
             adapter.addCheckbox(R.string.write_sms_journal, Settings.WRITE_SMS_JOURNAL);
 
             // sms notifications settings
             adapter.addTitle(R.string.SMS_notification);
-            adapter.addCheckbox(R.string.Notify_with_statusbar_blocked_SMS, Settings.BLOCKED_SMS_STATUS_NOTIFICATION,
+            adapter.addCheckbox(R.string.Notify_with_status_bar_blocked_SMS, Settings.BLOCKED_SMS_STATUS_NOTIFICATION,
                     new DependentRowOnClickListener());
             adapter.addCheckbox(R.string.Notify_with_sound_blocked_SMS, Settings.BLOCKED_SMS_SOUND_NOTIFICATION,
                     new RingtonePickerOnClickListener(BLOCKED_SMS));
             adapter.addCheckbox(R.string.Notify_with_vibration_blocked_SMS, Settings.BLOCKED_SMS_VIBRATION_NOTIFICATION,
                     new DependentRowOnClickListener());
-            adapter.addCheckbox(R.string.Notify_with_sound_received_SMS, Settings.RECEIVED_SMS_SOUND_NOTIFICATION,
-                    new RingtonePickerOnClickListener(RECEIVED_SMS));
-            adapter.addCheckbox(R.string.Notify_with_vibration_received_SMS, Settings.RECEIVED_SMS_VIBRATION_NOTIFICATION);
         }
+
+        // sms receiving/sending
+        adapter.addTitle(R.string.SMS_receiving_sending);
+        adapter.addCheckbox(R.string.Notify_with_sound_received_SMS, Settings.RECEIVED_SMS_SOUND_NOTIFICATION,
+                new RingtonePickerOnClickListener(RECEIVED_SMS));
+        adapter.addCheckbox(R.string.Notify_with_vibration_received_SMS, Settings.RECEIVED_SMS_VIBRATION_NOTIFICATION);
+        adapter.addCheckbox(R.string.Notify_on_delivery_SMS, Settings.DELIVERY_SMS_NOTIFICATION);
 
         // calls blocking settings
         adapter.addTitle(R.string.Calls_blocking);
         adapter.addCheckbox(R.string.block_all_calls, Settings.BLOCK_ALL_CALLS);
         adapter.addCheckbox(R.string.block_calls, Settings.BLOCK_CALLS_FROM_BLACK_LIST);
-        adapter.addCheckbox(R.string.block_hidden_calls, Settings.BLOCK_HIDDEN_CALLS);
         adapter.addCheckbox(R.string.block_calls_not_from_contacts, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS);
         adapter.addCheckbox(R.string.block_calls_not_from_sms_inbox, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX);
+        adapter.addCheckbox(R.string.block_hidden_calls, Settings.BLOCK_HIDDEN_CALLS);
         adapter.addCheckbox(R.string.write_calls_journal, Settings.WRITE_CALLS_JOURNAL);
 
         // calls notifications settings
         adapter.addTitle(R.string.Calls_notification);
-        adapter.addCheckbox(R.string.Notify_with_statusbar_blocked_call, Settings.BLOCKED_CALL_STATUS_NOTIFICATION,
+        adapter.addCheckbox(R.string.Notify_with_status_bar_blocked_call, Settings.BLOCKED_CALL_STATUS_NOTIFICATION,
                 new DependentRowOnClickListener());
         adapter.addCheckbox(R.string.Notify_with_sound_blocked_call, Settings.BLOCKED_CALL_SOUND_NOTIFICATION,
                 new RingtonePickerOnClickListener(BLOCKED_CALL));

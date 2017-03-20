@@ -13,21 +13,22 @@
     <string name="block_calls_not_from_contacts">Block calls not from the Contacts list</string>
     <string name="block_calls_not_from_sms_inbox">Block calls not from the SMS Inbox list</string>
     <string name="block_hidden_calls">Block private calls numbers</string>
-    <string name="Notify_with_statusbar_blocked_call">Show blocked calls notifications</string>
-    <string name="write_calls_journal">Write blocked calls to the journal</string>
-    <string name="Notify_with_sound_received_SMS">"Notify with sound when SMS was received"</string>
-    <string name="Notify_with_sound_blocked_SMS">"Notify with sound when SMS was blocked"</string>
-    <string name="Notify_with_vibration_received_SMS">"Notify with vibration when SMS was received"</string>
-    <string name="Notify_with_vibration_blocked_SMS">"Notify with vibration when SMS was blocked"</string>
+    <string name="Notify_with_status_bar_blocked_call">Notify in status bar about blocked call</string>
+    <string name="write_calls_journal">Write blocked calls to the Journal</string>
 
     <string name="block_sms">Block SMS from the Black list</string>
     <string name="block_all_sms">Block all SMS</string>
     <string name="block_sms_not_from_contacts">Block SMS not from the Contacts list</string>
     <string name="block_sms_not_from_inbox">Block SMS not from the Inbox list</string>
     <string name="block_hidden_sms">Block private SMS numbers</string>
-    <string name="Notify_with_statusbar_blocked_SMS">Show blocked SMS notifications</string>
-    <string name="write_sms_journal">Write blocked SMS to the journal</string>
+    <string name="Notify_with_status_bar_blocked_SMS">>Notify in status bar about blocked SMS</string>
+    <string name="Notify_with_sound_received_SMS">"Notify with sound about received SMS"</string>
+    <string name="Notify_with_sound_blocked_SMS">"Notify with sound about blocked SMS"</string>
+    <string name="Notify_with_vibration_received_SMS">"Notify with vibration about received SMS"</string>
+    <string name="Notify_with_vibration_blocked_SMS">"Notify with vibration about blocked SMS"</string>
+    <string name="Notify_on_delivery_SMS">Notify about SMS delivery</string>
 
+    <string name="write_sms_journal">Write blocked SMS to the Journal</string>
     <string name="from_contacts_list">From the Contacts list</string>
     <string name="from_calls_list">From the Calls list</string>
     <string name="from_sms_list">From the Inbox SMS list</string>
@@ -78,6 +79,8 @@
     <string name="SMS_default_app">SMS default application</string>
     <string name="SMS_blocking">SMS blocking</string>
     <string name="SMS_notification">SMS notification</string>
+    <string name="SMS_receiving_sending">SMS receiving/sending</string>
+
     <string name="digits_symbols">Digits/symbols</string>
     <string name="new_message">New message</string>
     <string name="needs_permission">needs the permission</string>

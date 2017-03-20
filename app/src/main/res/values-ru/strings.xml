@@ -14,7 +14,7 @@
     <string name="block_calls_not_from_sms_inbox">Блокировать звонки не из списка входящих SMS</string>
     <string name="block_hidden_calls">Блокировать звонки со скрытых номеров</string>
     <string name="write_calls_journal">Вести журнал заблокированных звонков</string>
-    <string name="Notify_with_statusbar_blocked_call">Уведомлять в строке статуса о заблокированном звонке</string>
+    <string name="Notify_with_status_bar_blocked_call">Уведомлять в строке статуса о заблокированном звонке</string>
     <string name="Notify_with_sound_blocked_call">Уведомлять звуком о заблокированном звонке</string>
     <string name="Notify_with_vibration_blocked_call">Уведомлять вибросигналом о заблокированном звонке</string>
 
@@ -23,15 +23,18 @@
     <string name="block_sms_not_from_contacts">Блокировать SMS не из списка контактов</string>
     <string name="block_sms_not_from_inbox">Блокировать SMS не из списка входящих SMS</string>
     <string name="block_hidden_sms">Блокировать SMS со скрытых номеров</string>
-    <string name="Notify_with_statusbar_blocked_SMS">Уведомлять в строке статуса о заблокированном SMS</string>
+    <string name="Notify_with_status_bar_blocked_SMS">Уведомлять в строке статуса о заблокированном SMS</string>
     <string name="Notify_with_sound_received_SMS">Уведомлять звуком о полученном SMS</string>
     <string name="Notify_with_sound_blocked_SMS">Уведомлять звуком о заблокированном SMS"</string>
     <string name="Notify_with_vibration_received_SMS">"Уведомлять вибросигналом о полученном SMS</string>
     <string name="Notify_with_vibration_blocked_SMS">Уведомлять вибросигналом о заблокированном SMS</string>
+    <string name="Notify_on_delivery_SMS">Уведомлять о доставке отправленного SMS</string>
 
     <string name="write_sms_journal">Вести журнал заблокированных SMS</string>
     <string name="SMS_blocking">SMS - блокировка</string>
     <string name="SMS_notification">SMS - уведомления</string>
+    <string name="SMS_sending">SMS - отправка</string>
+    <string name="SMS_receiving_sending">SMS - получение/отправка</string>
 
     <string name="from_contacts_list">Из списка контактов</string>
     <string name="from_calls_list">Из списка вызовов</string>

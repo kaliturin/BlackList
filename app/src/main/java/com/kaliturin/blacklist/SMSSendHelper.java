@@ -64,22 +64,24 @@ class SMSSendHelper {
                     phoneNumber, messagePart, messagePartId, messageParts.size());
             sentIntents.add(pendingIntent);
 
-            // create on delivery SMS receiver
-            receiver = new ResultReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    onSMSPartDelivery(context, intent, getResultCode());
-                    receivers.remove(this);
-                    context.unregisterReceiver(this);
-                }
-            };
-            receivers.add(receiver);
+            if(Settings.getBooleanValue(context, Settings.DELIVERY_SMS_NOTIFICATION)) {
+                // create on delivery SMS receiver
+                receiver = new ResultReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        onSMSPartDelivery(context, intent, getResultCode());
+                        receivers.remove(this);
+                        context.unregisterReceiver(this);
+                    }
+                };
+                receivers.add(receiver);
 
-            // create unique intent name and register receiver
-            intentName = "SMS_DELIVERED" + "_" + hashCode() + "_" + timeSent + "_" + messagePartId;
-            pendingIntent = receiver.register(context, intentName,
-                    phoneNumber, messagePart, messagePartId, messageParts.size());
-            deliveryIntents.add(pendingIntent);
+                // create unique intent name and register receiver
+                intentName = "SMS_DELIVERED" + "_" + hashCode() + "_" + timeSent + "_" + messagePartId;
+                pendingIntent = receiver.register(context, intentName,
+                        phoneNumber, messagePart, messagePartId, messageParts.size());
+                deliveryIntents.add(pendingIntent);
+            }
         }
 
         // send multipart message
@@ -113,7 +115,8 @@ class SMSSendHelper {
         }
 
         // notify user about sending
-        showNotification(context, intent, stringId);
+        String message = createNotificationMessage(context, intent, stringId);
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     /** Is calling on SMS part delivery result received **/
@@ -129,7 +132,8 @@ class SMSSendHelper {
         }
 
         // notify user about delivery
-        showNotification(context, intent, stringId);
+        String message = createNotificationMessage(context, intent, stringId);
+        Notification.onSmsDelivery(context, message);
     }
 
     /** Cleans pending results **/
@@ -141,8 +145,8 @@ class SMSSendHelper {
         receivers.clear();
     }
 
-    /** Shows notification on SMS sent/delivery **/
-    private void showNotification(Context context, Intent intent, @StringRes int stringId) {
+    // Creates notification message on SMS sent/delivery
+    private String createNotificationMessage(Context context, Intent intent, @StringRes int stringId) {
         // create message with SMS part id if it is defined
         String text = context.getString(stringId);
         String phoneNumber = intent.getStringExtra(PHONE_NUMBER);
@@ -154,8 +158,7 @@ class SMSSendHelper {
             int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
             text += " [" + messagePartId + "]";
         }
-        // TODO consider to user NotificationManager
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+        return text;
     }
 
     // Writes the sent SMS to the Outbox

@@ -147,14 +147,6 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         return name;
     }
 
-    // Notifies the user
-    private void notifyUser(Context context, String name) {
-        // is show notifications
-        if(Settings.getBooleanValue(context, Settings.BLOCKED_CALL_STATUS_NOTIFICATION)) {
-            Notification.onCallBlocked(context, name);
-        }
-    }
-
     // Writes record to the journal
     private void writeToJournal(Context context, String name, String number) {
         if(number.equals(name)) {
@@ -198,6 +190,6 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         // write record to the journal
         writeToJournal(context, name, number);
         // notify the user
-        notifyUser(context, name);
+        Notification.onCallBlocked(context, name);
     }
 }
