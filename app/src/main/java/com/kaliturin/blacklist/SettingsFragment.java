@@ -15,16 +15,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+
 /**
  * Settings fragment
  */
 public class SettingsFragment extends Fragment implements FragmentArguments {
-    private static final String CLICKED_ROW_POSITION = "CLICKED_ROW_POSITION";
     private static final String VISIBLE_ROW_POSITION = "VISIBLE_ROW_POSITION";
     private static final int BLOCKED_SMS = 1;
     private static final int RECEIVED_SMS = 2;
+    private static final int BLOCKED_CALL = 3;
     private SettingsArrayAdapter adapter = null;
-    private int clickedRowPosition = -1;
     private int visibleRowPosition = 0;
     private ListView listView = null;
 
@@ -47,7 +47,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         if(savedInstanceState != null) {
-            clickedRowPosition = savedInstanceState.getInt(CLICKED_ROW_POSITION, -1);
             visibleRowPosition =  savedInstanceState.getInt(VISIBLE_ROW_POSITION, 0);
         }
 
@@ -71,7 +70,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         // Create list adapter and fill it with data
         adapter = new SettingsArrayAdapter(getContext());
-        adapter.addTitle(R.string.SMS_default_app);
 
         // default sms feature is available
         boolean isSmsDefaultAvailable = DefaultSMSAppHelper.isAvailable();
@@ -80,6 +78,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         if(isSmsDefaultAvailable) {
             // show sms default app switch
+            adapter.addTitle(R.string.SMS_default_app);
             adapter.addCheckbox(R.string.set_as_default_sms_app, isSmsDefault,
                     new View.OnClickListener() {
                         @Override
@@ -92,8 +91,8 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         }
 
         if (!isSmsDefaultAvailable || isSmsDefault) {
+            // sms blocking settings
             adapter.addTitle(R.string.SMS_blocking);
-            // sms settings
             adapter.addCheckbox(R.string.block_all_sms, Settings.BLOCK_ALL_SMS);
             adapter.addCheckbox(R.string.block_sms, Settings.BLOCK_SMS_FROM_BLACK_LIST);
             adapter.addCheckbox(R.string.block_hidden_sms, Settings.BLOCK_HIDDEN_SMS);
@@ -101,15 +100,20 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
             adapter.addCheckbox(R.string.block_sms_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
             adapter.addCheckbox(R.string.write_sms_journal, Settings.WRITE_SMS_JOURNAL);
 
+            // sms notifications settings
             adapter.addTitle(R.string.SMS_notification);
-            adapter.addCheckbox(R.string.show_sms_notifications, Settings.BLOCKED_SMS_STATUS_NOTIFICATION);
+            adapter.addCheckbox(R.string.Notify_with_statusbar_blocked_SMS, Settings.BLOCKED_SMS_STATUS_NOTIFICATION,
+                    new DependentRowOnClickListener());
             adapter.addCheckbox(R.string.Notify_with_sound_blocked_SMS, Settings.BLOCKED_SMS_SOUND_NOTIFICATION,
                     new RingtonePickerOnClickListener(BLOCKED_SMS));
+            adapter.addCheckbox(R.string.Notify_with_vibration_blocked_SMS, Settings.BLOCKED_SMS_VIBRATION_NOTIFICATION,
+                    new DependentRowOnClickListener());
             adapter.addCheckbox(R.string.Notify_with_sound_received_SMS, Settings.RECEIVED_SMS_SOUND_NOTIFICATION,
                     new RingtonePickerOnClickListener(RECEIVED_SMS));
+            adapter.addCheckbox(R.string.Notify_with_vibration_received_SMS, Settings.RECEIVED_SMS_VIBRATION_NOTIFICATION);
         }
 
-        // calls settings
+        // calls blocking settings
         adapter.addTitle(R.string.Calls_blocking);
         adapter.addCheckbox(R.string.block_all_calls, Settings.BLOCK_ALL_CALLS);
         adapter.addCheckbox(R.string.block_calls, Settings.BLOCK_CALLS_FROM_BLACK_LIST);
@@ -118,8 +122,14 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         adapter.addCheckbox(R.string.block_calls_not_from_sms_inbox, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX);
         adapter.addCheckbox(R.string.write_calls_journal, Settings.WRITE_CALLS_JOURNAL);
 
+        // calls notifications settings
         adapter.addTitle(R.string.Calls_notification);
-        adapter.addCheckbox(R.string.show_calls_notifications, Settings.SHOW_CALLS_NOTIFICATIONS);
+        adapter.addCheckbox(R.string.Notify_with_statusbar_blocked_call, Settings.BLOCKED_CALL_STATUS_NOTIFICATION,
+                new DependentRowOnClickListener());
+        adapter.addCheckbox(R.string.Notify_with_sound_blocked_call, Settings.BLOCKED_CALL_SOUND_NOTIFICATION,
+                new RingtonePickerOnClickListener(BLOCKED_CALL));
+        adapter.addCheckbox(R.string.Notify_with_vibration_blocked_call, Settings.BLOCKED_CALL_VIBRATION_NOTIFICATION,
+                new DependentRowOnClickListener());
 
         listView.setAdapter(adapter);
         listView.setSelection(visibleRowPosition);
@@ -134,8 +144,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        // save last clicked row position
-        outState.putInt(CLICKED_ROW_POSITION, clickedRowPosition);
         // save first showed row position
         outState.putInt(VISIBLE_ROW_POSITION, listView.getFirstVisiblePosition());
     }
@@ -146,28 +154,47 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(resultCode == Activity.RESULT_OK) {
-            // is ringtone url returned
+            // get ringtone url
             Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-            if(uri != null) {
-                // save url as settings property value
-                setRingtoneUri(requestCode, uri);
-                // set last clicked row checked
-                adapter.setRowChecked(clickedRowPosition, true);
-                clickedRowPosition = -1;
-            }
+            // save url as settings property value
+            setRingtoneUri(requestCode, uri);
         }
     }
 
     // Saves ringtone url as settings property value
     private void setRingtoneUri(int type, Uri uri) {
-        String uriString = (uri != null ? uri.toString() : "");
+        String ringtoneProperty = null;
+        String soundProperty = null;
+        String statusProperty = null;
+
         switch (type) {
+            case BLOCKED_CALL:
+                ringtoneProperty = Settings.BLOCKED_CALL_RINGTONE;
+                soundProperty = Settings.BLOCKED_CALL_SOUND_NOTIFICATION;
+                statusProperty = Settings.BLOCKED_CALL_STATUS_NOTIFICATION;
+                break;
             case BLOCKED_SMS:
-                Settings.setStringValue(getContext(), Settings.BLOCKED_SMS_RINGTONE, uriString);
+                ringtoneProperty = Settings.BLOCKED_SMS_RINGTONE;
+                soundProperty = Settings.BLOCKED_SMS_SOUND_NOTIFICATION;
+                statusProperty = Settings.BLOCKED_SMS_STATUS_NOTIFICATION;
                 break;
             case RECEIVED_SMS:
-                Settings.setStringValue(getContext(), Settings.RECEIVED_SMS_RINGTONE, uriString);
+                ringtoneProperty = Settings.RECEIVED_SMS_RINGTONE;
+                soundProperty = Settings.RECEIVED_SMS_SOUND_NOTIFICATION;
                 break;
+        }
+
+        if(ringtoneProperty != null && soundProperty != null) {
+            if(uri != null) {
+                String uriString = uri.toString();
+                Settings.setStringValue(getContext(), ringtoneProperty, uriString);
+                Settings.setBooleanValue(getContext(), soundProperty, true);
+                if(statusProperty != null) {
+                    Settings.setBooleanValue(getContext(), statusProperty, true);
+                }
+            } else {
+                Settings.setBooleanValue(getContext(), soundProperty, false);
+            }
         }
     }
 
@@ -176,6 +203,9 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     private Uri getRingtoneUri(int type) {
         String uriString = null;
         switch (type) {
+            case BLOCKED_CALL:
+                uriString = Settings.getStringValue(getContext(), Settings.BLOCKED_CALL_RINGTONE);
+                break;
             case BLOCKED_SMS:
                 uriString = Settings.getStringValue(getContext(), Settings.BLOCKED_SMS_RINGTONE);
                 break;
@@ -198,8 +228,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         @Override
         public void onClick(View rowView) {
             // get the clicked row position
-            int position = adapter.getRowPosition(rowView);
-            if(!adapter.isRowChecked(position)) {
+            if(!adapter.isRowChecked(rowView)) {
                 // open ringtone picker dialog
                 Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
                 intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
@@ -207,10 +236,48 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getRingtoneUri(requestCode));
                 startActivityForResult(intent, requestCode);
             } else {
-                adapter.setRowChecked(position, false);
+                adapter.setRowChecked(rowView, false);
             }
-            // save the clicked row position
-            clickedRowPosition = position;
+        }
+    }
+
+
+    // On row click listener for updating dependent rows
+    class DependentRowOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View rowView) {
+            // trigger checked row
+            adapter.triggerRowChecked(rowView);
+            String property = adapter.getRowProperty(rowView);
+            if(property == null) {
+                return;
+            }
+
+            boolean checked = adapter.isRowChecked(rowView);
+            if(!checked) {
+                // if row was unchecked - reset dependent rows
+                switch (property) {
+                    case Settings.BLOCKED_SMS_STATUS_NOTIFICATION:
+                        adapter.setRowChecked(Settings.BLOCKED_SMS_SOUND_NOTIFICATION, false);
+                        adapter.setRowChecked(Settings.BLOCKED_SMS_VIBRATION_NOTIFICATION, false);
+                        break;
+                    case Settings.BLOCKED_CALL_STATUS_NOTIFICATION:
+                        adapter.setRowChecked(Settings.BLOCKED_CALL_SOUND_NOTIFICATION, false);
+                        adapter.setRowChecked(Settings.BLOCKED_CALL_VIBRATION_NOTIFICATION, false);
+                        break;
+                }
+            } else {
+                switch (property) {
+                    case Settings.BLOCKED_SMS_SOUND_NOTIFICATION:
+                    case Settings.BLOCKED_SMS_VIBRATION_NOTIFICATION:
+                        adapter.setRowChecked(Settings.BLOCKED_SMS_STATUS_NOTIFICATION, true);
+                        break;
+                    case Settings.BLOCKED_CALL_SOUND_NOTIFICATION:
+                    case Settings.BLOCKED_CALL_VIBRATION_NOTIFICATION:
+                        adapter.setRowChecked(Settings.BLOCKED_CALL_STATUS_NOTIFICATION, true);
+                        break;
+                }
+            }
         }
     }
 }

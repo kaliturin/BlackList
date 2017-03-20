@@ -13,17 +13,19 @@
     <string name="block_calls_not_from_contacts">Block calls not from the Contacts list</string>
     <string name="block_calls_not_from_sms_inbox">Block calls not from the SMS Inbox list</string>
     <string name="block_hidden_calls">Block private calls numbers</string>
-    <string name="show_calls_notifications">Show blocked calls notifications</string>
+    <string name="Notify_with_statusbar_blocked_call">Show blocked calls notifications</string>
     <string name="write_calls_journal">Write blocked calls to the journal</string>
     <string name="Notify_with_sound_received_SMS">"Notify with sound when SMS was received"</string>
     <string name="Notify_with_sound_blocked_SMS">"Notify with sound when SMS was blocked"</string>
+    <string name="Notify_with_vibration_received_SMS">"Notify with vibration when SMS was received"</string>
+    <string name="Notify_with_vibration_blocked_SMS">"Notify with vibration when SMS was blocked"</string>
 
     <string name="block_sms">Block SMS from the Black list</string>
     <string name="block_all_sms">Block all SMS</string>
     <string name="block_sms_not_from_contacts">Block SMS not from the Contacts list</string>
     <string name="block_sms_not_from_inbox">Block SMS not from the Inbox list</string>
     <string name="block_hidden_sms">Block private SMS numbers</string>
-    <string name="show_sms_notifications">Show blocked SMS notifications</string>
+    <string name="Notify_with_statusbar_blocked_SMS">Show blocked SMS notifications</string>
     <string name="write_sms_journal">Write blocked SMS to the journal</string>
 
     <string name="from_contacts_list">From the Contacts list</string>

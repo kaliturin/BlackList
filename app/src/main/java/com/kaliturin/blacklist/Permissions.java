@@ -32,8 +32,9 @@ class Permissions {
     static final String READ_PHONE_STATE = "android.permission.READ_PHONE_STATE";
     static final String READ_CONTACTS = "android.permission.READ_CONTACTS";
     static final String READ_CALL_LOG = "android.permission.READ_CALL_LOG";
+    static final String VIBRATE = "android.permission.VIBRATE";
 
-    private static String[] PERMISSIONS = new String[]{
+    private static String[] PERMISSIONS = new String[] {
             WRITE_EXTERNAL_STORAGE,
             RECEIVE_SMS,
             WRITE_SMS,
@@ -42,7 +43,8 @@ class Permissions {
             CALL_PHONE,
             READ_PHONE_STATE,
             READ_CONTACTS,
-            READ_CALL_LOG
+            READ_CALL_LOG,
+            VIBRATE
     };
 
     // Checks for permission

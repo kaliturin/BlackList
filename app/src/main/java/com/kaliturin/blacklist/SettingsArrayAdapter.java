@@ -53,25 +53,44 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
         return rowView;
     }
 
-    void invalidateCache() {
-        rowsArray.clear();
-    }
-
-    int getRowPosition(View rowView) {
+    // Triggers row checked status
+    void triggerRowChecked(View rowView) {
         ViewHolder viewHolder = (ViewHolder) rowView.getTag();
-        return  (viewHolder != null ? viewHolder.position : -1);
+        if(viewHolder != null) {
+            viewHolder.trigger();
+        }
     }
 
-    void setRowChecked(int position, boolean checked) {
-        ViewHolder viewHolder = rowsArray.get(position);
+    // Returns true if row is checked
+    boolean isRowChecked(View rowView) {
+        ViewHolder viewHolder = (ViewHolder) rowView.getTag();
+        return (viewHolder != null && viewHolder.isChecked());
+    }
+
+    // Sets row checked
+    void setRowChecked(View rowView, boolean checked) {
+        ViewHolder viewHolder = (ViewHolder) rowView.getTag();
         if(viewHolder != null) {
             viewHolder.setChecked(checked);
         }
     }
 
-    boolean isRowChecked(int position) {
-        ViewHolder viewHolder = rowsArray.get(position);
-        return (viewHolder != null && viewHolder.isChecked());
+    // Sets row checked by property name
+    void setRowChecked(String property, boolean checked) {
+        for(int i=0; i<rowsArray.size(); i++) {
+            ViewHolder viewHolder = rowsArray.valueAt(i);
+            if(viewHolder.model.property != null &&
+                    viewHolder.model.property.equals(property)) {
+                viewHolder.setChecked(checked);
+            }
+        }
+    }
+
+    // Returns property name from row's model
+    @Nullable
+    String getRowProperty(View rowView) {
+        ViewHolder viewHolder = (ViewHolder) rowView.getTag();
+        return (viewHolder != null ? viewHolder.model.property : null);
     }
 
     private void addModel(int type, @StringRes int titleId, String property, View.OnClickListener listener) {
@@ -131,8 +150,10 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
         }
         void setChecked(boolean checked) {
             this.checked = checked;
+            if(property != null) {
+                Settings.setBooleanValue(getContext(), property, checked);
+            }
         }
-
     }
 
     // Row view holder
@@ -166,7 +187,7 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
                     if(model.listener != null) {
                         model.listener.onClick(rowView);
                     } else {
-                        setChecked(!isChecked());
+                        trigger();
                     }
                 }
             });
@@ -174,16 +195,17 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
 
         void setChecked(boolean checked) {
             if(model.type == Model.CHECKBOX) {
-                checkBox.setChecked(checked);
                 model.setChecked(checked);
-                if(model.property != null) {
-                    Settings.setBooleanValue(getContext(), model.property, checked);
-                }
+                checkBox.setChecked(checked);
             }
         }
 
         boolean isChecked() {
             return model.isChecked();
+        }
+
+        void trigger() {
+            setChecked(!isChecked());
         }
     }
 }
