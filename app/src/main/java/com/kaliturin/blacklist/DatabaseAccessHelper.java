@@ -281,9 +281,9 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Deletes record by specified id
-    int deleteJournalRecord(long id) {
+    boolean deleteJournalRecord(long id) {
         SQLiteDatabase db = getWritableDatabase();
-        return db.delete(JournalTable.NAME, JournalTable.Column.ID + " = " + id, null);
+        return (db.delete(JournalTable.NAME, JournalTable.Column.ID + " = " + id, null) > 0);
     }
 
     // Writes journal record

@@ -31,8 +31,10 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecord;
  * Fragment for the journal (blocked calls/sms list) representation
  */
 public class JournalFragment extends Fragment implements FragmentArguments {
+    private static final String LIST_POSITION = "LIST_POSITION";
     private InternalEventBroadcast internalEventBroadcast = null;
     private JournalCursorAdapter cursorAdapter = null;
+    private ListView listView = null;
     private CustomSnackBar snackBar = null;
     private String itemsFilter = "";
     private SearchView searchView = null;
@@ -109,7 +111,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             public void onJournalWasWritten() {
                 clearSearchView();
                 // reload list view items
-                reloadItems("");
+                reloadItems("", true);
             }
         };
         internalEventBroadcast.register(getContext());
@@ -131,11 +133,17 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         cursorAdapter.setOnLongClickListener(new OnLongClickListener());
 
         // add cursor listener to the journal list
-        ListView listView = (ListView) view.findViewById(R.id.journal_list);
+        listView = (ListView) view.findViewById(R.id.journal_list);
         listView.setAdapter(cursorAdapter);
 
-        // init and run the journal records loader
-        getLoaderManager().initLoader(0, null, newLoaderCallbacks(null, false));
+        // get saved list position
+        int listPosition = 0;
+        if(savedInstanceState != null) {
+            listPosition = savedInstanceState.getInt(LIST_POSITION);
+        }
+
+        // load the list view
+        loadListViewItems(itemsFilter, false, listPosition);
     }
 
     @Override
@@ -164,7 +172,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                reloadItems(newText);
+                reloadItems(newText, false);
                 return true;
             }
         });
@@ -180,12 +188,18 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                reloadItems("");
+                reloadItems("", false);
                 return true;
             }
         });
 
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
     }
 
 //-------------------------------------------------------------------
@@ -260,28 +274,41 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             }
             MenuItemCompat.collapseActionView(itemSearch);
         }
+        itemsFilter = "";
     }
 
     // Deletes all checked items
     private void deleteCheckedItems() {
-        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, true));
+        int listPosition = listView.getFirstVisiblePosition();
+        loadListViewItems(itemsFilter, true, listPosition);
     }
 
     // Reloads items
-    private void reloadItems(@NonNull String itemsFilter) {
-        if(this.itemsFilter.equals(itemsFilter)) {
+    private void reloadItems(@NonNull String itemsFilter, boolean force) {
+        if(!force && this.itemsFilter.equals(itemsFilter)) {
             return;
         }
         this.itemsFilter = itemsFilter;
         dismissSnackBar();
-        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, false));
+
+        int listPosition = listView.getFirstVisiblePosition();
+        loadListViewItems(itemsFilter, false, listPosition);
     }
 
-    // Creates new journal items loader
-    private JournalItemsLoaderCallbacks newLoaderCallbacks(String itemsFilter,
-                                                           boolean deleteCheckedItems) {
-        return new JournalItemsLoaderCallbacks(getContext(),
-                cursorAdapter, itemsFilter, deleteCheckedItems);
+    // Loads SMS conversations to the list view
+    private void loadListViewItems(String itemsFilter,  boolean deleteItems, int listPosition) {
+        int loaderId = 0;
+        JournalItemsLoaderCallbacks callbacks =
+                new JournalItemsLoaderCallbacks(getContext(), cursorAdapter,
+                        itemsFilter, deleteItems, listView, listPosition);
+        LoaderManager manager = getLoaderManager();
+        if (manager.getLoader(loaderId) == null) {
+            // init and run the items loader
+            manager.initLoader(loaderId, null, callbacks);
+        } else {
+            // restart loader
+            manager.restartLoader(loaderId, null, callbacks);
+        }
     }
 
 //--------------------------------------------
@@ -319,7 +346,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                         @Override
                         public void onClick(View v) {
                             deleteItem(record.id);
-                            reloadItems(itemsFilter);
+                            reloadItems(itemsFilter, true);
                         }
                     }).
                     // add menu item records searching
@@ -400,22 +427,26 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         private Context context;
         private String itemsFilter;
         private JournalCursorAdapter cursorAdapter;
-        private boolean deleteCheckedItems;
+        private boolean deleteItems;
+        private ListView listView;
+        private int listPosition;
 
         JournalItemsLoaderCallbacks(Context context,
                                     JournalCursorAdapter cursorAdapter,
                                     @Nullable String itemsFilter,
-                                    boolean deleteCheckedItems) {
+                                    boolean deleteItems, ListView listView, int listPosition) {
             this.context = context;
             this.cursorAdapter = cursorAdapter;
             this.itemsFilter = itemsFilter;
-            this.deleteCheckedItems = deleteCheckedItems;
+            this.deleteItems = deleteItems;
+            this.listView = listView;
+            this.listPosition = listPosition;
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             IdentifiersContainer deletingItems = null;
-            if(deleteCheckedItems) {
+            if(deleteItems) {
                 deletingItems = cursorAdapter.getCheckedItems().clone();
             }
             return new JournalItemsLoader(context, itemsFilter, deletingItems);
@@ -424,6 +455,16 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             cursorAdapter.changeCursor(data);
+
+            if(listView != null) {
+                // scroll list to saved position
+                listView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listView.setSelection(listPosition);
+                    }
+                });
+            }
         }
 
         // TODO: check whether cursor is closing

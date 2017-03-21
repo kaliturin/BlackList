@@ -12,16 +12,18 @@
     <string name="block_all_calls">Block all calls</string>
     <string name="block_calls_not_from_contacts">Block calls not from the Contacts list</string>
     <string name="block_calls_not_from_sms_inbox">Block calls not from the SMS Inbox list</string>
-    <string name="block_hidden_calls">Block private calls numbers</string>
-    <string name="Notify_with_status_bar_blocked_call">Notify in status bar about blocked call</string>
+    <string name="block_hidden_calls">Block calls from private numbers</string>
     <string name="write_calls_journal">Write blocked calls to the Journal</string>
+    <string name="Notify_in_status_bar_blocked_call">Notify in status bar about blocked call</string>
+    <string name="Notify_with_sound_blocked_call">Notify with sound about blocked call</string>
+    <string name="Notify_with_vibration_blocked_call">Notify with vibration about blocked call</string>
 
     <string name="block_sms">Block SMS from the Black list</string>
     <string name="block_all_sms">Block all SMS</string>
     <string name="block_sms_not_from_contacts">Block SMS not from the Contacts list</string>
     <string name="block_sms_not_from_inbox">Block SMS not from the Inbox list</string>
-    <string name="block_hidden_sms">Block private SMS numbers</string>
-    <string name="Notify_with_status_bar_blocked_SMS">>Notify in status bar about blocked SMS</string>
+    <string name="block_hidden_sms">Block SMS from private numbers</string>
+    <string name="Notify_in_status_bar_blocked_SMS">Notify in status bar about blocked SMS</string>
     <string name="Notify_with_sound_received_SMS">"Notify with sound about received SMS"</string>
     <string name="Notify_with_sound_blocked_SMS">"Notify with sound about blocked SMS"</string>
     <string name="Notify_with_vibration_received_SMS">"Notify with vibration about received SMS"</string>

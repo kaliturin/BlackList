@@ -8,6 +8,7 @@
     <color name="colorTitleBackground">#f5f5f5</color>
     <color name="colorOnPressed">#ffebee</color>
     <color name="colorText">#000000</color>
+    <color name="colorLink">#304ffe</color>
     <color name="colorIncomeSms">#ffecb3</color>
     <color name="colorOutcomeSms">#bbdefb</color>
 </resources>

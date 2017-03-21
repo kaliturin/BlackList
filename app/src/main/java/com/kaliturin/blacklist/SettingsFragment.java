@@ -102,7 +102,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
             // sms notifications settings
             adapter.addTitle(R.string.SMS_notification);
-            adapter.addCheckbox(R.string.Notify_with_status_bar_blocked_SMS, Settings.BLOCKED_SMS_STATUS_NOTIFICATION,
+            adapter.addCheckbox(R.string.Notify_in_status_bar_blocked_SMS, Settings.BLOCKED_SMS_STATUS_NOTIFICATION,
                     new DependentRowOnClickListener());
             adapter.addCheckbox(R.string.Notify_with_sound_blocked_SMS, Settings.BLOCKED_SMS_SOUND_NOTIFICATION,
                     new RingtonePickerOnClickListener(BLOCKED_SMS));
@@ -128,7 +128,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         // calls notifications settings
         adapter.addTitle(R.string.Calls_notification);
-        adapter.addCheckbox(R.string.Notify_with_status_bar_blocked_call, Settings.BLOCKED_CALL_STATUS_NOTIFICATION,
+        adapter.addCheckbox(R.string.Notify_in_status_bar_blocked_call, Settings.BLOCKED_CALL_STATUS_NOTIFICATION,
                 new DependentRowOnClickListener());
         adapter.addCheckbox(R.string.Notify_with_sound_blocked_call, Settings.BLOCKED_CALL_SOUND_NOTIFICATION,
                 new RingtonePickerOnClickListener(BLOCKED_CALL));

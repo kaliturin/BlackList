@@ -7,6 +7,51 @@
     android:background="@drawable/selector_control"
     android:focusable="true">
 
+    <!--TextView
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="6dp"
+        android:paddingStart="6dp"
+        android:paddingRight="0dp"
+        android:paddingEnd="0dp"
+        android:gravity="start"
+        android:textColor="@color/colorText"
+        android:background="@color/colorTitleBackground"
+        android:textSize="20sp"
+        android:visibility="gone" /-->
+
+    <RelativeLayout
+        android:id="@+id/date_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorTitleBackground"
+        android:orientation="vertical"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorTitleBackground"
+            android:paddingBottom="2dp"
+            android:paddingLeft="@dimen/settings_left_margin"
+            android:paddingRight="@dimen/settings_left_margin"
+            android:paddingTop="@dimen/settings_margin"
+            android:textColor="@color/colorAccent"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorAccent" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,17 +61,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingStart="10dp"
-            android:paddingRight="8dp"
-            android:paddingEnd="8dp"
+            android:paddingLeft="6dp"
+            android:paddingStart="6dp"
+            android:paddingRight="6dp"
+            android:paddingEnd="6dp"
             android:layout_gravity="center">
 
             <ImageView
                 android:id="@+id/icon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/sym_action_email"
                 android:tint="@color/colorBorder"/>
 
             <TextView
@@ -36,12 +80,12 @@
                 android:gravity="center"
                 android:textSize="13sp"/>
 
-            <TextView
+            <!--TextView
                 android:id="@+id/date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="13sp"/>
+                android:textSize="13sp"/-->
         </LinearLayout>
 
         <LinearLayout
