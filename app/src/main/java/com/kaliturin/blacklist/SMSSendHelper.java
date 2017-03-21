@@ -133,7 +133,7 @@ class SMSSendHelper {
 
         // notify user about delivery
         String message = createNotificationMessage(context, intent, stringId);
-        Notification.onSmsDelivery(context, message);
+        Notifications.onSmsDelivery(context, message);
     }
 
     /** Cleans pending results **/

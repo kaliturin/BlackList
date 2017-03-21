@@ -190,6 +190,6 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         // write record to the journal
         writeToJournal(context, name, number);
         // notify the user
-        Notification.onCallBlocked(context, name);
+        Notifications.onCallBlocked(context, name);
     }
 }

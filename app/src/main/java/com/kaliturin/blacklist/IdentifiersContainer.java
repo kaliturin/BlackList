@@ -1,6 +1,5 @@
 package com.kaliturin.blacklist;
 
-import android.support.v4.util.LongSparseArray;
 import android.util.SparseBooleanArray;
 
 import java.util.List;
@@ -20,12 +19,12 @@ public class IdentifiersContainer implements Cloneable {
 
     // Returns true if contains all identifiers
     public boolean isFull() {
-        return all;
+        return (all && ids.size() == 0);
     }
 
     // Returns true if container is empty
     public boolean isEmpty() {
-        return capacity == 0 || (!all && ids.size() == 0);
+        return (capacity == 0 || (!all && ids.size() == 0));
     }
 
     // Returns true if contains the identifier

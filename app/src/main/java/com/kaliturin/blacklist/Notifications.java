@@ -15,7 +15,7 @@ import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
 /**
  * Status bar & ringtone/vibration notification
  */
-class Notification {
+class Notifications {
     static void onCallBlocked(Context context, String address) {
         if(!Settings.getBooleanValue(context, Settings.BLOCKED_CALL_STATUS_NOTIFICATION)) {
             return;

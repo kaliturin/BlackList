@@ -58,7 +58,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                     // get name for notification
                     String name = (contact == null ? number : contact.name);
                     // notify user
-                    Notification.onSmsReceived(context, name);
+                    Notifications.onSmsReceived(context, name);
                 }
             }
         }
@@ -241,6 +241,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // write record to the journal
         writeToJournal(context, name, number, messages);
         // notify user
-        Notification.onSmsBlocked(context, name);
+        Notifications.onSmsBlocked(context, name);
     }
 }
