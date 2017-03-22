@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|center"
-            android:text="@string/phone_number"
+            android:text="@string/Phone_number"
             android:textColor="@color/colorText" />
 
         <Spinner
@@ -48,7 +48,7 @@
             android:layout_gravity="center"
             android:padding="3dp"
             android:background="@drawable/selector_edit_text"
-            android:hint="@string/digits_symbols"
+            android:hint="@string/Digits_symbols"
             android:maxLength="50" />
 
         <ImageButton

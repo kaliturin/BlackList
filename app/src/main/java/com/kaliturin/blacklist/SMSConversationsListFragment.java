@@ -145,7 +145,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
             public boolean onMenuItemClick(MenuItem item) {
                 // open SMS sending activity
                 CustomFragmentActivity.show(getContext(),
-                        getString(R.string.new_message),
+                        getString(R.string.New_message),
                         SMSSendFragment.class, null);
                 return true;
             }
@@ -186,7 +186,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 String title = (sms.person != null ? sms.person : sms.number);
                 dialog.setTitle(title);
                 // add menu item of sms deletion
-                dialog.addItem(R.string.delete_thread, new View.OnClickListener() {
+                dialog.addItem(R.string.Delete_thread, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if(DefaultSMSAppHelper.isDefault(getContext())) {
@@ -266,7 +266,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            progressBar.setMessage(context.getString(R.string.loading));
+            progressBar.setMessage(context.getString(R.string.Loading_));
             progressBar.setCancelable(true);
             progressBar.show();
             return new ConversationsLoader(context);

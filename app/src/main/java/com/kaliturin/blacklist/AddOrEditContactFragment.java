@@ -53,7 +53,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         CustomSnackBar snackBar = new CustomSnackBar(view, R.id.snack_bar);
         // "Add" button
         snackBar.setButton(R.id.button_left,
-                getString(R.string.save),
+                getString(R.string.SAVE),
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -68,7 +68,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
 
         // "Cancel" button
         snackBar.setButton(R.id.button_right,
-                getString(R.string.cancel),
+                getString(R.string.CANCEL),
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -154,7 +154,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
                 name = numbers.get(0).number;
             } else {
                 // get default name
-                name = getContext().getString(R.string.unnamed);
+                name = getContext().getString(R.string.Unnamed);
             }
         }
 

@@ -18,7 +18,7 @@
         android:layout_gravity="start|center"
         android:layout_weight="1"
         android:padding="3dp"
-        android:text="@string/phone_number"
+        android:text="@string/Phone_number"
         android:textColor="@color/colorText" />
 
     <ImageButton
@@ -28,7 +28,7 @@
         android:layout_gravity="start|center"
         android:src="@drawable/ic_remove"
         android:tint="@color/colorAccent"
-        android:contentDescription="@string/remove_contact"/>
+        android:contentDescription="@string/Remove_contact"/>
 
     </LinearLayout>
 

@@ -45,7 +45,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/selector_edit_text"
-                        android:hint="@string/phone_number"
+                        android:hint="@string/Phone_number"
                         android:inputType="phone"
                         android:maxLength="100"
                         android:padding="3dp">
@@ -63,7 +63,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/selector_edit_text"
                         android:gravity="top|start"
-                        android:hint="@string/message"
+                        android:hint="@string/Message"
                         android:inputType="textCapSentences|textMultiLine"
                         android:minLines="5"
                         android:padding="3dp" />
@@ -86,7 +86,7 @@
                             android:id="@+id/button_add_number"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:contentDescription="@string/add_contact"
+                            android:contentDescription="@string/Add_contact"
                             android:src="@drawable/ic_add"
                             android:tint="@color/colorAccent" />
 
@@ -94,7 +94,7 @@
                             android:id="@+id/button_add_contact"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:contentDescription="@string/add_contact"
+                            android:contentDescription="@string/Add_contact"
                             android:src="@drawable/ic_contact"
                             android:tint="@color/colorAccent" />
 
@@ -120,7 +120,7 @@
                             android:minHeight="40dp"
                             android:minWidth="0dp"
                             android:textSize="14sp"
-                            android:text="@string/send" />
+                            android:text="@string/Send" />
 
                     </LinearLayout>
 

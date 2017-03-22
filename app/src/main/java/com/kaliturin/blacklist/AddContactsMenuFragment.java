@@ -27,22 +27,22 @@ public class AddContactsMenuFragment extends Fragment implements FragmentArgumen
             String permission = "";
             switch (v.getId()) {
                 case R.id.add_from_contacts:
-                    title = getString(R.string.contacts_list);
+                    title = getString(R.string.List_of_contacts);
                     sourceType = ContactSourceType.FROM_CONTACTS;
                     permission = Permissions.READ_CONTACTS;
                     break;
                 case R.id.add_from_calls:
-                    title = getString(R.string.calls_list);
+                    title = getString(R.string.List_of_calls);
                     sourceType = ContactSourceType.FROM_CALLS_LOG;
                     permission = Permissions.READ_CALL_LOG;
                     break;
                 case R.id.add_from_sms:
-                    title = getString(R.string.sms_inbox_list);
+                    title = getString(R.string.List_of_inbox_SMS);
                     sourceType = ContactSourceType.FROM_SMS_INBOX;
                     permission = Permissions.READ_SMS;
                     break;
                 case R.id.add_manually:
-                    title = getString(R.string.adding_contact);
+                    title = getString(R.string.Adding_contact);
                     permission = Permissions.WRITE_EXTERNAL_STORAGE;
                     break;
             }

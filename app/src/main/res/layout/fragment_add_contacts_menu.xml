@@ -29,7 +29,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/from_contacts_list"
+                    android:text="@string/From_contacts_list"
                     android:textColor="@color/colorText"
                     android:textSize="20sp"/>
             </LinearLayout>
@@ -52,7 +52,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/from_calls_list"
+                    android:text="@string/From_calls_list"
                     android:textColor="@color/colorText"
                     android:textSize="20sp"/>
             </LinearLayout>
@@ -75,7 +75,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/from_sms_list"
+                    android:text="@string/From_SMS_list"
                     android:textColor="@color/colorText"
                     android:textSize="20sp"/>
             </LinearLayout>
@@ -98,7 +98,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/manually"
+                    android:text="@string/Manually"
                     android:textColor="@color/colorText"
                     android:textSize="20sp"/>
             </LinearLayout>

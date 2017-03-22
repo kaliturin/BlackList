@@ -71,7 +71,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         if(isPrivateNumber(number)) {
             // if block private numbers
             if(Settings.getBooleanValue(context, Settings.BLOCK_HIDDEN_SMS)) {
-                String name = context.getString(R.string.hidden);
+                String name = context.getString(R.string.Private);
                 // abort broadcast and notify user
                 abortSMSAndNotify(context, name, name, messages);
                 return true;
@@ -182,7 +182,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         }
         String body = smsBody.toString();
         if(body.isEmpty()) {
-            body = context.getString(R.string.empty_sms);
+            body = context.getString(R.string.No_text);
         }
         return body;
     }

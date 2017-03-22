@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity
         // drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                R.string.Open_navigation_drawer, R.string.Close_navigation_drawer);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity
         Bundle arguments = new Bundle();
         arguments.putString(FragmentArguments.CONTACT_NAME, person);
         arguments.putString(FragmentArguments.CONTACT_NUMBER, number);
-        String title = getString(R.string.new_message);
+        String title = getString(R.string.New_message);
         CustomFragmentActivity.show(this, title, SMSSendFragment.class, arguments);
     }
 }

@@ -301,29 +301,29 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     private void showAddContactsMenuDialog() {
         // create and show menu dialog for actions with the contact
         MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
-        dialog.setTitle(R.string.add_number).
-                addItem(R.string.from_contacts_list, new View.OnClickListener() {
+        dialog.setTitle(R.string.Add_number).
+                addItem(R.string.From_contacts_list, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         showAddContactsActivity(Permissions.READ_CONTACTS,
                                 ContactSourceType.FROM_CONTACTS,
-                                R.string.contacts_list);
+                                R.string.List_of_contacts);
                     }
                 }).
-                addItem(R.string.from_calls_list, new View.OnClickListener() {
+                addItem(R.string.From_calls_list, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         showAddContactsActivity(Permissions.READ_CALL_LOG,
                                 ContactsAccessHelper.ContactSourceType.FROM_CALLS_LOG,
-                                R.string.calls_list);
+                                R.string.List_of_calls);
                     }
                 }).
-                addItem(R.string.from_sms_list, new View.OnClickListener() {
+                addItem(R.string.From_SMS_list, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         showAddContactsActivity(Permissions.READ_SMS,
                                 ContactsAccessHelper.ContactSourceType.FROM_SMS_INBOX,
-                                R.string.sms_inbox_list);
+                                R.string.List_of_inbox_SMS);
                     }
                 }).show();
     }

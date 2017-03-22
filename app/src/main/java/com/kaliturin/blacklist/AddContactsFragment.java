@@ -75,7 +75,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         snackBar = new CustomSnackBar(view, R.id.snack_bar);
         // "Select all" button
         snackBar.setButton(R.id.button_left,
-                getString(R.string.select_all),
+                getString(R.string.SELECT_ALL),
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -84,7 +84,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
                 });
         // "Add" button
         snackBar.setButton(R.id.button_center,
-                getString(R.string.add),
+                getString(R.string.ADD),
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -95,7 +95,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
                 });
         // "Cancel button" button
         snackBar.setButton(R.id.button_right,
-                getString(R.string.cancel),
+                getString(R.string.CANCEL),
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -147,7 +147,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
         // get the view from search menu item
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(itemSearch);
-        searchView.setQueryHint(getString(R.string.action_search));
+        searchView.setQueryHint(getString(R.string.Search_action));
         // set on text change listener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -362,14 +362,14 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
         @Override
         protected void onPreExecute() {
-            progressBar.setMessage(getString(R.string.saving) + " 0%");
+            progressBar.setMessage(getString(R.string.Saving_) + " 0%");
             progressBar.show();
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
             progressBar.setProgress(values[0]);
-            progressBar.setMessage(getString(R.string.saving) + " " + values[0] + "%");
+            progressBar.setMessage(getString(R.string.Saving_) + " " + values[0] + "%");
         }
     }
 }

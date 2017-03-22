@@ -9,13 +9,14 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBorder" />
+        android:background="@color/colorBorder"/>
 
     <TextView
         android:id="@+id/item_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:textSize="18sp"/>
+        android:textSize="18sp"
+        android:textColor="@color/colorText2"/>
 
 </LinearLayout>

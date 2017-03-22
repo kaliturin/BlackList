@@ -44,12 +44,8 @@ public class JournalCursorAdapter extends CursorAdapter {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.row_journal, parent, false);
 
-        // add view holder to the row
+        // link row-view to view holder
         view.setTag(new ViewHolder(view));
-
-        // on click listeners for the row and checkbox (which is inside the row)
-        view.setOnClickListener(rowOnClickListener);
-        view.setOnLongClickListener(rowOnLongClickListener);
 
         return view;
     }
@@ -72,7 +68,7 @@ public class JournalCursorAdapter extends CursorAdapter {
             showDate = true;
         }
 
-        // update the view holder with new model
+        // update the view holder with new record
         viewHolder.setModel(record, showDate);
 
         // save last time
@@ -134,19 +130,18 @@ public class JournalCursorAdapter extends CursorAdapter {
     }
 
     @Nullable
-    JournalRecord getRecord(View row) {
-        if(row != null) {
-            ViewHolder viewHolder = (ViewHolder) row.getTag();
-            return viewHolder.model;
+    JournalRecord getRecord(View view) {
+        if(view != null) {
+            ViewHolder viewHolder = (ViewHolder) view.getTag();
+            return viewHolder.record;
         }
         return null;
     }
 
     // View holder improves scroll performance
     private class ViewHolder {
-        private JournalRecord model;
+        private JournalRecord record;
         private int itemId;
-        private CheckableLinearLayout rowView;
         private ImageView iconImageView;
         private TextView senderTextView;
         private TextView numberTextView;
@@ -155,24 +150,25 @@ public class JournalCursorAdapter extends CursorAdapter {
         private TextView timeTextView;
         private CheckBox checkBox;
         private View dateLayout;
+        private CheckableLinearLayout contentLayout;
 
         ViewHolder(View rowView) {
-            this((CheckableLinearLayout) rowView,
-                    (ImageView) rowView.findViewById(R.id.icon),
+            this((ImageView) rowView.findViewById(R.id.icon),
                     (TextView) rowView.findViewById(R.id.sender),
                     (TextView) rowView.findViewById(R.id.number),
                     (TextView) rowView.findViewById(R.id.text),
                     (TextView) rowView.findViewById(R.id.date),
                     (TextView) rowView.findViewById(R.id.time),
                     (CheckBox) rowView.findViewById(R.id.cb),
-                    rowView.findViewById(R.id.date_layout));
+                    rowView.findViewById(R.id.date_layout),
+                    (CheckableLinearLayout) rowView.findViewById(R.id.content_layout));
         }
 
-        ViewHolder(CheckableLinearLayout rowView, ImageView iconImageView, TextView senderTextView,
+        ViewHolder(ImageView iconImageView, TextView senderTextView,
                    TextView numberTextView, TextView textTextView, TextView dateTextView,
-                   TextView timeTextView, CheckBox checkBox, View dateLayout) {
-            this.model = null;
-            this.rowView = rowView;
+                   TextView timeTextView, CheckBox checkBox, View dateLayout,
+                   CheckableLinearLayout contentLayout) {
+            this.record = null;
             this.itemId = 0;
             this.iconImageView = iconImageView;
             this.senderTextView = senderTextView;
@@ -182,12 +178,18 @@ public class JournalCursorAdapter extends CursorAdapter {
             this.timeTextView = timeTextView;
             this.checkBox = checkBox;
             this.dateLayout = dateLayout;
+            this.contentLayout = contentLayout;
+            contentLayout.setTag(this);
+
+            // add on click listeners
+            contentLayout.setOnClickListener(rowOnClickListener);
+            contentLayout.setOnLongClickListener(rowOnLongClickListener);
         }
 
-        private void setModel(JournalRecord model, boolean showDate) {
-            this.model = model;
-            itemId = (int) model.id;
-            Date date = toDate(model.time);
+        private void setModel(JournalRecord record, boolean showDate) {
+            this.record = record;
+            itemId = (int) record.id;
+            Date date = toDate(record.time);
             if(showDate) {
                 dateTextView.setText(dateFormat.format(date));
                 dateLayout.setVisibility(View.VISIBLE);
@@ -196,20 +198,20 @@ public class JournalCursorAdapter extends CursorAdapter {
             }
             timeTextView.setText(timeFormat.format(date));
 
-            senderTextView.setText(model.caller);
+            senderTextView.setText(record.caller);
 
-            if(model.number != null &&
-                    !model.caller.equals(model.number)) {
-                numberTextView.setText(model.number);
+            if(record.number != null &&
+                    !record.caller.equals(record.number)) {
+                numberTextView.setText(record.number);
                 numberTextView.setVisibility(View.VISIBLE);
             } else {
                 numberTextView.setText("");
                 numberTextView.setVisibility(View.GONE);
             }
 
-            if (model.text != null) {
+            if (record.text != null) {
                 iconImageView.setImageResource(android.R.drawable.sym_action_email);
-                textTextView.setText(model.text);
+                textTextView.setText(record.text);
                 textTextView.setVisibility(View.VISIBLE);
             } else {
                 iconImageView.setImageResource(android.R.drawable.sym_action_call);
@@ -219,7 +221,7 @@ public class JournalCursorAdapter extends CursorAdapter {
 
             boolean checked = isChecked();
             checkBox.setChecked(checked);
-            rowView.setChecked(checked);
+            contentLayout.setChecked(checked);
         }
 
         private void toggle() {
@@ -233,7 +235,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         private void setChecked(boolean checked) {
             checkedItems.set(itemId, checked);
             checkBox.setChecked(checked);
-            rowView.setChecked(checked);
+            contentLayout.setChecked(checked);
         }
 
         private Date toDate(long time) {

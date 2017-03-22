@@ -79,7 +79,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         if(isDefaultSmsAppAvailable) {
             // show sms default app switch
             adapter.addTitle(R.string.SMS_default_app);
-            adapter.addCheckbox(R.string.set_as_default_sms_app, isDefaultSmsApp,
+            adapter.addCheckbox(R.string.Set_as_default_SMS_app, isDefaultSmsApp,
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -93,12 +93,12 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         if (isDefaultSmsApp) {
             // sms blocking settings
             adapter.addTitle(R.string.SMS_blocking);
-            adapter.addCheckbox(R.string.block_all_sms, Settings.BLOCK_ALL_SMS);
-            adapter.addCheckbox(R.string.block_sms, Settings.BLOCK_SMS_FROM_BLACK_LIST);
-            adapter.addCheckbox(R.string.block_sms_not_from_contacts, Settings.BLOCK_SMS_NOT_FROM_CONTACTS);
-            adapter.addCheckbox(R.string.block_sms_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
-            adapter.addCheckbox(R.string.block_hidden_sms, Settings.BLOCK_HIDDEN_SMS);
-            adapter.addCheckbox(R.string.write_sms_journal, Settings.WRITE_SMS_JOURNAL);
+            adapter.addCheckbox(R.string.Block_all_SMS, Settings.BLOCK_ALL_SMS);
+            adapter.addCheckbox(R.string.Block_SMS_from_black_list, Settings.BLOCK_SMS_FROM_BLACK_LIST);
+            adapter.addCheckbox(R.string.Block_SMS_not_from_contacts, Settings.BLOCK_SMS_NOT_FROM_CONTACTS);
+            adapter.addCheckbox(R.string.Block_SMS_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
+            adapter.addCheckbox(R.string.Block_hidden_SMS, Settings.BLOCK_HIDDEN_SMS);
+            adapter.addCheckbox(R.string.Write_SMS_to_journal, Settings.WRITE_SMS_JOURNAL);
 
             // sms notifications settings
             adapter.addTitle(R.string.SMS_notification);
@@ -119,12 +119,12 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         // calls blocking settings
         adapter.addTitle(R.string.Calls_blocking);
-        adapter.addCheckbox(R.string.block_all_calls, Settings.BLOCK_ALL_CALLS);
-        adapter.addCheckbox(R.string.block_calls, Settings.BLOCK_CALLS_FROM_BLACK_LIST);
-        adapter.addCheckbox(R.string.block_calls_not_from_contacts, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS);
-        adapter.addCheckbox(R.string.block_calls_not_from_sms_inbox, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX);
-        adapter.addCheckbox(R.string.block_hidden_calls, Settings.BLOCK_HIDDEN_CALLS);
-        adapter.addCheckbox(R.string.write_calls_journal, Settings.WRITE_CALLS_JOURNAL);
+        adapter.addCheckbox(R.string.Block_all_calls, Settings.BLOCK_ALL_CALLS);
+        adapter.addCheckbox(R.string.Block_calls_from_black_list, Settings.BLOCK_CALLS_FROM_BLACK_LIST);
+        adapter.addCheckbox(R.string.Block_calls_not_from_contacts, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS);
+        adapter.addCheckbox(R.string.Block_calls_not_from_SMS_inbox, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX);
+        adapter.addCheckbox(R.string.Block_hidden_calls, Settings.BLOCK_HIDDEN_CALLS);
+        adapter.addCheckbox(R.string.Write_calls_to_journal, Settings.WRITE_CALLS_JOURNAL);
 
         // calls notifications settings
         adapter.addTitle(R.string.Calls_notification);

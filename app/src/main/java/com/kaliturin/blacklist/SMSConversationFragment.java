@@ -177,7 +177,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         arguments.putString(SMS_MESSAGE_BODY, body);
         // open activity with the fragment
         CustomFragmentActivity.show(getContext(),
-                getString(R.string.new_message),
+                getString(R.string.New_message),
                 SMSSendFragment.class, arguments);
     }
 

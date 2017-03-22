@@ -1,15 +1,11 @@
 package com.kaliturin.blacklist;
 
-import android.app.ActivityManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
-import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
@@ -17,10 +13,6 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-
-import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
-
-import java.util.List;
 
 /**
  * Some utils methods
@@ -89,7 +81,7 @@ public class Utils {
                         context.getSystemService(Context.CLIPBOARD_SERVICE);
                 android.content.ClipData clip =
                         android.content.ClipData.newPlainText(
-                                context.getResources().getString(R.string.message), text);
+                                context.getResources().getString(R.string.Message), text);
                 clipboard.setPrimaryClip(clip);
             }
             return true;

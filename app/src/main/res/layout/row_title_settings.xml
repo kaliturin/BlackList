@@ -14,9 +14,9 @@
         android:layout_alignParentBottom="true"
         android:background="@color/colorTitleBackground"
         android:paddingBottom="2dp"
-        android:paddingLeft="@dimen/settings_left_margin"
-        android:paddingRight="@dimen/settings_left_margin"
-        android:paddingTop="@dimen/settings_margin"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="20dp"
         android:textColor="@color/colorAccent"
         android:textSize="18sp" />
 

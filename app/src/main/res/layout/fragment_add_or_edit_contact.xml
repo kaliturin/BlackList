@@ -25,7 +25,7 @@
                 android:padding="3dp"
                 android:background="@drawable/selector_edit_text"
                 android:maxLength="100"
-                android:hint="@string/contact_name" />
+                android:hint="@string/Contact_name_nn" />
 
             <LinearLayout
                 android:id="@+id/layout_number_list"
@@ -46,14 +46,14 @@
                     android:layout_gravity="center"
                     android:paddingRight="5dp"
                     android:paddingLeft="5dp"
-                    android:text="@string/add_another" />
+                    android:text="@string/Add_another" />
 
                 <ImageButton
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:clickable="false"
-                    android:contentDescription="@string/add_contact"
+                    android:contentDescription="@string/Add_contact"
                     android:src="@drawable/ic_add"
                     android:tint="@color/colorAccent" />
 

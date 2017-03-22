@@ -242,11 +242,11 @@ class ContactsCursorAdapter extends CursorAdapter {
     private String getNumberTypeTitle(Context context, int type) {
         switch (type) {
             case ContactNumber.TYPE_STARTS:
-                return context.getString(R.string.starts_with);
+                return context.getString(R.string.Starts_with);
             case ContactNumber.TYPE_ENDS:
-                return context.getString(R.string.ends_with);
+                return context.getString(R.string.Ends_with);
             case ContactNumber.TYPE_CONTAINS:
-                return context.getString(R.string.contains);
+                return context.getString(R.string.Contains);
         }
         return "";
     }

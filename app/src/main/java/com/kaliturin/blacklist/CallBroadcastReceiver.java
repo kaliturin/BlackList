@@ -39,7 +39,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         if(isPrivateNumber(number)) {
             // if block private numbers
             if(Settings.getBooleanValue(context, Settings.BLOCK_HIDDEN_CALLS)) {
-                String name = context.getString(R.string.hidden);
+                String name = context.getString(R.string.Private);
                 // break call and notify
                 breakCallAndNotify(context, name, name);
             }
