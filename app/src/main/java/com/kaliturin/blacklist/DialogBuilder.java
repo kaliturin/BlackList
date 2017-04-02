@@ -150,7 +150,7 @@ class DialogBuilder {
                                     final DialogInterface.OnClickListener listener) {
         View view = getView();
         if(buttonsBar == null) {
-            buttonsBar = new ButtonsBar(view);
+            buttonsBar = new ButtonsBar(view, R.id.three_buttons_bar);
             buttonsBar.show();
         }
 

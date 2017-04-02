@@ -50,9 +50,18 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
-        ButtonsBar snackBar = new ButtonsBar(view);
-        // "Add" button
+        ButtonsBar snackBar = new ButtonsBar(view, R.id.three_buttons_bar);
+        // "Cancel" button
         snackBar.setButton(R.id.button_left,
+                getString(R.string.CANCEL),
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finishActivity(Activity.RESULT_CANCELED);
+                    }
+                });
+        // "Save" button
+        snackBar.setButton(R.id.button_right,
                 getString(R.string.SAVE),
                 new View.OnClickListener() {
                     @Override
@@ -65,17 +74,6 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
                         }
                     }
                 });
-
-        // "Cancel" button
-        snackBar.setButton(R.id.button_right,
-                getString(R.string.CANCEL),
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finishActivity(Activity.RESULT_CANCELED);
-                    }
-                });
-
         snackBar.show();
 
         // 'add new row' button click listener

@@ -2,7 +2,6 @@ package com.kaliturin.blacklist;
 
 import android.support.annotation.IdRes;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
@@ -11,8 +10,8 @@ import android.widget.TextView;
 public class ButtonsBar {
     private View view;
 
-    public ButtonsBar(View parentView) {
-        view = parentView.findViewById(R.id.buttons_bar);
+    public ButtonsBar(View parentView, @IdRes int layoutId) {
+        view = parentView.findViewById(layoutId);
         dismiss();
     }
 

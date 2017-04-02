@@ -80,14 +80,15 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE);
 
         // snack bar
-        snackBar = new ButtonsBar(view);
-        // "Select all" button
+        snackBar = new ButtonsBar(view, R.id.three_buttons_bar);
+        // "Cancel button" button
         snackBar.setButton(R.id.button_left,
-                getString(R.string.SELECT_ALL),
+                getString(R.string.CANCEL),
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        setAllItemsChecked();
+                        snackBar.dismiss();
+                        clearCheckedItems();
                     }
                 });
         // "Delete" button
@@ -100,14 +101,13 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                         deleteCheckedItems();
                     }
                 });
-        // "Cancel button" button
+        // "Select all" button
         snackBar.setButton(R.id.button_right,
-                getString(R.string.CANCEL),
+                getString(R.string.SELECT_ALL),
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        snackBar.dismiss();
-                        clearCheckedItems();
+                        setAllItemsChecked();
                     }
                 });
 

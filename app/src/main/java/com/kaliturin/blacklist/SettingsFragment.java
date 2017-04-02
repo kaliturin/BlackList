@@ -355,7 +355,8 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         DialogBuilder dialog = new DialogBuilder(getActivity());
         dialog.setTitle(titleId);
         dialog.addEdit(editId, filePath, getString(R.string.File_path));
-        dialog.addButtonLeft(getString(R.string.OK), new DialogInterface.OnClickListener() {
+        dialog.addButtonLeft(getString(R.string.CANCEL), null);
+        dialog.addButtonRight(getString(R.string.OK), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Window window = ((Dialog)dialog).getWindow();
@@ -367,8 +368,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 }
             }
         });
-
-        dialog.addButtonRight(getString(R.string.CANCEL), null);
         dialog.show();
     }
 
