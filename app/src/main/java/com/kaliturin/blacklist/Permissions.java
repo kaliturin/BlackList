@@ -22,7 +22,7 @@ class Permissions {
     private static final int REQUEST_CODE = 1020;
     private static final Map<String, Boolean> permissionsResults = new HashMap<>();
 
-    // Permissions that are using in the app
+    // Permissions names
     static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
     static final String RECEIVE_SMS = "android.permission.RECEIVE_SMS";
     static final String WRITE_SMS = "android.permission.WRITE_SMS";
@@ -47,7 +47,7 @@ class Permissions {
             VIBRATE
     };
 
-    // Checks for permission
+    /** Checks for permission **/
     static boolean isGranted(@NonNull Context context, @NonNull String permission) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
@@ -61,14 +61,14 @@ class Permissions {
         return result;
     }
 
-    // Checks for permissions and notifies the user if they aren't granted
+    /** Checks for permissions and notifies the user if they aren't granted **/
     static void notifyIfNotGranted(@NonNull Context context) {
         for(String permission : PERMISSIONS) {
             notifyIfNotGranted(context, permission);
         }
     }
 
-    // Checks for permission and notifies if it isn't granted
+    /** Checks for permission and notifies if it isn't granted **/
     static boolean notifyIfNotGranted(@NonNull Context context, @NonNull String permission) {
         if(!isGranted(context, permission)) {
             notify(context, permission);
@@ -77,7 +77,7 @@ class Permissions {
         return false;
     }
 
-    // Notifies the user if permission isn't granted
+    /** Notifies the user if permission isn't granted **/
     private static void notify(@NonNull Context context, @NonNull String permission) {
         context = context.getApplicationContext();
         PackageManager pm = context.getPackageManager();
@@ -100,19 +100,19 @@ class Permissions {
         }
     }
 
-    // Checks for permissions and shows a dialog for permission granting
+    /** Checks for permissions and shows a dialog for permission granting **/
     static void checkAndRequest(@NonNull Activity context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(context, PERMISSIONS, REQUEST_CODE);
         }
     }
 
-    // Resets permissions results cache
+    /** Resets permissions results cache **/
     static void invalidateCache() {
         permissionsResults.clear();
     }
 
-    // Saves the results of permission granting request
+    /** Saves the results of permission granting request **/
     static void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {

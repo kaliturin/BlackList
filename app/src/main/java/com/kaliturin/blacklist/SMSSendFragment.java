@@ -300,7 +300,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     // Shows menu dialog of contacts adding
     private void showAddContactsMenuDialog() {
         // create and show menu dialog for actions with the contact
-        MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+        DialogBuilder dialog = new DialogBuilder(getActivity());
         dialog.setTitle(R.string.Add_number).
                 addItem(R.string.From_contacts_list, new View.OnClickListener() {
                     @Override

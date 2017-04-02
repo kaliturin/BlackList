@@ -16,6 +16,7 @@ import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
  * Status bar & ringtone/vibration notification
  */
 class Notifications {
+    // Notification on call blocked
     static void onCallBlocked(Context context, String address) {
         if(!Settings.getBooleanValue(context, Settings.BLOCKED_CALL_STATUS_NOTIFICATION)) {
             return;
@@ -31,6 +32,7 @@ class Notifications {
         notify(context, message, icon, action, ringtone, vibration);
     }
 
+    // Notification on SMS blocked
     static void onSmsBlocked(Context context, String address) {
         if(!Settings.getBooleanValue(context, Settings.BLOCKED_SMS_STATUS_NOTIFICATION)) {
             return;
@@ -46,6 +48,7 @@ class Notifications {
         notify(context, message, icon, action, ringtone, vibration);
     }
 
+    // Notification on SMS received
     static void onSmsReceived(Context context, String address) {
         String message = address + " " + context.getString(R.string.message_is_received);
         int icon = R.drawable.ic_status_sms;
@@ -115,6 +118,7 @@ class Notifications {
         notificationManager.notify(0, builder.build());
     }
 
+    // Returns notification ringtone uri (if settings do not allow it - returns null)
     private static Uri getRingtoneUri(Context context, String notificationProperty,
                                       String ringtoneProperty) {
         Uri ringtone = null;

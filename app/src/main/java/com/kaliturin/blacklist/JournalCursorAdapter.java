@@ -23,7 +23,7 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecordCursorWrapper;
  * Journal data cursor adapter
  */
 public class JournalCursorAdapter extends CursorAdapter {
-    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT);
+    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG);
     private final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
     private Date datetime = new Date();
     private Calendar calendar1 = Calendar.getInstance();
@@ -54,6 +54,7 @@ public class JournalCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // get cursor wrapper
         JournalRecordCursorWrapper cursorWrapper = (JournalRecordCursorWrapper) cursor;
+        // FIXME consider to read record's id at first and whole record at second (for memory saving)
         // get journal item
         JournalRecord record = cursorWrapper.getJournalRecord();
         // get view holder from the row

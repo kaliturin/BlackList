@@ -182,7 +182,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
             final SMSConversation sms = cursorAdapter.getSMSConversation(row);
             if(sms != null) {
                 // create menu dialog
-                MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+                DialogBuilder dialog = new DialogBuilder(getActivity());
                 String title = (sms.person != null ? sms.person : sms.number);
                 dialog.setTitle(title);
                 // add menu item of sms deletion

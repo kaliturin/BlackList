@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class AddContactsFragment extends Fragment implements FragmentArguments {
     private ContactsCursorAdapter cursorAdapter = null;
-    private CustomSnackBar snackBar = null;
+    private ButtonsBar snackBar = null;
     private ContactSourceType sourceType = null;
     private int contactType = 0;
     private boolean singleNumberMode = false;
@@ -72,7 +72,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
-        snackBar = new CustomSnackBar(view, R.id.snack_bar);
+        snackBar = new ButtonsBar(view);
         // "Select all" button
         snackBar.setButton(R.id.button_left,
                 getString(R.string.SELECT_ALL),
@@ -185,10 +185,10 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Opens menu dialog with list of contact's numbers to choose
     private void askForContactNumber(final Contact contact) {
-        MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+        DialogBuilder dialog = new DialogBuilder(getActivity());
         dialog.setTitle(contact.name);
         for(ContactNumber number : contact.numbers) {
-            dialog.addItem(number.number, new View.OnClickListener() {
+            dialog.addItem(0, number.number, number.number, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String number = (String) v.getTag();
@@ -196,7 +196,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
                         contactIdToNumber.put(contact.id, number);
                     }
                 }
-            }).setItemTag(number.number);
+            });
         }
         dialog.show();
     }

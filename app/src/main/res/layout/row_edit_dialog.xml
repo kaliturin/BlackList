@@ -3,20 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/selector_control"
     android:focusable="true">
 
     <View
+        android:id="@+id/item_top_border"
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:visibility="gone"
         android:background="@color/colorBorder"/>
 
-    <TextView
-        android:id="@+id/item_title"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/edit_text"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="18sp"
-        android:textColor="@color/colorText2"/>
+        android:padding="10dp"
+        android:background="@color/colorPrimary"/>
 
 </LinearLayout>

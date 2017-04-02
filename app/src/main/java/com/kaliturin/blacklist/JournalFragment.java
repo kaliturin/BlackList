@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -35,10 +36,11 @@ public class JournalFragment extends Fragment implements FragmentArguments {
     private InternalEventBroadcast internalEventBroadcast = null;
     private JournalCursorAdapter cursorAdapter = null;
     private ListView listView = null;
-    private CustomSnackBar snackBar = null;
+    private ButtonsBar snackBar = null;
     private String itemsFilter = "";
     private SearchView searchView = null;
     private MenuItem itemSearch = null;
+    private int listPosition = 0;
 
     public JournalFragment() {
         // Required empty public constructor
@@ -64,6 +66,10 @@ public class JournalFragment extends Fragment implements FragmentArguments {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if(savedInstanceState != null) {
+            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
+        }
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_journal, container, false);
     }
@@ -74,7 +80,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE);
 
         // snack bar
-        snackBar = new CustomSnackBar(view, R.id.snack_bar);
+        snackBar = new ButtonsBar(view);
         // "Select all" button
         snackBar.setButton(R.id.button_left,
                 getString(R.string.SELECT_ALL),
@@ -136,12 +142,6 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         listView = (ListView) view.findViewById(R.id.journal_list);
         listView.setAdapter(cursorAdapter);
 
-        // get saved list position
-        int listPosition = 0;
-        if(savedInstanceState != null) {
-            listPosition = savedInstanceState.getInt(LIST_POSITION);
-        }
-
         // load the list view
         loadListViewItems(itemsFilter, false, listPosition);
     }
@@ -200,6 +200,12 @@ public class JournalFragment extends Fragment implements FragmentArguments {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        listPosition = listView.getFirstVisiblePosition();
     }
 
 //-------------------------------------------------------------------
@@ -295,7 +301,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         loadListViewItems(itemsFilter, false, listPosition);
     }
 
-    // Loads SMS conversations to the list view
+    // Loads items to the list view
     private void loadListViewItems(String itemsFilter,  boolean deleteItems, int listPosition) {
         int loaderId = 0;
         JournalItemsLoaderCallbacks callbacks =
@@ -339,16 +345,8 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             }
 
             // create menu dialog
-            MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+            DialogBuilder dialog = new DialogBuilder(getActivity());
             dialog.setTitle(record.caller).
-                    // add menu item of record deletion
-                            addItem(R.string.Delete_record, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            deleteItem(record.id);
-                            reloadItems(itemsFilter, true);
-                        }
-                    }).
                     // add menu item records searching
                             addItem(R.string.Find_similar_records, new View.OnClickListener() {
                         @Override
@@ -356,7 +354,28 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                             // find all records by record's caller
                             searchItems(record.caller);
                         }
+                    }).
+                    // add menu item of record deletion
+                            addItem(R.string.Delete_record, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            deleteItem(record.id);
+                            reloadItems(itemsFilter, true);
+                        }
                     });
+
+            if(record.text != null && !record.text.isEmpty()) {
+                // add menu item of record copying
+                dialog.addItem(R.string.Copy_text, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(Utils.copyTextToClipboard(getContext(), record.text)) {
+                            Toast.makeText(getContext(), R.string.Copied_to_clipboard,
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
 
             // if contact is found in the black list
             if (blackContact != null) {
@@ -434,7 +453,9 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         JournalItemsLoaderCallbacks(Context context,
                                     JournalCursorAdapter cursorAdapter,
                                     @Nullable String itemsFilter,
-                                    boolean deleteItems, ListView listView, int listPosition) {
+                                    boolean deleteItems,
+                                    ListView listView,
+                                    int listPosition) {
             this.context = context;
             this.cursorAdapter = cursorAdapter;
             this.itemsFilter = itemsFilter;

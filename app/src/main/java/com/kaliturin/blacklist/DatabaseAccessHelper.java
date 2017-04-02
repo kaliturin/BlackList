@@ -9,9 +9,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.sqlite.util.StringUtils;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -22,10 +26,8 @@ import java.util.TreeSet;
  * Database access helper
  */
 public class DatabaseAccessHelper extends SQLiteOpenHelper {
-    // TODO move to app dir
-    private static final String DATABASE_NAME = "/sdcard/Download/BlackList/blacklist.db";
-    //private static final String DATABASE_NAME = "/sdcard/Download/blacklist.db";
-    //private static final String DATABASE_NAME = "blacklist.db";
+    private static final String TAG = DatabaseAccessHelper.class.getName();
+    public static final String DATABASE_NAME = "blacklist.db";
     private static final int DATABASE_VERSION = 1;
     private static DatabaseAccessHelper sInstance = null;
 
@@ -37,6 +39,13 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             }
         }
         return sInstance;
+    }
+
+    public static synchronized void invalidateCache() {
+        if (sInstance != null) {
+            sInstance.close();
+            sInstance = null;
+        }
     }
 
     private DatabaseAccessHelper(Context context) {
@@ -73,6 +82,29 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
 //----------------------------------------------------------------
+
+    // Checks whether file is SQLite file
+    public static boolean isSQLiteFile(String fileName) {
+        File file = new File(fileName);
+        if (!file.exists() || !file.canRead()) {
+            return false;
+        }
+
+        FileReader reader = null;
+        try {
+            reader = new FileReader(file);
+            char[] buffer = new char[16];
+            if(reader.read(buffer, 0, 16) > 0) {
+                String str = String.valueOf(buffer);
+                return str.equals("SQLite format 3\u0000");
+            }
+        } catch (Exception e) {
+            Log.w(TAG, e);
+        } finally {
+            Utils.close(reader);
+        }
+        return false;
+    }
 
     // Closes cursor if it is empty and returns false
     private boolean validate(Cursor cursor) {
@@ -158,10 +190,11 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             " FROM " + JournalTable.NAME +
                             " WHERE _id = ? ";
 
-            static final String SELECT_FILTER_BY_CALLER =
+            static final String SELECT_BY_FILTER =
                     "SELECT * " +
                             " FROM " + JournalTable.NAME +
                             " WHERE " + Column.CALLER + " LIKE ? " +
+                            " OR " + Column.TEXT + " LIKE ? " +
                             " ORDER BY " + Column.TIME +
                             " DESC";
         }
@@ -256,8 +289,8 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             return getJournalRecords();
         }
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT_FILTER_BY_CALLER,
-                new String[] {"%" + filter + "%"});
+        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT_BY_FILTER,
+                new String[] {"%" + filter + "%", "%" + filter + "%"});
 
         return (validate(cursor) ? new JournalRecordCursorWrapper(cursor) : null);
     }
@@ -544,7 +577,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             " FROM " + ContactTable.NAME +
                             " WHERE " + Column.ID + " = ? ";
 
-            static final String SELECT_BY_TYPE_FILTER_BY_NAME =
+            static final String SELECT_BY_FILTER =
                     "SELECT * " +
                             " FROM " + ContactTable.NAME +
                             " WHERE " + Column.TYPE + " = ? " +
@@ -635,7 +668,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         }
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
-                ContactTable.Statement.SELECT_BY_TYPE_FILTER_BY_NAME,
+                ContactTable.Statement.SELECT_BY_FILTER,
                 new String[]{String.valueOf(type), "%" + filter + "%"});
 
         return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -169,16 +170,32 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
             this.model = model;
             this.position = position;
 
+            // title
             TextView titleView = (TextView) rowView.findViewById(R.id.text);
-            titleView.setText(model.title);
+            if(titleView != null) {
+                titleView.setText(model.title);
+            }
+
+            // checkbox
             if(model.type == Model.CHECKBOX) {
                 checkBox = (CheckBox) rowView.findViewById(R.id.cb);
-                checkBox.setVisibility(View.VISIBLE);
-                checkBox.setChecked(model.isChecked());
+                if(checkBox != null) {
+                    checkBox.setVisibility(View.VISIBLE);
+                    checkBox.setChecked(model.isChecked());
+                }
             } else {
                 checkBox = null;
             }
 
+            // image
+            if(model.type == Model.BUTTON) {
+                ImageView imageView = (ImageView) rowView.findViewById(R.id.image);
+                if(imageView != null) {
+                    imageView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            // click listener
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View rowView) {
@@ -194,9 +211,9 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
         }
 
         void setChecked(boolean checked) {
-            if(model.type == Model.CHECKBOX) {
-                model.setChecked(checked);
+            if(checkBox != null) {
                 checkBox.setChecked(checked);
+                model.setChecked(checked);
             }
         }
 

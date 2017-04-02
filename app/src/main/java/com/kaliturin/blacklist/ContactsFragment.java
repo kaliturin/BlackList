@@ -29,10 +29,13 @@ import com.kaliturin.blacklist.ContactsAccessHelper.ContactSourceType;
  */
 
 public class ContactsFragment extends Fragment implements FragmentArguments {
+    private static final String LIST_POSITION = "LIST_POSITION";
     private ContactsCursorAdapter cursorAdapter = null;
-    private CustomSnackBar snackBar = null;
+    private ButtonsBar snackBar = null;
     private int contactType = 0;
     private String itemsFilter = null;
+    private ListView listView = null;
+    private int listPosition = 0;
 
     public ContactsFragment() {
         // Required empty public constructor
@@ -63,6 +66,10 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
             contactType = arguments.getInt(CONTACT_TYPE, 0);
         }
 
+        if(savedInstanceState != null) {
+            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
+        }
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_contacts, container, false);
     }
@@ -73,7 +80,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE);
 
         // snack bar
-        snackBar = new CustomSnackBar(view, R.id.snack_bar);
+        snackBar = new ButtonsBar(view);
         // "Select all" button
         snackBar.setButton(R.id.button_left,
                 getString(R.string.SELECT_ALL),
@@ -127,7 +134,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                 final Contact contact = cursorAdapter.getContact(row);
                 if(contact != null) {
                     // create and show menu dialog for actions with the contact
-                    MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+                    DialogBuilder dialog = new DialogBuilder(getActivity());
                     dialog.setTitle(contact.name).
                             // add menu item of contact deletion
                                     addItem(R.string.Remove_contact, new View.OnClickListener() {
@@ -162,11 +169,13 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         });
 
         // add cursor listener to the list
-        ListView listView = (ListView) view.findViewById(R.id.contacts_list);
+        listView = (ListView) view.findViewById(R.id.contacts_list);
         listView.setAdapter(cursorAdapter);
 
         // init and run the contact items loader
-        getLoaderManager().initLoader(0, null, newLoaderCallbacks(null, false));
+        //getLoaderManager().initLoader(0, null, newLoaderCallbacks(null, false));
+        // load the list view
+        loadListViewItems(itemsFilter, false, listPosition);
     }
 
     @Override
@@ -224,14 +233,6 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         itemAdd.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-//                // set current type of contacts (black/white list)
-//                Bundle arguments = new Bundle();
-//                arguments.putInt(CONTACT_TYPE, contactType);
-//                // open the dialog activity with the contacts menu fragment
-//                String title = getString(R.string.add_contact);
-//                CustomFragmentActivity.show(getActivity(), title,
-//                        AddContactsMenuFragment.class, arguments, 0);
-
                 // show menu dialog
                 showAddContactsMenuDialog();
 
@@ -240,6 +241,18 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         });
 
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        listPosition = listView.getFirstVisiblePosition();
     }
 
 //----------------------------------------------------
@@ -282,20 +295,33 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
 
     // Deletes checked items
     private void deleteCheckedItems() {
-        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, true));
+        int listPosition = listView.getFirstVisiblePosition();
+        loadListViewItems(itemsFilter, true, listPosition);
     }
 
     // Reloads items
     private void reloadItems(String itemsFilter) {
         this.itemsFilter = itemsFilter;
         dismissSnackBar();
-        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, false));
+
+        int listPosition = listView.getFirstVisiblePosition();
+        loadListViewItems(itemsFilter, false, listPosition);
     }
 
-    // Creates new contacts loader
-    private ContactsLoaderCallbacks newLoaderCallbacks(String itemsFilter, boolean deleteCheckedItems) {
-        return new ContactsLoaderCallbacks(getContext(), contactType,
-                cursorAdapter, itemsFilter, deleteCheckedItems);
+    // Loads SMS conversations to the list view
+    private void loadListViewItems(String itemsFilter, boolean deleteItems, int listPosition) {
+        int loaderId = 0;
+        ContactsLoaderCallbacks callbacks =
+                new ContactsLoaderCallbacks(getContext(), contactType,
+                        cursorAdapter, itemsFilter, deleteItems, listView, listPosition);
+        LoaderManager manager = getLoaderManager();
+        if (manager.getLoader(loaderId) == null) {
+            // init and run the items loader
+            manager.initLoader(loaderId, null, callbacks);
+        } else {
+            // restart loader
+            manager.restartLoader(loaderId, null, callbacks);
+        }
     }
 
     // Opens fragment for contact editing
@@ -344,24 +370,30 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         private int contactType;
         private String itemsFilter;
         private ContactsCursorAdapter cursorAdapter;
-        private boolean deleteCheckedItems;
+        private boolean deleteItems;
+        private ListView listView;
+        private int listPosition;
 
         ContactsLoaderCallbacks(Context context,
                                 int contactType,
                                 ContactsCursorAdapter cursorAdapter,
                                 String itemsFilter,
-                                boolean deleteCheckedItems) {
+                                boolean deleteItems,
+                                ListView listView,
+                                int listPosition) {
             this.context = context;
             this.itemsFilter = itemsFilter;
             this.contactType = contactType;
             this.cursorAdapter = cursorAdapter;
-            this.deleteCheckedItems = deleteCheckedItems;
+            this.deleteItems = deleteItems;
+            this.listView = listView;
+            this.listPosition = listPosition;
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             IdentifiersContainer deletingItems = null;
-            if(deleteCheckedItems) {
+            if(deleteItems) {
                 deletingItems = cursorAdapter.getCheckedItems().clone();
             }
             return new ContactsLoader(context, contactType, itemsFilter, deletingItems);
@@ -370,6 +402,16 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             cursorAdapter.changeCursor(data);
+
+            if(listView != null) {
+                // scroll list to saved position
+                listView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listView.setSelection(listPosition);
+                    }
+                });
+            }
         }
 
         @Override
@@ -383,7 +425,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
     // Shows menu dialog of contacts adding
     private void showAddContactsMenuDialog() {
         // create and show menu dialog for actions with the contact
-        MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+        DialogBuilder dialog = new DialogBuilder(getActivity());
         dialog.setTitle(R.string.Add_contact).
                 addItem(R.string.From_contacts_list, new View.OnClickListener() {
                     @Override

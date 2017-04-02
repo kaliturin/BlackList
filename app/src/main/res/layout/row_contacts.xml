@@ -2,6 +2,7 @@
 <com.kaliturin.blacklist.CheckableLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@drawable/selector_control"
     android:focusable="true">
@@ -38,14 +39,25 @@
                 android:textColor="@color/colorText2"/>
         </LinearLayout>
 
-        <CheckBox
+        <!--CheckBox
             android:id="@+id/contact_cb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.CheckBox"
             android:background="@android:color/transparent"
             android:layout_gravity="center"
-            android:clickable="false" />
+            android:clickable="false" /-->
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/contact_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:button="@drawable/selector_checkbox"
+            app:buttonTint="@drawable/selector_checkbox_tint"
+            android:layout_gravity="center"
+            android:clickable="false"
+            android:padding="2dp"/>
 
     </LinearLayout>
 

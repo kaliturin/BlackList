@@ -1,7 +1,6 @@
 package com.kaliturin.blacklist;
 
 import android.support.annotation.IdRes;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -9,23 +8,17 @@ import android.widget.TextView;
 /**
  * Customized snack bar
  */
-public class CustomSnackBar {
-    private ViewGroup snackBarView;
+public class ButtonsBar {
+    private View view;
 
-    public CustomSnackBar(View parentView, @IdRes int snackBarId) {
-        snackBarView = (ViewGroup) parentView.findViewById(snackBarId);
-        // hide all children views
-        for (int i = 0; i < snackBarView.getChildCount(); i++) {
-            View view = snackBarView.getChildAt(i);
-            view.setVisibility(View.INVISIBLE);
-        }
-
+    public ButtonsBar(View parentView) {
+        view = parentView.findViewById(R.id.buttons_bar);
         dismiss();
     }
 
     // Sets button's parameters
     public boolean setButton(@IdRes int buttonId, String title, View.OnClickListener listener) {
-        TextView button = (TextView) snackBarView.findViewById(buttonId);
+        TextView button = (TextView) view.findViewById(buttonId);
         if (button != null) {
             button.setText(title);
             button.setOnClickListener(listener);
@@ -38,20 +31,20 @@ public class CustomSnackBar {
 
     // Returns true if snack bar is shown
     public boolean isShown() {
-        return snackBarView.getVisibility() == View.VISIBLE;
+        return view.getVisibility() == View.VISIBLE;
     }
 
     // Shows shack bar
     public void show() {
         if (!isShown()) {
-            snackBarView.setVisibility(View.VISIBLE);
+            view.setVisibility(View.VISIBLE);
         }
     }
 
     // Hides shack bar
     public boolean dismiss() {
         if (isShown()) {
-            snackBarView.setVisibility(View.GONE);
+            view.setVisibility(View.GONE);
             return true;
         }
         return false;

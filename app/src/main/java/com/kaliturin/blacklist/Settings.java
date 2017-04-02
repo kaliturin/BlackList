@@ -44,7 +44,11 @@ class Settings {
 
     private static Map<String, String> map = new HashMap<>();
 
-     static boolean setStringValue(Context context, @NonNull String name, @NonNull String value) {
+    static void invalidateCache() {
+        map.clear();
+    }
+
+    static boolean setStringValue(Context context, @NonNull String name, @NonNull String value) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
         if(db != null) {
             if(db.setSettingsValue(name, value)) {

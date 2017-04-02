@@ -50,7 +50,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         super.onViewCreated(view, savedInstanceState);
 
         // snack bar
-        CustomSnackBar snackBar = new CustomSnackBar(view, R.id.snack_bar);
+        ButtonsBar snackBar = new ButtonsBar(view);
         // "Add" button
         snackBar.setButton(R.id.button_left,
                 getString(R.string.SAVE),

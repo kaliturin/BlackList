@@ -6,6 +6,10 @@
     <string name="Settings_action">Настройки</string>
     <string name="Calls_blocking">Звонки - блокировка</string>
     <string name="Calls_notification">Звонки - уведомления</string>
+    <string name="Application_data">Данные приложения</string>
+    <string name="Export_data">Экспорт данных</string>
+    <string name="Import_data">Импорт данных</string>
+    <string name="File_path">Путь к файлу</string>
     <string name="Block_calls_from_black_list">Блокировать звонки из Чёрного списка</string>
     <string name="Block_all_calls">Блокировать все звонки</string>
     <string name="Block_calls_not_from_contacts">Блокировать звонки не из списка контактов</string>
@@ -47,6 +51,7 @@
     <string name="DELETE">УДАЛИТЬ</string>
     <string name="CANCEL">ОТМЕНИТЬ</string>
     <string name="ADD">ДОБАВИТЬ</string>
+    <string name="OK">OK</string>
     <string name="Add_contact">Добавить контакт</string>
     <string name="Add_number">Добавить номер</string>
     <string name="Adding_contact">Добавление контакта</string>
@@ -69,6 +74,7 @@
     <string name="Editing_contact">Изменение контакта</string>
     <string name="SAVE">СОХРАНИТЬ</string>
     <string name="Delete_record">Удалить запись</string>
+    <string name="Copy_text">Копировать текст</string>
     <string name="Remove_contact">Удалить контакт</string>
     <string name="Find_similar_records">Найти похожие записи</string>
     <string name="Exclude_from_black_list">Удалить контакт из Чёрного списка</string>
@@ -90,10 +96,10 @@
     <string name="Forward_message">Переслать сообщение</string>
     <string name="Copied_to_clipboard">Скопировано в буфер обмена</string>
     <string name="SMS_is_sent">SMS отправлено</string>
-    <string name="Generic_failure">Общая ошибка</string>
-    <string name="No_service">Сервис недоступен</string>
-    <string name="Null_PDU">PDU равен нулю</string>
-    <string name="Radio_off">Нет связи</string>
+    <string name="Generic_failure">Ошибка: общая ошибка</string>
+    <string name="No_service">Ошибка: сервис недоступен</string>
+    <string name="Null_PDU">Ошибка: PDU равен нулю</string>
+    <string name="Radio_off">Ошибка: нет связи</string>
     <string name="SMS_is_delivered">SMS доставлено</string>
     <string name="SMS_is_not_delivered">SMS не доставлено</string>
     <string name="Message_text_is_not_defined">Текст сообщения не задан</string>
@@ -101,6 +107,15 @@
     <string name="Need_default_SMS_app">Требуются права приложения для работы с SMS по умолчанию</string>
     <string name="Unknown_error">Неизвестная ошибка</string>
     <string name="Ringtone_picker">Мелодия сигнала</string>
+    <string name="Menu_button">Кнопка меню</string>
+    <string name="Error_file_already_exists">Ошибка: файл уже существует</string>
+    <string name="Error_invalid_file_path">Ошибка: недопустимый путь к файлу</string>
+    <string name="Error_on_file_path_creating">Ошибка при создании пути к файлу</string>
+    <string name="Error_on_file_writing">Ошибка при записи файла</string>
+    <string name="Export_complete">Экспорт данных завершён</string>
+    <string name="Error_file_is_not_valid">Ошибка: недопустимый формат Файла</string>
+    <string name="Error_on_old_data_deletion">Ошибка при удалении старых данных</string>
+    <string name="Import_complete">Импорт данных завершён</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>

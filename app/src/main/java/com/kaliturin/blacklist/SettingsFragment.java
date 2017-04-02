@@ -2,31 +2,42 @@ package com.kaliturin.blacklist;
 
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.File;
 
 
 /**
  * Settings fragment
  */
 public class SettingsFragment extends Fragment implements FragmentArguments {
-    private static final String VISIBLE_ROW_POSITION = "VISIBLE_ROW_POSITION";
+    private static final String LIST_POSITION = "LIST_POSITION";
     private static final int BLOCKED_SMS = 1;
     private static final int RECEIVED_SMS = 2;
     private static final int BLOCKED_CALL = 3;
     private SettingsArrayAdapter adapter = null;
-    private int visibleRowPosition = 0;
     private ListView listView = null;
+    private int listPosition = 0;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -47,7 +58,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         if(savedInstanceState != null) {
-            visibleRowPosition =  savedInstanceState.getInt(VISIBLE_ROW_POSITION, 0);
+            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
         }
 
         // Inflate the layout for this fragment
@@ -135,21 +146,71 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         adapter.addCheckbox(R.string.Notify_with_vibration_blocked_call, Settings.BLOCKED_CALL_VIBRATION_NOTIFICATION,
                 new DependentRowOnClickListener());
 
+        // app data export/import
+        adapter.addTitle(R.string.Application_data);
+        // export DB file
+        adapter.addButton(R.string.Export_data, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // check permissions
+                if(Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+                    return;
+                }
+                // open the dialog for getting the DB file path
+                showFilePathDialog(R.string.Export_data, new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                        // FIXME execute in the thread
+                        // export data file
+                        exportDataFile(textView.getText().toString());
+                        return true;
+                    }
+                });
+            }
+        });
+        // import DB file
+        adapter.addButton(R.string.Import_data, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // check permissions
+                if(Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+                    return;
+                }
+                // open the dialog for getting the DB file path
+                showFilePathDialog(R.string.Import_data, new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                        // FIXME execute in the thread
+                        // import data file
+                        if(importDataFile(textView.getText().toString())) {
+                            // update settings data
+                            Settings.invalidateCache();
+                            Settings.initDefaults(getContext());
+                            // refresh fragment
+                            onPause();
+                            onResume();
+                        }
+                        return true;
+                    }
+                });
+            }
+        });
+
         listView.setAdapter(adapter);
-        listView.setSelection(visibleRowPosition);
+        listView.setSelection(listPosition);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        visibleRowPosition = listView.getFirstVisiblePosition();
+        listPosition = listView.getFirstVisiblePosition();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         // save first showed row position
-        outState.putInt(VISIBLE_ROW_POSITION, listView.getFirstVisiblePosition());
+        outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
     }
 
     // Is used for getting result of ringtone picker dialog
@@ -222,7 +283,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     }
 
     // On row click listener for opening ringtone picker
-    class RingtonePickerOnClickListener implements View.OnClickListener {
+    private class RingtonePickerOnClickListener implements View.OnClickListener {
         int requestCode;
 
         RingtonePickerOnClickListener(int requestCode) {
@@ -245,9 +306,8 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         }
     }
 
-
     // On row click listener for updating dependent rows
-    class DependentRowOnClickListener implements View.OnClickListener {
+    private class DependentRowOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View rowView) {
             // trigger checked row
@@ -283,5 +343,114 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 }
             }
         }
+    }
+
+    // Shows the dialog of database file path definition
+    private void showFilePathDialog(@StringRes int titleId, final TextView.OnEditorActionListener listener) {
+        String filePath = Environment.getExternalStorageDirectory().getPath() +
+                "/Download/" + DatabaseAccessHelper.DATABASE_NAME;
+
+        @IdRes final int editId = 1;
+        // create dialog
+        DialogBuilder dialog = new DialogBuilder(getActivity());
+        dialog.setTitle(titleId);
+        dialog.addEdit(editId, filePath, getString(R.string.File_path));
+        dialog.addButtonLeft(getString(R.string.OK), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Window window = ((Dialog)dialog).getWindow();
+                if(window != null) {
+                    TextView textView = (TextView) window.findViewById(editId);
+                    if(textView != null) {
+                        listener.onEditorAction(textView, 0, null);
+                    }
+                }
+            }
+        });
+
+        dialog.addButtonRight(getString(R.string.CANCEL), null);
+        dialog.show();
+    }
+
+    // Exports data file to the passed path
+    private boolean exportDataFile(String dstFilePath) {
+        if(!Permissions.isGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+            return false;
+        }
+
+        // get source file
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+        if(db == null) {
+            return false;
+        }
+        File srcFile = new File(db.getReadableDatabase().getPath());
+
+        // check destination file
+        File dstFile = new File(dstFilePath);
+        if(dstFile.exists()) {
+            toast(R.string.Error_file_already_exists);
+            return false;
+        }
+        // check destination file path
+        if(dstFile.getParent() == null) {
+            toast(R.string.Error_invalid_file_path);
+            return false;
+        }
+        // create destination file path
+        if(!Utils.makeFilePath(dstFile)) {
+            toast(R.string.Error_on_file_path_creating);
+            return false;
+        }
+        // copy source file to destination
+        if(!Utils.copyFile(srcFile, dstFile)) {
+            toast(R.string.Error_on_file_writing);
+            return false;
+        }
+
+        toast(R.string.Export_complete);
+
+        return true;
+    }
+
+    // Imports data file from the passed path
+    private boolean importDataFile(String srcFilePath) {
+        if(!Permissions.isGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+            return false;
+        }
+
+        // check source file
+        if(!DatabaseAccessHelper.isSQLiteFile(srcFilePath)) {
+            toast(R.string.Error_file_is_not_valid);
+            return false;
+        }
+        // get source file
+        File srcFile = new File(srcFilePath);
+
+        // get destination file
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+        if(db == null) {
+            return false;
+        }
+        File dstFile = new File(db.getReadableDatabase().getPath());
+        // clear cache
+        DatabaseAccessHelper.invalidateCache();
+        // remove the old file
+        if(dstFile.exists() && !dstFile.delete()) {
+            toast(R.string.Error_on_old_data_deletion);
+            return false;
+        }
+        // copy source file to destination
+        if(!Utils.copyFile(srcFile, dstFile)) {
+            toast(R.string.Error_on_file_writing);
+            return false;
+        }
+
+        toast(R.string.Import_complete);
+
+        return true;
+    }
+
+    private void toast(@StringRes int messageId) {
+        Toast.makeText(getContext(), messageId, Toast.LENGTH_SHORT).show();
     }
 }

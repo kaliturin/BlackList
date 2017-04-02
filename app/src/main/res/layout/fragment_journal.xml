@@ -12,12 +12,7 @@
         android:divider="@color/colorBorder"
         android:dividerHeight="1dp"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/colorBorder" />
-
-    <include layout="@layout/snack_bar_3_buttons"
+    <include layout="@layout/row_3_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

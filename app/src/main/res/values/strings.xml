@@ -6,6 +6,10 @@
     <string name="Settings_action">Settings</string>
     <string name="Calls_blocking">Calls blocking</string>
     <string name="Calls_notification">Calls notification</string>
+    <string name="Application_data">Application data</string>
+    <string name="Export_data">Export data</string>
+    <string name="Import_data">Import data</string>
+    <string name="File_path">File path</string>
     <string name="Block_calls_from_black_list">Block calls from the Black list</string>
     <string name="Block_all_calls">Block all calls</string>
     <string name="Block_calls_not_from_contacts">Block calls not from the Contacts list</string>
@@ -47,6 +51,7 @@
     <string name="DELETE">DELETE</string>
     <string name="CANCEL">CANCEL</string>
     <string name="ADD">ADD</string>
+    <string name="OK">OK</string>
     <string name="Add_contact">Add a contact</string>
     <string name="Add_number">Add a number</string>
     <string name="Adding_contact">Adding a contact</string>
@@ -69,6 +74,7 @@
     <string name="Editing_contact">Contact editing</string>
     <string name="SAVE">SAVE</string>
     <string name="Delete_record">Delete the record</string>
+    <string name="Copy_text">Copy the text</string>
     <string name="Remove_contact">Remove the contact</string>
     <string name="Find_similar_records">Find similar records</string>
     <string name="Exclude_from_black_list">Exclude the contact from the Black list</string>
@@ -90,10 +96,10 @@
     <string name="Forward_message">Forward the message</string>
     <string name="Copied_to_clipboard">Copied to the clipboard</string>
     <string name="SMS_is_sent">SMS is sent</string>
-    <string name="Generic_failure">Generic failure</string>
-    <string name="No_service">No service</string>
-    <string name="Null_PDU">Null PDU</string>
-    <string name="Radio_off">Radio is off</string>
+    <string name="Generic_failure">Error: generic failure</string>
+    <string name="No_service">Error: no service</string>
+    <string name="Null_PDU">Error: null PDU</string>
+    <string name="Radio_off">Error: radio is off</string>
     <string name="SMS_is_delivered">SMS is delivered</string>
     <string name="SMS_is_not_delivered">SMS isn not delivered</string>
     <string name="Message_text_is_not_defined">Message text is not defined</string>
@@ -101,6 +107,15 @@
     <string name="Need_default_SMS_app">Need default SMS application permissions</string>
     <string name="Unknown_error">Unknown error</string>
     <string name="Ringtone_picker">Ringtone picker</string>
+    <string name="Menu_button">Menu button</string>
+    <string name="Error_file_already_exists">Error: file already exists</string>
+    <string name="Error_invalid_file_path">Error: invalid file path</string>
+    <string name="Error_on_file_path_creating">Error on file path creating</string>
+    <string name="Error_on_file_writing">Error on file writing</string>
+    <string name="Export_complete">Export complete</string>
+    <string name="Error_file_is_not_valid">Error: file isn\'t valid</string>
+    <string name="Error_on_old_data_deletion">Error on old data deletion</string>
+    <string name="Import_complete">Import complete</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>

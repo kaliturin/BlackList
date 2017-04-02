@@ -80,7 +80,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                     return true;
                 }
                 // create menu dialog
-                MenuDialogBuilder dialog = new MenuDialogBuilder(getActivity());
+                DialogBuilder dialog = new DialogBuilder(getActivity());
                 // 'delete message'
                 dialog.addItem(R.string.Delete_message, new View.OnClickListener() {
                     @Override

@@ -14,6 +14,15 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * Some utils methods
  */
@@ -21,23 +30,20 @@ import android.view.View;
 public class Utils {
     static final String TAG = Utils.class.getName();
 
-    /** Tints menu icon
-     */
+    /** Tints menu icon **/
     public static void setMenuIconTint(Context context, MenuItem item, @ColorRes int colorRes) {
         Drawable drawable = DrawableCompat.wrap(item.getIcon());
         drawable.mutate();
         setDrawableTint(context, drawable, colorRes);
     }
 
-    /** Sets the tint color of the drawable
-     */
+    /** Sets the tint color of the drawable **/
     public static void setDrawableTint(Context context, Drawable drawable, @ColorRes int colorRes) {
         int color = ContextCompat.getColor(context, colorRes);
         DrawableCompat.setTint(drawable, color);
     }
 
-    /** Sets the background color of the drawable
-     */
+    /** Sets the background color of the drawable **/
     public static void setDrawableColor(Context context, Drawable drawable, @ColorRes int colorRes) {
         int color = ContextCompat.getColor(context, colorRes);
         if (drawable instanceof ShapeDrawable) {
@@ -53,8 +59,7 @@ public class Utils {
         }
     }
 
-    /** Sets drawable for the view
-     */
+    /** Sets drawable for the view **/
     @SuppressWarnings("deprecation")
     public static void setDrawable(Context context, View view, @DrawableRes int drawableId) {
         Drawable drawable = ContextCompat.getDrawable(context, drawableId);
@@ -65,8 +70,7 @@ public class Utils {
         }
     }
 
-    /** Copies passed text to clipboard
-     */
+    /** Copies passed text to clipboard **/
     @SuppressWarnings("deprecation")
     public static boolean copyTextToClipboard(Context context, String text) {
         try {
@@ -89,5 +93,56 @@ public class Utils {
             Log.w(TAG, e);
             return false;
         }
+    }
+
+    /** Copies file from source to destination **/
+    public static boolean copyFile(File src, File dst) {
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+        } catch (IOException e) {
+            Log.w(TAG, e);
+            return false;
+        } finally {
+            close(in);
+            close(out);
+        }
+
+        return true;
+    }
+
+    public static void close(Closeable closeable) {
+        try {
+            if(closeable != null) {
+                closeable.close();
+            }
+        } catch (IOException e) {
+            Log.w(TAG, e);
+        }
+    }
+
+    /** Makes file path if it doesn't exist **/
+    public static boolean makeFilePath(File file) {
+        String parent = file.getParent();
+        if(parent != null) {
+            File dir = new File(parent);
+            try {
+                if(!dir.exists() && !dir.mkdirs()) {
+                    throw new SecurityException("File.mkdirs() returns false");
+                }
+            } catch (SecurityException e) {
+                Log.w(TAG, e);
+                return false;
+            }
+        }
+
+        return true;
     }
 }
