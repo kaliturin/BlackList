@@ -7,6 +7,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -38,6 +39,16 @@ class DialogBuilder {
     DialogBuilder setTitle(String title) {
         TextView titleView = (TextView) getView().findViewById(R.id.dialog_title);
         titleView.setText(title);
+        titleView.setVisibility(View.VISIBLE);
+        return this;
+    }
+
+    /** Sets the title of the dialog **/
+    DialogBuilder setTitle(String title, int maxLines) {
+        TextView titleView = (TextView) getView().findViewById(R.id.dialog_title);
+        titleView.setText(title);
+        titleView.setMaxLines(maxLines);
+        titleView.setEllipsize(TextUtils.TruncateAt.END);
         titleView.setVisibility(View.VISIBLE);
         return this;
     }

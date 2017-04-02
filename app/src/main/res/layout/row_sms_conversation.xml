@@ -24,6 +24,8 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:autoLink="web|phone|email"
+            android:linksClickable="true"
+            android:longClickable="true"
             android:textColorLink="@color/colorLink"
             android:textColor="@color/colorText"
             android:textSize="18sp" />

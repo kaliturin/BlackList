@@ -72,54 +72,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
         // cursor adapter
         cursorAdapter = new SMSConversationCursorAdapter(getContext());
-        cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View row) {
-                final ContactsAccessHelper.SMSMessage sms = cursorAdapter.getSMSMessage(row);
-                if(sms == null) {
-                    return true;
-                }
-                // create menu dialog
-                DialogBuilder dialog = new DialogBuilder(getActivity());
-                // 'delete message'
-                dialog.addItem(R.string.Delete_message, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(!DefaultSMSAppHelper.isDefault(getContext())) {
-                            Toast.makeText(getContext(), R.string.Need_default_SMS_app,
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-                            if (db.deleteSMSMessageById(getContext(), sms.id)) {
-                                // reload sms messages in the list
-                                int listPosition = listView.getFirstVisiblePosition();
-                                loadListViewItems(listPosition, 0);
-                            }
-                        }
-                    }
-                });
-                // 'copy text' to clipboard
-                dialog.addItem(R.string.Copy_message, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(Utils.copyTextToClipboard(getContext(), sms.body)) {
-                            Toast.makeText(getContext(), R.string.Copied_to_clipboard,
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                // 'forward message'
-                dialog.addItem(R.string.Forward_message, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openSMSSendActivity("", "", sms.body);
-                    }
-                });
-                dialog.show();
-
-                return true;
-            }
-        });
+        cursorAdapter.setOnLongClickListener(new RowOnLongClickListener());
 
         // add cursor listener to the list
         listView = (ListView) view.findViewById(R.id.rows_list);
@@ -146,17 +99,18 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
 
-        MenuItem writeSMS = menu.findItem(R.id.write_message);
-        Utils.setMenuIconTint(getContext(), writeSMS, R.color.colorAccent);
-        writeSMS.setVisible(true);
+        MenuItem writeMessageItem = menu.findItem(R.id.write_message);
+        Utils.setMenuIconTint(getContext(), writeMessageItem, R.color.colorAccent);
+        writeMessageItem.setVisible(true);
 
-        writeSMS.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        writeMessageItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // get showed first sms
+                // get the first showed sms
                 View row = listView.getChildAt(0);
                 ContactsAccessHelper.SMSMessage sms = cursorAdapter.getSMSMessage(row);
                 if(sms != null) {
+                    // open activity with fragment of sending SMS
                     openSMSSendActivity(sms.person, sms.number, "");
                 }
                 return true;
@@ -281,7 +235,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
     }
 
     // Async task - marks SMS of the thread are read
-    static class SMSReadMarker extends AsyncTask<Integer, Void, Void> {
+    private static class SMSReadMarker extends AsyncTask<Integer, Void, Void> {
         private Context context;
 
         SMSReadMarker(Context context) {
@@ -298,6 +252,59 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                 InternalEventBroadcast.sendSMSWasRead(context, threadId);
             }
             return null;
+        }
+    }
+
+    // On row long click listener
+    class RowOnLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(View view) {
+            // view here may be as row itself as some of child view of row
+            final ContactsAccessHelper.SMSMessage sms = cursorAdapter.getSMSMessage(view);
+            if(sms == null) {
+                return true;
+            }
+            // create menu dialog
+            DialogBuilder dialog = new DialogBuilder(getActivity());
+            // add dialog title as message snippet
+            dialog.setTitle(sms.body, 1);
+            // 'copy text' to clipboard
+            dialog.addItem(R.string.Copy_message, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(Utils.copyTextToClipboard(getContext(), sms.body)) {
+                        Toast.makeText(getContext(), R.string.Copied_to_clipboard,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            // 'delete message'
+            dialog.addItem(R.string.Delete_message, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!DefaultSMSAppHelper.isDefault(getContext())) {
+                        Toast.makeText(getContext(), R.string.Need_default_SMS_app,
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
+                        if (db.deleteSMSMessageById(getContext(), sms.id)) {
+                            // reload sms messages in the list
+                            int listPosition = listView.getFirstVisiblePosition();
+                            loadListViewItems(listPosition, 0);
+                        }
+                    }
+                }
+            });
+            // 'forward message'
+            dialog.addItem(R.string.Forward_message, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openSMSSendActivity("", "", sms.body);
+                }
+            });
+            dialog.show();
+
+            return true;
         }
     }
 }

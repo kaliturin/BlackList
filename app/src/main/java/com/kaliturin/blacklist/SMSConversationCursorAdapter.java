@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -51,10 +52,6 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         // add view holder to the row
         view.setTag(viewHolder);
 
-        // on click listeners for the row and checkbox (which is inside the row)
-        view.setOnClickListener(rowOnClickListener);
-        view.setOnLongClickListener(rowOnLongClickListener);
-
         return view;
     }
 
@@ -72,13 +69,14 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
 
 //------------------------------------------------------------------------
 
+    // Extracts SMS message data from the passed view if contains
     @Nullable
-    SMSMessage getSMSMessage(View row) {
-        if(row != null) {
-            ViewHolder holder = (ViewHolder) row.getTag();
-            return holder.model;
+    SMSMessage getSMSMessage(View view) {
+        ViewHolder holder = null;
+        if(view != null) {
+            holder = (ViewHolder) view.getTag();
         }
-        return null;
+        return (holder == null ? null : holder.model);
     }
 
     void setOnClickListener(View.OnClickListener onClickListener) {
@@ -164,6 +162,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         void setModel(Context context, SMSMessage model) {
             this.model = model;
             bodyTextView.setText(model.body);
+
             Date date = toDate(model.date);
             String text = timeFormat.format(date) + ", " + dateFormat.format(date);
             dateTextView.setText(text);
@@ -193,6 +192,12 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             //Utils.setDrawable(context, contentView, drawableId);
             Drawable drawable = contentView.getBackground().mutate();
             Utils.setDrawableColor(context, drawable, color);
+
+            // add click listener to message area
+            contentView.setTag(this);
+            contentView.setOnLongClickListener(rowOnLongClickListener);
+            bodyTextView.setTag(this);
+            bodyTextView.setOnLongClickListener(rowOnLongClickListener);
         }
 
         private Date toDate(long time) {
