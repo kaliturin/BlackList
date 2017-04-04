@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#ffffff</color>
+    <color name="colorWindow">#ffffff</color>
     <!--color name="colorPrimaryDark">#303F9F</color-->
     <color name="colorAccent">#ff3d00</color>
     <color name="colorBorder">#bdbdbd</color>
     <color name="colorOnChecked">#eeeeee</color>
     <color name="colorTitleBackground">#eeeeee</color>
+    <!--color name="colorToolbarBackground">#d7ccc8</color-->
     <color name="colorOnPressed">#ffebee</color>
     <color name="colorText">#000000</color>
-    <color name="colorText2">#424242</color>
+    <color name="colorText2">#757575</color>
     <color name="colorLink">#304ffe</color>
     <color name="colorIncomeSms">#ffecb3</color>
     <color name="colorOutcomeSms">#bbdefb</color>
 </resources>
+
+<!--resources>
+<color name="colorPrimary">#000000</color>
+<color name="colorPrimaryDark">#303F9F</color>
+<color name="colorAccent">#891515</color>
+<color name="colorBorder">#312f2f</color>
+<color name="colorOnChecked">#141629</color>
+<color name="colorTitleBackground">#060d0b</color>
+<color name="colorOnPressed">#4d3a3d</color>
+<color name="colorText">#a3a1a1</color>
+<color name="colorText2">#355287</color>
+<color name="colorLink">#304ffe</color>
+<color name="colorIncomeSms">#ffecb3</color>
+<color name="colorOutcomeSms">#bbdefb</color>
+</resources-->

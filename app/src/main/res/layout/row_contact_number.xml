@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="5dp"
-    android:orientation="vertical">
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingTop="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,53 +12,58 @@
         android:background="@color/colorTitleBackground"
         android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp">
-
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center"
-            android:text="@string/Phone_number"
-            android:textColor="@color/colorText" />
+            android:orientation="horizontal"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp">
 
-        <Spinner
-            android:id="@+id/spinner_number_type"
-            android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center"
+                android:text="@string/Phone_number"
+                android:textColor="@color/colorText" />
+
+            <Spinner
+                android:id="@+id/spinner_number_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:entries="@array/phone_metadata" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:entries="@array/phone_metadata" />
+            android:orientation="horizontal"
+            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingRight="0dp"
+            android:paddingEnd="0dp">
 
+            <EditText
+                android:id="@+id/edit_number"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/selector_edit_text"
+                android:hint="@string/Digits_symbols"
+                android:maxLength="50"
+                android:padding="3dp" />
+
+            <ImageButton
+                android:id="@+id/button_remove"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/Remove_contact"
+                android:src="@drawable/ic_remove"
+                android:tint="@color/colorAccent" />
+
+        </LinearLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/edit_number"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:padding="3dp"
-            android:background="@drawable/selector_edit_text"
-            android:hint="@string/Digits_symbols"
-            android:maxLength="50" />
-
-        <ImageButton
-            android:id="@+id/button_remove"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_remove"
-            android:tint="@color/colorAccent" />
-
-    </LinearLayout>
-</LinearLayout>
 
 </LinearLayout>

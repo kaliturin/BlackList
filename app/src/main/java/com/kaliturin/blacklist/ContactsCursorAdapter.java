@@ -146,7 +146,7 @@ class ContactsCursorAdapter extends CursorAdapter {
     Contact getContact(View row) {
         if(row != null) {
             ViewHolder viewHolder = (ViewHolder) row.getTag();
-            return viewHolder.model;
+            return viewHolder.contact;
         }
         return null;
     }
@@ -155,7 +155,7 @@ class ContactsCursorAdapter extends CursorAdapter {
     private class ViewHolder {
         private StringBuilder sb = new StringBuilder();
 
-        private Contact model;
+        private Contact contact;
         private int itemId;
         private CheckableLinearLayout rowView;
         private TextView nameTextView;
@@ -170,7 +170,7 @@ class ContactsCursorAdapter extends CursorAdapter {
         }
 
         ViewHolder(CheckableLinearLayout rowView, TextView nameTextView, TextView numbersTextView, CheckBox checkBox) {
-            this.model = null;
+            this.contact = null;
             this.itemId = 0;
             this.rowView = rowView;
             this.nameTextView = nameTextView;
@@ -178,21 +178,21 @@ class ContactsCursorAdapter extends CursorAdapter {
             this.checkBox = checkBox;
         }
 
-        private void setModel(Context context, Contact model) {
-            this.model = model;
+        private void setModel(Context context, Contact contact) {
+            this.contact = contact;
 
-            itemId = (int) model.id;
+            itemId = (int) contact.id;
             boolean oneNumberEquals = false;
 
             // show contact name
-            String name = model.name;
-            final int size = model.numbers.size();
-            if (size == 1) {
-                ContactNumber number = model.numbers.get(0);
-                if (model.name.equals(number.number)) {
+            String name = contact.name;
+            final int size = contact.numbers.size();
+            if(size == 1) {
+                ContactNumber number = contact.numbers.get(0);
+                if(name.equals(number.number)) {
                     // there is just 1 number and it equals to the contact name
                     // add number type title before the contact name
-                    name = getNumberTypeTitle(context, number.type) + " " + name;
+                    name = getNumberTypeTitle(context, number.type) + name;
                     oneNumberEquals = true;
                 }
             }
@@ -202,9 +202,8 @@ class ContactsCursorAdapter extends CursorAdapter {
             sb.setLength(0);
             if(!oneNumberEquals) {
                 for (int i = 0; i < size; i++) {
-                    ContactNumber number = model.numbers.get(i);
+                    ContactNumber number = contact.numbers.get(i);
                     sb.append(getNumberTypeTitle(context, number.type));
-                    sb.append(" ");
                     sb.append(number.number);
                     if (i < size - 1) {
                         sb.append("\n");
@@ -242,11 +241,11 @@ class ContactsCursorAdapter extends CursorAdapter {
     private String getNumberTypeTitle(Context context, int type) {
         switch (type) {
             case ContactNumber.TYPE_STARTS:
-                return context.getString(R.string.Starts_with);
+                return context.getString(R.string.Starts_with) + " ";
             case ContactNumber.TYPE_ENDS:
-                return context.getString(R.string.Ends_with);
+                return context.getString(R.string.Ends_with) + " ";
             case ContactNumber.TYPE_CONTAINS:
-                return context.getString(R.string.Contains);
+                return context.getString(R.string.Contains) + " ";
         }
         return "";
     }

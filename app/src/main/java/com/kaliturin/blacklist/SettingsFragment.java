@@ -146,6 +146,10 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         adapter.addCheckbox(R.string.Notify_with_vibration_blocked_call, Settings.BLOCKED_CALL_VIBRATION_NOTIFICATION,
                 new DependentRowOnClickListener());
 
+        // app interface
+        adapter.addTitle(R.string.Application_interface);
+        adapter.addCheckbox(R.string.Journal_SMS_text_folding, Settings.FOLD_SMS_TEXT_IN_JOURNAL);
+
         // app data export/import
         adapter.addTitle(R.string.Application_data);
         // export DB file
@@ -309,15 +313,15 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     // On row click listener for updating dependent rows
     private class DependentRowOnClickListener implements View.OnClickListener {
         @Override
-        public void onClick(View rowView) {
+        public void onClick(View view) {
             // trigger checked row
-            adapter.triggerRowChecked(rowView);
-            String property = adapter.getRowProperty(rowView);
+            adapter.triggerRowChecked(view);
+            String property = adapter.getRowProperty(view);
             if(property == null) {
                 return;
             }
 
-            boolean checked = adapter.isRowChecked(rowView);
+            boolean checked = adapter.isRowChecked(view);
             if(!checked) {
                 // if row was unchecked - reset dependent rows
                 switch (property) {

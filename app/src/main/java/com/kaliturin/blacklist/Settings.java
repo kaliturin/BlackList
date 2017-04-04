@@ -36,6 +36,7 @@ class Settings {
     static final String BLOCKED_CALL_VIBRATION_NOTIFICATION = "BLOCKED_CALL_VIBRATION_NOTIFICATION";
     static final String BLOCKED_CALL_RINGTONE = "BLOCKED_CALL_RINGTONE";
     static final String DELIVERY_SMS_NOTIFICATION = "DELIVERY_SMS_NOTIFICATION";
+    static final String FOLD_SMS_TEXT_IN_JOURNAL = "FOLD_SMS_TEXT_IN_JOURNAL";
 
     static final String DEFAULT_SMS_APP_NATIVE_PACKAGE = "DEFAULT_SMS_APP_NATIVE_PACKAGE";
 
@@ -107,6 +108,7 @@ class Settings {
         map.put(RECEIVED_SMS_VIBRATION_NOTIFICATION, TRUE);
         map.put(BLOCKED_SMS_VIBRATION_NOTIFICATION, FALSE);
         map.put(DELIVERY_SMS_NOTIFICATION, TRUE);
+        map.put(FOLD_SMS_TEXT_IN_JOURNAL, TRUE);
 
         for(Map.Entry<String, String> entry : map.entrySet()) {
             String setting = entry.getKey();

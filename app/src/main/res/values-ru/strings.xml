@@ -6,6 +6,8 @@
     <string name="Settings_action">Настройки</string>
     <string name="Calls_blocking">Звонки - блокировка</string>
     <string name="Calls_notification">Звонки - уведомления</string>
+    <string name="Application_interface">Интерфейс приложения</string>
+    <string name="Journal_SMS_text_folding">Сворачивать текст SMS в Журнале блокировки</string>
     <string name="Application_data">Данные приложения</string>
     <string name="Export_data">Экспорт данных</string>
     <string name="Import_data">Импорт данных</string>
@@ -15,7 +17,7 @@
     <string name="Block_calls_not_from_contacts">Блокировать звонки не из списка контактов</string>
     <string name="Block_calls_not_from_SMS_inbox">Блокировать звонки не из списка входящих SMS</string>
     <string name="Block_hidden_calls">Блокировать звонки со скрытых номеров</string>
-    <string name="Write_calls_to_journal">Вести журнал заблокированных звонков</string>
+    <string name="Write_calls_to_journal">Вести Журнал заблокированных звонков</string>
     <string name="Notify_in_status_bar_blocked_call">Уведомлять в строке статуса о заблокированном звонке</string>
     <string name="Notify_with_sound_blocked_call">Уведомлять звуком о заблокированном звонке</string>
     <string name="Notify_with_vibration_blocked_call">Уведомлять вибросигналом о заблокированном звонке</string>
@@ -30,7 +32,7 @@
     <string name="Notify_with_vibration_received_SMS">"Уведомлять вибросигналом о полученном SMS</string>
     <string name="Notify_with_vibration_blocked_SMS">Уведомлять вибросигналом о заблокированном SMS</string>
     <string name="Notify_on_delivery_SMS">Уведомлять о доставке отправленного SMS</string>
-    <string name="Write_SMS_to_journal">Вести журнал заблокированных SMS</string>
+    <string name="Write_SMS_to_journal">Вести Журнал заблокированных SMS</string>
     <string name="SMS_blocking">SMS - блокировка</string>
     <string name="SMS_notification">SMS - уведомления</string>
     <string name="SMS_sending">SMS - отправка</string>
@@ -66,7 +68,8 @@
     <string name="Ends_with">Заканчивается на:</string>
     <string name="Contains">Содержит:</string>
     <string name="No_text">Нет текста</string>
-    <string name="Contact_name_nn">Имя контакта (не обязательно)</string>
+    <string name="Contact_name_">Имя контакта:</string>
+    <string name="Contact_name_nn">Не обязательно</string>
     <string name="Phone_number">Номер телефона</string>
     <string name="Add_another">Добавить ещё</string>
     <string name="Unnamed">Безымянный</string>

@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:background="@color/colorPrimary">
+        android:background="@color/colorWindow">
 
         <TextView
             android:id="@+id/button_left"

@@ -6,6 +6,8 @@
     <string name="Settings_action">Settings</string>
     <string name="Calls_blocking">Calls blocking</string>
     <string name="Calls_notification">Calls notification</string>
+    <string name="Application_interface">Application interface</string>
+    <string name="Journal_SMS_text_folding">Show folded SMS-text in the Journal</string>
     <string name="Application_data">Application data</string>
     <string name="Export_data">Export data</string>
     <string name="Import_data">Import data</string>
@@ -66,7 +68,8 @@
     <string name="Ends_with">Ends with:</string>
     <string name="Contains">Contains:</string>
     <string name="No_text">No text</string>
-    <string name="Contact_name_nn">Contact name (not necessary)</string>
+    <string name="Contact_name_">Contact name:</string>
+    <string name="Contact_name_nn">Not necessary</string>
     <string name="Phone_number">Phone number</string>
     <string name="Add_another">Add another</string>
     <string name="Unnamed">Unnamed</string>

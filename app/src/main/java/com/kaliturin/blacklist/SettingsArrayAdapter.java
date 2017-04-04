@@ -89,8 +89,8 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
 
     // Returns property name from row's model
     @Nullable
-    String getRowProperty(View rowView) {
-        ViewHolder viewHolder = (ViewHolder) rowView.getTag();
+    String getRowProperty(View view) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         return (viewHolder != null ? viewHolder.model.property : null);
     }
 
@@ -163,12 +163,24 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
         final View rowView;
         final CheckBox checkBox;
         final int position;
+        final View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(model.listener != null) {
+                    model.listener.onClick(rowView);
+                } else {
+                    trigger();
+                }
+            }
+        };
 
         ViewHolder(View rowView, Model model, final int position) {
-            rowView.setTag(this);
             this.rowView = rowView;
             this.model = model;
             this.position = position;
+
+            rowView.setTag(this);
+            rowView.setOnClickListener(listener);
 
             // title
             TextView titleView = (TextView) rowView.findViewById(R.id.text);
@@ -194,20 +206,6 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
                     imageView.setVisibility(View.VISIBLE);
                 }
             }
-
-            // click listener
-            rowView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View rowView) {
-                    ViewHolder viewHolder = (ViewHolder) rowView.getTag();
-                    Model model = viewHolder.model;
-                    if(model.listener != null) {
-                        model.listener.onClick(rowView);
-                    } else {
-                        trigger();
-                    }
-                }
-            });
         }
 
         void setChecked(boolean checked) {

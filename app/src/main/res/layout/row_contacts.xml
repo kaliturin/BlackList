@@ -15,16 +15,14 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="bottom"
             android:layout_weight="1"
+            android:padding="8dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/contact_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
                 android:textSize="22sp"
                 android:textColor="@color/colorText"/>
 
@@ -32,21 +30,10 @@
                 android:id="@+id/contact_numbers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:paddingBottom="12dp"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textColor="@color/colorText2"/>
-        </LinearLayout>
 
-        <!--CheckBox
-            android:id="@+id/contact_cb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.CheckBox"
-            android:background="@android:color/transparent"
-            android:layout_gravity="center"
-            android:clickable="false" /-->
+        </LinearLayout>
 
         <android.support.v7.widget.AppCompatCheckBox
             android:id="@+id/contact_cb"
@@ -57,7 +44,7 @@
             app:buttonTint="@drawable/selector_checkbox_tint"
             android:layout_gravity="center"
             android:clickable="false"
-            android:padding="2dp"/>
+            android:padding="4dp"/>
 
     </LinearLayout>
 

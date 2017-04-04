@@ -375,7 +375,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     }
 
     // Contacts container
-    static class ContactsContainer {
+    private static class ContactsContainer {
         private ArrayList<String> numbers = new ArrayList<>();
         private ArrayList<String> names = new ArrayList<>();
 

@@ -5,7 +5,7 @@
     android:orientation="vertical"
     tools:context="com.kaliturin.blacklist.SMSConversationFragment">
 
-    <ListView
+    <android.support.v7.widget.ListViewCompat
         android:id="@+id/rows_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -13,6 +13,7 @@
         android:choiceMode="none"
         android:divider="@android:color/transparent"
         android:dividerHeight="1dp"
-        android:visibility="invisible"/>
+        android:visibility="invisible"
+        android:theme="@style/AppTheme.ListView"/>
 
 </LinearLayout>

@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorWindow"
+    android:orientation="vertical">
 
     <ScrollView
         android:id="@+id/scroll"
@@ -14,38 +14,66 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="3dp"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp">
+            android:paddingRight="8dp"
+            android:paddingTop="3dp">
 
-            <EditText
-                android:id="@+id/edit_name"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="3dp"
-                android:background="@drawable/selector_edit_text"
-                android:maxLength="100"
-                android:hint="@string/Contact_name_nn" />
+                android:background="@color/colorTitleBackground"
+                android:orientation="vertical"
+                android:paddingLeft="4dp"
+                android:paddingStart="4dp"
+                android:paddingRight="4dp"
+                android:paddingEnd="4dp"
+                android:paddingBottom="6dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:text="@string/Contact_name_"
+                        android:textColor="@color/colorText" />
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/edit_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_edit_text"
+                    android:hint="@string/Contact_name_nn"
+                    android:maxLength="100"
+                    android:padding="3dp" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layout_number_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/view_add_another"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/selector_control"
-                android:layout_gravity="end">
+                android:layout_gravity="end"
+                android:background="@drawable/selector_control">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:paddingRight="5dp"
                     android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
                     android:text="@string/Add_another" />
 
                 <ImageButton

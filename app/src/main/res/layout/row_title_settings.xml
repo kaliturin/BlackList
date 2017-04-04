@@ -16,7 +16,7 @@
         android:paddingBottom="2dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="20dp"
+        android:paddingTop="10dp"
         android:textColor="@color/colorAccent"
         android:textSize="18sp" />
 

@@ -2,13 +2,14 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <!--item name="colorPrimaryDark">@color/colorPrimaryDark</item-->
         <item name="colorAccent">@color/colorAccent</item>
+        <!--item name="colorPrimary">@color/colorPrimary</item-->
+        <!--item name="colorPrimaryDark">@color/colorPrimaryDark</item-->
         <!--item name="android:textColor">@color/colorText</item-->
         <!--item name="android:textColorSecondary">@color/colorText</item>
         <item name="android:textColorPrimary">@color/colorText</item-->
         <item name="android:textSize">16sp</item>
+        <!--item name="windowBackground">@color/colorWindow</item-->
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
@@ -24,19 +25,23 @@
 
     <style name="AppTheme.Toolbar" parent="AppTheme">
         <item name="android:textColorSecondary">@color/colorAccent</item>
+        <!--item name="android:background">@color/colorToolbarBackground</item-->
     </style>
 
     <style name="ToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="AppTheme.CheckBox" parent="AppTheme">
-        <item name="colorControlNormal">@color/colorBorder</item>   <!-- border color -->
-        <item name="colorControlActivated">@color/colorAccent</item> <!-- activated color -->
-    </style>
+    <!--style name="AppTheme.CheckBox" parent="AppTheme">
+        <item name="colorControlNormal">@color/colorBorder</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+    </style-->
 
-    <style name="AlertDialogCustom" parent="@android:style/Theme.Dialog">
+    <style name="AppTheme.ListView" parent="AppTheme">
+        <item name="android:divider">@color/colorBorder</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:scrollbars">vertical</item>
+        <!--item name="android:background">@color/colorWindow</item-->
     </style>
-
 
 </resources>

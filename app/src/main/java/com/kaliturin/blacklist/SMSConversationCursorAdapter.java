@@ -157,6 +157,12 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             this.contentView = contentView;
             this.bodyTextView = snippetTextView;
             this.dateTextView = dateTextView;
+
+            // add click listener to message area
+            contentView.setTag(this);
+            contentView.setOnLongClickListener(rowOnLongClickListener);
+            bodyTextView.setTag(this);
+            bodyTextView.setOnLongClickListener(rowOnLongClickListener);
         }
 
         void setModel(Context context, SMSMessage model) {
@@ -192,12 +198,6 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             //Utils.setDrawable(context, contentView, drawableId);
             Drawable drawable = contentView.getBackground().mutate();
             Utils.setDrawableColor(context, drawable, color);
-
-            // add click listener to message area
-            contentView.setTag(this);
-            contentView.setOnLongClickListener(rowOnLongClickListener);
-            bodyTextView.setTag(this);
-            bodyTextView.setOnLongClickListener(rowOnLongClickListener);
         }
 
         private Date toDate(long time) {

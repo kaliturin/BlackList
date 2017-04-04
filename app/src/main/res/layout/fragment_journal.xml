@@ -3,17 +3,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ListView
+    <android.support.v7.widget.ListViewCompat
         android:id="@+id/journal_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:choiceMode="none"
-        android:divider="@color/colorBorder"
-        android:dividerHeight="1dp"/>
+        android:theme="@style/AppTheme.ListView" />
 
-    <include layout="@layout/row_3_buttons"
+    <include
+        layout="@layout/row_3_buttons"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

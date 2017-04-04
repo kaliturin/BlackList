@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CursorAdapter;
+import android.text.TextUtils;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,14 +31,17 @@ public class JournalCursorAdapter extends CursorAdapter {
     private Calendar calendar1 = Calendar.getInstance();
     private Calendar calendar2 = Calendar.getInstance();
     private IdentifiersContainer checkedItems = new IdentifiersContainer(0);
+    private SparseBooleanArray unfoldedTextItems = new SparseBooleanArray();
     private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
     private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
     private long recordTime = 0;
+    private boolean foldSMSText = false;
 
     JournalCursorAdapter(Context context) {
         super(context, null, 0);
+        foldSMSText = Settings.getBooleanValue(context, Settings.FOLD_SMS_TEXT_IN_JOURNAL);
     }
 
     @Override
@@ -130,13 +135,13 @@ public class JournalCursorAdapter extends CursorAdapter {
         }
     }
 
-    @Nullable
-    JournalRecord getRecord(View view) {
+    // Returns record linked to the passed view if it is available
+    @Nullable JournalRecord getRecord(View view) {
+        ViewHolder viewHolder = null;
         if(view != null) {
-            ViewHolder viewHolder = (ViewHolder) view.getTag();
-            return viewHolder.record;
+            viewHolder = (ViewHolder) view.getTag();
         }
-        return null;
+        return (viewHolder == null ? null : viewHolder.record);
     }
 
     // View holder improves scroll performance
@@ -145,7 +150,6 @@ public class JournalCursorAdapter extends CursorAdapter {
         private int itemId;
         private ImageView iconImageView;
         private TextView senderTextView;
-        private TextView numberTextView;
         private TextView textTextView;
         private TextView dateTextView;
         private TextView timeTextView;
@@ -156,7 +160,6 @@ public class JournalCursorAdapter extends CursorAdapter {
         ViewHolder(View rowView) {
             this((ImageView) rowView.findViewById(R.id.icon),
                     (TextView) rowView.findViewById(R.id.sender),
-                    (TextView) rowView.findViewById(R.id.number),
                     (TextView) rowView.findViewById(R.id.text),
                     (TextView) rowView.findViewById(R.id.date),
                     (TextView) rowView.findViewById(R.id.time),
@@ -166,25 +169,35 @@ public class JournalCursorAdapter extends CursorAdapter {
         }
 
         ViewHolder(ImageView iconImageView, TextView senderTextView,
-                   TextView numberTextView, TextView textTextView, TextView dateTextView,
+                   TextView textTextView, TextView dateTextView,
                    TextView timeTextView, CheckBox checkBox, View dateLayout,
                    CheckableLinearLayout contentLayout) {
             this.record = null;
             this.itemId = 0;
             this.iconImageView = iconImageView;
             this.senderTextView = senderTextView;
-            this.numberTextView = numberTextView;
             this.textTextView = textTextView;
             this.dateTextView = dateTextView;
             this.timeTextView = timeTextView;
             this.checkBox = checkBox;
             this.dateLayout = dateLayout;
             this.contentLayout = contentLayout;
+
             contentLayout.setTag(this);
+            textTextView.setTag(this);
 
             // add on click listeners
             contentLayout.setOnClickListener(rowOnClickListener);
             contentLayout.setOnLongClickListener(rowOnLongClickListener);
+            if(foldSMSText) {
+                textTextView.setOnLongClickListener(rowOnLongClickListener);
+                textTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setTextUnfolded(!isTextUnfolded());
+                    }
+                });
+            }
         }
 
         private void setModel(JournalRecord record, boolean showDate) {
@@ -199,21 +212,20 @@ public class JournalCursorAdapter extends CursorAdapter {
             }
             timeTextView.setText(timeFormat.format(date));
 
-            senderTextView.setText(record.caller);
-
+            String sender = record.caller;
             if(record.number != null &&
                     !record.caller.equals(record.number)) {
-                numberTextView.setText(record.number);
-                numberTextView.setVisibility(View.VISIBLE);
-            } else {
-                numberTextView.setText("");
-                numberTextView.setVisibility(View.GONE);
+                sender += " (" + record.number + ")";
             }
+            senderTextView.setText(sender);
 
             if (record.text != null) {
                 iconImageView.setImageResource(android.R.drawable.sym_action_email);
                 textTextView.setText(record.text);
                 textTextView.setVisibility(View.VISIBLE);
+                if(foldSMSText) {
+                    setTextUnfolded(isTextUnfolded());
+                }
             } else {
                 iconImageView.setImageResource(android.R.drawable.sym_action_call);
                 textTextView.setText("");
@@ -237,6 +249,25 @@ public class JournalCursorAdapter extends CursorAdapter {
             checkedItems.set(itemId, checked);
             checkBox.setChecked(checked);
             contentLayout.setChecked(checked);
+        }
+
+        private boolean isTextUnfolded() {
+            return unfoldedTextItems.get(itemId);
+        }
+
+        private void setTextUnfolded(boolean unfolded) {
+            if(unfolded) {
+                textTextView.setSingleLine(false);
+                textTextView.setMaxLines(Integer.MAX_VALUE);
+                textTextView.setEllipsize(null);
+                unfoldedTextItems.append(itemId, true);
+
+            } else {
+                textTextView.setSingleLine(true);
+                textTextView.setMaxLines(1);
+                textTextView.setEllipsize(TextUtils.TruncateAt.END);
+                unfoldedTextItems.delete(itemId);
+            }
         }
 
         private Date toDate(long time) {

@@ -49,6 +49,9 @@ class DialogBuilder {
         titleView.setText(title);
         titleView.setMaxLines(maxLines);
         titleView.setEllipsize(TextUtils.TruncateAt.END);
+        if(maxLines == 1) {
+            titleView.setSingleLine(true);
+        }
         titleView.setVisibility(View.VISIBLE);
         return this;
     }
