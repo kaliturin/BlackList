@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kaliturin.blacklist.ContactsAccessHelper.SMSConversation;
+import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
 
 /**
@@ -180,30 +181,59 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         @Override
         public boolean onLongClick(View row) {
             final SMSConversation sms = cursorAdapter.getSMSConversation(row);
-            if(sms != null) {
-                // create menu dialog
-                DialogBuilder dialog = new DialogBuilder(getActivity());
-                String title = (sms.person != null ? sms.person : sms.number);
-                dialog.setTitle(title);
-                // add menu item of sms deletion
-                dialog.addItem(R.string.Delete_thread, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(DefaultSMSAppHelper.isDefault(getContext())) {
-                            // remove SMS thread
-                            ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
-                            if(db.deleteSMSMessagesByThreadId(getContext(), sms.threadId)) {
-                                // reload list
-                                loadListViewItems();
-                            }
-                        } else {
-                            Toast.makeText(getContext(), R.string.Need_default_SMS_app,
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                dialog.show();
+            if(sms == null) {
+                return true;
             }
+
+            final String person = (sms.person != null ? sms.person : sms.number);
+
+            // create menu dialog
+            DialogBuilder dialog = new DialogBuilder(getActivity());
+            dialog.setTitle(person);
+            // add menu item of sms deletion
+            dialog.addItem(R.string.Delete_thread, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(DefaultSMSAppHelper.isDefault(getContext())) {
+                        // remove SMS thread
+                        ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
+                        if(db.deleteSMSMessagesByThreadId(getContext(), sms.threadId)) {
+                            // reload list
+                            loadListViewItems();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), R.string.Need_default_SMS_app,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            final DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+            if(db != null) {
+                // 'move contact to black list'
+                DatabaseAccessHelper.Contact contact = db.getContact(person, sms.number);
+                if(contact == null || contact.type != Contact.TYPE_BLACK_LIST) {
+                    dialog.addItem(R.string.Move_to_black_list, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            db.addContact(Contact.TYPE_BLACK_LIST, person, sms.number);
+                        }
+                    });
+                }
+
+                // 'move contact to white list'
+                if(contact == null || contact.type != Contact.TYPE_WHITE_LIST) {
+                    dialog.addItem(R.string.Move_to_white_list, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            db.addContact(Contact.TYPE_WHITE_LIST, person, sms.number);
+                        }
+                    });
+                }
+            }
+
+            dialog.show();
+
             return true;
         }
     }

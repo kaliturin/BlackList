@@ -840,6 +840,18 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         return getContacts(numbers, withNumbers);
     }
 
+    // Searches contact by name and number
+    @Nullable
+    Contact getContact(String name, String number) {
+        List<Contact> contacts = getContacts(number, false);
+        for(Contact contact : contacts) {
+            if(contact.name.equals(name)) {
+                return contact;
+            }
+        }
+        return null;
+    }
+
     // Moves the contact to the opposite type list
     long moveContact(Contact contact) {
         int type = reverseContactType(contact.type);

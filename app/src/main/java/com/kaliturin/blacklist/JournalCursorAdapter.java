@@ -25,23 +25,34 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.JournalRecordCursorWrapper;
  * Journal data cursor adapter
  */
 public class JournalCursorAdapter extends CursorAdapter {
-    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG);
     private final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
-    private Date datetime = new Date();
-    private Calendar calendar1 = Calendar.getInstance();
-    private Calendar calendar2 = Calendar.getInstance();
+    private final SimpleDateFormat dateFormat = (SimpleDateFormat) SimpleDateFormat.getDateInstance(DateFormat.LONG);
+    private final DateFormat yearLessDateFormat;
+    private final Date datetime = new Date();
+    private final Calendar calendar = Calendar.getInstance();
+    private final SparseBooleanArray unfoldedTextItems = new SparseBooleanArray();
     private IdentifiersContainer checkedItems = new IdentifiersContainer(0);
-    private SparseBooleanArray unfoldedTextItems = new SparseBooleanArray();
     private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;
-    private RowOnClickListener rowOnClickListener = new RowOnClickListener();
-    private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
-    private long recordTime = 0;
+    private final RowOnClickListener rowOnClickListener = new RowOnClickListener();
+    private final RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
+    private long lastRecordTime = 0;
     private boolean foldSMSText = false;
+    private final int currentYear;
 
     JournalCursorAdapter(Context context) {
         super(context, null, 0);
         foldSMSText = Settings.getBooleanValue(context, Settings.FOLD_SMS_TEXT_IN_JOURNAL);
+
+        // creating year less date format
+        String fullPattern = dateFormat.toPattern();
+        // checking 'de' we omit problems with Spain locale
+        String regex = fullPattern.contains("de") ? "[^Mm]*[Yy]+[^Mm]*" : "[^DdMm]*[Yy]+[^DdMm]*";
+        String yearLessPattern = fullPattern.replaceAll(regex, "");
+        yearLessDateFormat = new SimpleDateFormat(yearLessPattern);
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        currentYear = calendar.get(Calendar.YEAR);
     }
 
     @Override
@@ -65,20 +76,29 @@ public class JournalCursorAdapter extends CursorAdapter {
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        boolean showDate = false;
-        calendar1.setTimeInMillis(recordTime);
-        calendar2.setTimeInMillis(record.time);
+        // define date format of showing record
+        calendar.setTimeInMillis(lastRecordTime);
+        int lastRecordDay = calendar.get(Calendar.DAY_OF_YEAR);
+        int lastRecordYear = calendar.get(Calendar.YEAR);
+        calendar.setTimeInMillis(record.time);
+        int currentRecordDay = calendar.get(Calendar.DAY_OF_YEAR);
+        int currentRecordYear = calendar.get(Calendar.YEAR);
+        DateFormat df = null;
         // if date of previous record isn't the same as current one - show date in record view
-        if(calendar1.get(Calendar.DAY_OF_YEAR) != calendar2.get(Calendar.DAY_OF_YEAR) ||
-                calendar1.get(Calendar.YEAR) != calendar2.get(Calendar.YEAR)) {
-            showDate = true;
+        if(lastRecordDay != currentRecordDay || lastRecordYear != currentRecordYear) {
+            // if current year - do not show it
+            if(currentRecordYear == currentYear) {
+                df = yearLessDateFormat;
+            } else {
+                df = dateFormat;
+            }
         }
 
         // update the view holder with new record
-        viewHolder.setModel(record, showDate);
+        viewHolder.setModel(record, df);
 
         // save last time
-        recordTime = record.time;
+        lastRecordTime = record.time;
     }
 
     @Override
@@ -87,6 +107,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         // rebuild checked items container
         int size = (cursor != null ? cursor.getCount() : 0);
         checkedItems = new IdentifiersContainer(size);
+        lastRecordTime = 0;
     }
 
     void setOnClickListener(View.OnClickListener onClickListener) {
@@ -200,11 +221,11 @@ public class JournalCursorAdapter extends CursorAdapter {
             }
         }
 
-        private void setModel(JournalRecord record, boolean showDate) {
+        private void setModel(JournalRecord record, DateFormat dateFormat) {
             this.record = record;
             itemId = (int) record.id;
             Date date = toDate(record.time);
-            if(showDate) {
+            if(dateFormat != null) {
                 dateTextView.setText(dateFormat.format(date));
                 dateLayout.setVisibility(View.VISIBLE);
             } else {

@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
+
 
 /**
  * Fragment for showing one SMS conversation
@@ -264,6 +266,9 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             if(sms == null) {
                 return true;
             }
+
+            final String person = (sms.person != null ? sms.person : sms.number);
+
             // create menu dialog
             DialogBuilder dialog = new DialogBuilder(getActivity());
             // add dialog title as message snippet
@@ -302,6 +307,31 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                     openSMSSendActivity("", "", sms.body);
                 }
             });
+
+            final DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+            if(db != null) {
+                // 'move contact to black list'
+                DatabaseAccessHelper.Contact contact = db.getContact(person, sms.number);
+                if(contact == null || contact.type != Contact.TYPE_BLACK_LIST) {
+                    dialog.addItem(R.string.Move_to_black_list, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            db.addContact(Contact.TYPE_BLACK_LIST, person, sms.number);
+                        }
+                    });
+                }
+
+                // 'move contact to white list'
+                if(contact == null || contact.type != Contact.TYPE_WHITE_LIST) {
+                    dialog.addItem(R.string.Move_to_white_list, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            db.addContact(Contact.TYPE_WHITE_LIST, person, sms.number);
+                        }
+                    });
+                }
+            }
+
             dialog.show();
 
             return true;

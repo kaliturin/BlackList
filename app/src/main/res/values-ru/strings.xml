@@ -81,7 +81,6 @@
     <string name="Remove_contact">Удалить контакт</string>
     <string name="Find_similar_records">Найти похожие записи</string>
     <string name="Exclude_from_black_list">Удалить контакт из Чёрного списка</string>
-    <string name="Add_to_black_list">Добавить контакт в Чёрный список</string>
     <string name="Move_to_white_list">Поместить контакт в Белый список</string>
     <string name="Move_to_black_list">Поместить контакт в Чёрный список</string>
     <string name="Set_as_default_SMS_app">Уcтановить как приложение для работы с SMS по умолчанию (необходимо для блокировки SMS в версиях Android 4.4 и последующих)</string>

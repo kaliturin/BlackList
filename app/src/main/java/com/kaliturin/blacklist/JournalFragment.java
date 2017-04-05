@@ -389,7 +389,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                 });
             } else {
                 // add menu item of adding the contact to the black list
-                dialog.addItem(R.string.Add_to_black_list, new View.OnClickListener() {
+                dialog.addItem(R.string.Move_to_black_list, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         addContactToBlackList(record.caller, record.number);
