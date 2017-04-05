@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity
                     switchFragment(whiteListFragment, arguments);
                     break;
                 case R.id.nav_sms:
-                    arguments.putString(TITLE, getString(R.string.SMS_messages));
+                    arguments.putString(TITLE, getString(R.string.SMS_messaging));
                     switchFragment(smsFragment, arguments);
                     break;
                 default:

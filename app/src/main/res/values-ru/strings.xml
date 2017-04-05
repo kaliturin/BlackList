@@ -48,7 +48,7 @@
     <string name="White_list">Белый список</string>
     <string name="Journal">Журнал</string>
     <string name="Settings">Настройки</string>
-    <string name="SMS_messages">SMS сообщения</string>
+    <string name="SMS_messaging">SMS сообщения</string>
     <string name="SELECT_ALL">ВЫБРАТЬ ВСЕ</string>
     <string name="DELETE">УДАЛИТЬ</string>
     <string name="CANCEL">ОТМЕНИТЬ</string>
