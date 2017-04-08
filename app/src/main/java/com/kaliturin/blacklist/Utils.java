@@ -11,6 +11,8 @@ import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
+import android.support.annotation.StyleRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
@@ -35,22 +37,22 @@ public class Utils {
     static final String TAG = Utils.class.getName();
 
     /** Tints menu icon **/
-    public static void setMenuIconTint(Context context, MenuItem item, @AttrRes int colorRef) {
+    public static void setMenuIconTint(Context context, MenuItem item, @AttrRes int colorAttrRes) {
         Drawable drawable = DrawableCompat.wrap(item.getIcon());
         drawable.mutate();
-        setDrawableTint(context, drawable, colorRef);
+        setDrawableTint(context, drawable, colorAttrRes);
     }
 
     /** Sets the tint color of the drawable **/
-    public static void setDrawableTint(Context context, Drawable drawable, @AttrRes int colorRef) {
-        int colorRes = getResourceId(context, colorRef);
+    public static void setDrawableTint(Context context, Drawable drawable, @AttrRes int colorAttrRes) {
+        int colorRes = getResourceId(context, colorAttrRes);
         int color = ContextCompat.getColor(context, colorRes);
         DrawableCompat.setTint(drawable, color);
     }
 
     /** Sets the background color of the drawable **/
-    public static void setDrawableColor(Context context, Drawable drawable, @AttrRes int colorRef) {
-        int colorRes = getResourceId(context, colorRef);
+    public static void setDrawableColor(Context context, Drawable drawable, @AttrRes int colorAttrRes) {
+        int colorRes = getResourceId(context, colorAttrRes);
         int color = ContextCompat.getColor(context, colorRes);
         if (drawable instanceof ShapeDrawable) {
             ((ShapeDrawable)drawable).getPaint().setColor(color);
@@ -67,8 +69,8 @@ public class Utils {
 
     /** Sets drawable for the view **/
     @SuppressWarnings("deprecation")
-    public static void setDrawable(Context context, View view, @DrawableRes int drawableId) {
-        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
+    public static void setDrawable(Context context, View view, @DrawableRes int drawableRes) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableRes);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             view.setBackgroundDrawable(drawable);
         } else {
@@ -76,12 +78,23 @@ public class Utils {
         }
     }
 
-    /** Resolves theme's attribute returning referenced resource id **/
-    public static int getResourceId(Context context, @AttrRes int reference) {
+    /** Resolves attribute of passed theme returning referenced resource id **/
+    public static int getResourceId(@AttrRes int attrRes, Resources.Theme theme) {
         TypedValue typedValue = new TypedValue();
-        Resources.Theme theme = context.getTheme();
-        theme.resolveAttribute(reference, typedValue, true);
+        theme.resolveAttribute(attrRes, typedValue, true);
         return typedValue.resourceId;
+    }
+
+    /** Resolves current theme's attribute returning referenced resource id **/
+    public static int getResourceId(Context context, @AttrRes int attrRes) {
+        return getResourceId(attrRes, context.getTheme());
+    }
+
+    /** Resolves attribute of passed theme returning referenced resource id **/
+    public static int getResourceId(Context context, @AttrRes int attrRes, @StyleRes int styleRes) {
+        Resources.Theme theme = context.getResources().newTheme();
+        theme.applyStyle(styleRes, true);
+        return getResourceId(attrRes, theme);
     }
 
 //----------------------------------------------------------------------------

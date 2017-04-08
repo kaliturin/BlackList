@@ -48,6 +48,7 @@
     <string name="White_list">White list</string>
     <string name="Journal">Journal</string>
     <string name="Settings">Settings</string>
+    <string name="Exit">Exit</string>
     <string name="SMS_messaging">SMS messaging</string>
     <string name="SELECT_ALL">SELECT ALL</string>
     <string name="DELETE">DELETE</string>
@@ -118,6 +119,7 @@
     <string name="Error_file_is_not_valid">Error: file isn\'t valid</string>
     <string name="Error_on_old_data_deletion">Error on old data deletion</string>
     <string name="Import_complete">Import complete</string>
+    <string name="UI_theme_dark">UI theme: dark</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>

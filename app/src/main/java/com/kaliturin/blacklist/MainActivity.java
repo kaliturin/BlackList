@@ -104,7 +104,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        fragmentSwitcher.switchFragment(item.getItemId());
+        int itemId = item.getItemId();
+        if(itemId == R.id.nav_exit) {
+            finish();
+        }
+        fragmentSwitcher.switchFragment(itemId);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

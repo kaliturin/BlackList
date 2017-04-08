@@ -346,24 +346,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
             // create menu dialog
             DialogBuilder dialog = new DialogBuilder(getActivity());
-            dialog.setTitle(record.caller).
-                    // add menu item records searching
-                            addItem(R.string.Find_similar_records, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // find all records by record's caller
-                            searchItems(record.caller);
-                        }
-                    }).
-                    // add menu item of record deletion
-                            addItem(R.string.Delete_record, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            deleteItem(record.id);
-                            reloadItems(itemsFilter, true);
-                        }
-                    });
-
+            dialog.setTitle(record.caller);
             if(record.text != null && !record.text.isEmpty()) {
                 // add menu item of record copying
                 dialog.addItem(R.string.Copy_text, new View.OnClickListener() {
@@ -376,6 +359,22 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                     }
                 });
             }
+            // add menu item of record deletion
+            dialog.addItem(R.string.Delete_record, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteItem(record.id);
+                    reloadItems(itemsFilter, true);
+                }
+            });
+            // add menu item records searching
+            dialog.addItem(R.string.Find_similar_records, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // find all records by record's caller
+                    searchItems(record.caller);
+                }
+            });
 
             // if contact is found in the black list
             if (blackContact != null) {

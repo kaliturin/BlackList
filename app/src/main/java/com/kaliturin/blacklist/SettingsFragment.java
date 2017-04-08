@@ -101,7 +101,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                     });
         }
 
-        if (isDefaultSmsApp) {
+        if(isDefaultSmsApp) {
             // sms blocking settings
             adapter.addTitle(R.string.SMS_blocking);
             adapter.addCheckbox(R.string.Block_all_SMS, Settings.BLOCK_ALL_SMS);
@@ -149,6 +149,19 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         // app interface
         adapter.addTitle(R.string.Application_interface);
         adapter.addCheckbox(R.string.Journal_SMS_text_folding, Settings.FOLD_SMS_TEXT_IN_JOURNAL);
+        adapter.addCheckbox(R.string.UI_theme_dark, Settings.UI_THEME_DARK, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // trigger checked row
+                adapter.triggerRowChecked(view);
+                // apply the new theme
+                if(Settings.getBooleanValue(getContext(), Settings.UI_THEME_DARK)) {
+
+                } else {
+
+                }
+            }
+        });
 
         // app data export/import
         adapter.addTitle(R.string.Application_data);
@@ -295,9 +308,9 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         }
 
         @Override
-        public void onClick(View rowView) {
+        public void onClick(View view) {
             // get the clicked row position
-            if(!adapter.isRowChecked(rowView)) {
+            if(!adapter.isRowChecked(view)) {
                 // open ringtone picker dialog
                 Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
                 intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
@@ -305,7 +318,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getRingtoneUri(requestCode));
                 startActivityForResult(intent, requestCode);
             } else {
-                adapter.setRowChecked(rowView, false);
+                adapter.setRowChecked(view, false);
             }
         }
     }

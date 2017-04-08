@@ -48,6 +48,7 @@
     <string name="White_list">Белый список</string>
     <string name="Journal">Журнал</string>
     <string name="Settings">Настройки</string>
+    <string name="Exit">Выход</string>
     <string name="SMS_messaging">SMS сообщения</string>
     <string name="SELECT_ALL">ВЫБРАТЬ ВСЕ</string>
     <string name="DELETE">УДАЛИТЬ</string>
@@ -118,6 +119,7 @@
     <string name="Error_file_is_not_valid">Ошибка: недопустимый формат Файла</string>
     <string name="Error_on_old_data_deletion">Ошибка при удалении старых данных</string>
     <string name="Import_complete">Импорт данных завершён</string>
+    <string name="UI_theme_dark">Тема интерфейса: тёмная</string>
 
     <string-array name="phone_metadata">
         <item>равняется:</item>

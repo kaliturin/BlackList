@@ -1,9 +1,12 @@
 package com.kaliturin.blacklist;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,22 +58,22 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
     }
 
     // Triggers row checked status
-    void triggerRowChecked(View rowView) {
-        ViewHolder viewHolder = (ViewHolder) rowView.getTag();
+    void triggerRowChecked(View view) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         if(viewHolder != null) {
             viewHolder.trigger();
         }
     }
 
     // Returns true if row is checked
-    boolean isRowChecked(View rowView) {
-        ViewHolder viewHolder = (ViewHolder) rowView.getTag();
+    boolean isRowChecked(View view) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         return (viewHolder != null && viewHolder.isChecked());
     }
 
     // Sets row checked
-    void setRowChecked(View rowView, boolean checked) {
-        ViewHolder viewHolder = (ViewHolder) rowView.getTag();
+    void setRowChecked(View view, boolean checked) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         if(viewHolder != null) {
             viewHolder.setChecked(checked);
         }
@@ -180,7 +183,6 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
             this.position = position;
 
             rowView.setTag(this);
-            rowView.setOnClickListener(listener);
 
             // title
             TextView titleView = (TextView) rowView.findViewById(R.id.text);
@@ -194,13 +196,19 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
                 if(checkBox != null) {
                     checkBox.setVisibility(View.VISIBLE);
                     checkBox.setChecked(model.isChecked());
+                    checkBox.setOnClickListener(listener);
                 }
             } else {
                 checkBox = null;
             }
 
-            // image
+            // button
             if(model.type == Model.BUTTON) {
+                rowView.setOnClickListener(listener);
+                // set row's background drawable
+                int drawableRes = Utils.getResourceId(getContext(), R.attr.selector_control);
+                Utils.setDrawable(getContext(), rowView, drawableRes);
+                // set row's image
                 ImageView imageView = (ImageView) rowView.findViewById(R.id.image);
                 if(imageView != null) {
                     imageView.setVisibility(View.VISIBLE);

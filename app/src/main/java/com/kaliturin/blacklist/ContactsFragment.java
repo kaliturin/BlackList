@@ -136,20 +136,20 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                     // create and show menu dialog for actions with the contact
                     DialogBuilder dialog = new DialogBuilder(getActivity());
                     dialog.setTitle(contact.name).
-                            // add menu item of contact deletion
-                                    addItem(R.string.Remove_contact, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    deleteContact(contact.id);
-                                    reloadItems(itemsFilter);
-                                }
-                            }).
                             // add menu item of contact editing
-                                    addItem(R.string.Edit_contact, new View.OnClickListener() {
+                            addItem(R.string.Edit_contact, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     // edit contact
                                     editContact(contact.id);
+                                }
+                            }).
+                            // add menu item of contact deletion
+                            addItem(R.string.Remove_contact, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    deleteContact(contact.id);
+                                    reloadItems(itemsFilter);
                                 }
                             });
                     // add menu item of contact moving to opposite list
