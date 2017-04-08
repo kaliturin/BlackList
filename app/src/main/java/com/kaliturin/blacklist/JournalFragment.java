@@ -157,7 +157,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
         itemSearch = menu.findItem(R.id.action_search);
-        Utils.setMenuIconTint(getContext(), itemSearch, R.color.colorAccent);
+        Utils.setMenuIconTint(getContext(), itemSearch, R.attr.colorAccent);
         itemSearch.setVisible(true);
 
         // get the view from search menu item

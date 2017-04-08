@@ -190,10 +190,10 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
 
         // tune menu options
         MenuItem itemSearch = menu.findItem(R.id.action_search);
-        Utils.setMenuIconTint(getContext(), itemSearch, R.color.colorAccent);
+        Utils.setMenuIconTint(getContext(), itemSearch, R.attr.colorAccent);
         itemSearch.setVisible(true);
         MenuItem itemAdd = menu.findItem(R.id.action_add);
-        Utils.setMenuIconTint(getContext(), itemAdd, R.color.colorAccent);
+        Utils.setMenuIconTint(getContext(), itemAdd, R.attr.colorAccent);
         itemAdd.setVisible(true);
 
         // get the view from search menu item

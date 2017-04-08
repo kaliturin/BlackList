@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorWindow"
     android:orientation="vertical"
     tools:context="com.kaliturin.blacklist.SMSSendFragment">
 
@@ -17,7 +16,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingLeft="8dp"
-            android:paddingRight="2dp">
+            android:paddingStart="8dp"
+            android:paddingRight="2dp"
+            android:paddingEnd="2dp">
 
             <LinearLayout
                 android:id="@+id/contacts_list"
@@ -29,22 +30,22 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="2dp"
+                android:orientation="horizontal"
                 android:paddingBottom="5dp"
-                android:orientation="horizontal">
+                android:paddingTop="2dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:paddingTop="6dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingTop="6dp">
 
                     <EditText
                         android:id="@+id/edit_number"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/selector_edit_text"
+                        android:background="?selector_edit"
                         android:hint="@string/Phone_number"
                         android:inputType="phone"
                         android:maxLength="100"
@@ -61,7 +62,7 @@
                         android:id="@+id/text_message"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/selector_edit_text"
+                        android:background="?selector_edit"
                         android:gravity="top|start"
                         android:hint="@string/Message"
                         android:inputType="textCapSentences|textMultiLine"
@@ -88,7 +89,7 @@
                             android:layout_height="40dp"
                             android:contentDescription="@string/Add_contact"
                             android:src="@drawable/ic_add"
-                            android:tint="@color/colorAccent" />
+                            android:tint="?colorAccent" />
 
                         <ImageButton
                             android:id="@+id/button_add_contact"
@@ -96,7 +97,7 @@
                             android:layout_height="40dp"
                             android:contentDescription="@string/Add_contact"
                             android:src="@drawable/ic_contact"
-                            android:tint="@color/colorAccent" />
+                            android:tint="?colorAccent" />
 
                     </LinearLayout>
 
@@ -119,8 +120,8 @@
                             android:layout_height="wrap_content"
                             android:minHeight="40dp"
                             android:minWidth="0dp"
-                            android:textSize="14sp"
-                            android:text="@string/Send" />
+                            android:text="@string/Send"
+                            android:textSize="14sp" />
 
                     </LinearLayout>
 

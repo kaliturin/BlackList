@@ -1,47 +1,53 @@
 <resources>
 
-    <!-- Base application theme. -->
+    <!-- Light theme -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <item name="colorAccent">@color/colorAccent</item>
-        <!--item name="colorPrimary">@color/colorPrimary</item-->
-        <!--item name="colorPrimaryDark">@color/colorPrimaryDark</item-->
-        <!--item name="android:textColor">@color/colorText</item-->
-        <!--item name="android:textColorSecondary">@color/colorText</item>
-        <item name="android:textColorPrimary">@color/colorText</item-->
+        <!-- Custom resources -->
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorTitleBackground">@color/titleBackground</item>
+        <item name="colorBorder">@color/border</item>
+        <item name="colorIncomeSms">@color/incomeSms</item>
+        <item name="colorOutcomeSms">@color/outcomeSms</item>
+        <item name="colorPressed">@color/pressed</item>
+        <item name="colorChecked">@color/checked</item>
+        <item name="colorText">@color/text</item>
+        <item name="colorEdit">@color/edit</item>
+
+        <!-- Android resources -->
+        <item name="android:textColor">?colorText</item>
+        <item name="android:textColorSecondary">@color/text2</item>
+        <item name="android:textColorLink">@color/link</item>
         <item name="android:textSize">16sp</item>
-        <!--item name="windowBackground">@color/colorWindow</item-->
+
+        <!-- Drawables -->
+        <item name="selector_control">@drawable/selector_control_light</item>
+        <item name="selector_edit">@drawable/selector_edit_light</item>
+        <item name="selector_checkbox_tint">@drawable/selector_checkbox_tint_light</item>
+        <item name="selector_checkbox">@drawable/selector_checkbox</item>
+        <item name="shape_unread_sms">@drawable/shape_unread_sms_light</item>
     </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar">
-    </style>
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
-    </style>
-
     <style name="AppTheme.Toolbar" parent="AppTheme">
-        <item name="android:textColorSecondary">@color/colorAccent</item>
-        <!--item name="android:background">@color/colorToolbarBackground</item-->
+        <item name="android:textColorSecondary">?colorAccent</item>
     </style>
 
     <style name="ToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
     </style>
 
-    <!--style name="AppTheme.CheckBox" parent="AppTheme">
-        <item name="colorControlNormal">@color/colorBorder</item>
-        <item name="colorControlActivated">@color/colorAccent</item>
-    </style-->
-
     <style name="AppTheme.ListView" parent="AppTheme">
-        <item name="android:divider">@color/colorBorder</item>
+        <item name="android:divider">?colorBorder</item>
         <item name="android:dividerHeight">1dp</item>
         <item name="android:scrollbars">vertical</item>
-        <!--item name="android:background">@color/colorWindow</item-->
     </style>
 
 </resources>

@@ -2,42 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="start"
     android:orientation="vertical"
     android:paddingEnd="50dp"
-    android:paddingRight="50dp"
-    android:paddingStart="5dp"
     android:paddingLeft="5dp"
-    android:gravity="start">
+    android:paddingRight="50dp"
+    android:paddingStart="5dp">
 
     <LinearLayout
         android:id="@+id/content_shape"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:focusable="true"
         android:orientation="vertical"
-        android:background="@drawable/shape_sms_body"
-        android:focusable="true">
+        android:background="@drawable/shape_sms_body">
 
         <TextView
             android:id="@+id/body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
             android:autoLink="web|phone|email"
             android:linksClickable="true"
             android:longClickable="true"
-            android:textColorLink="@color/colorLink"
-            android:textColor="@color/colorText"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
             android:textSize="18sp" />
 
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
-            android:layout_gravity="end"
-            android:textColor="@color/colorText"
             android:textSize="14sp" />
     </LinearLayout>
 

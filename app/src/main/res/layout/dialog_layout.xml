@@ -8,16 +8,16 @@
         android:id="@+id/dialog_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorTitleBackground"
+        android:background="?colorTitleBackground"
         android:padding="12dp"
-        android:textColor="@color/colorAccent"
+        android:textColor="?colorAccent"
         android:textSize="18sp"
         android:visibility="gone" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/colorAccent" />
+        android:background="?colorAccent" />
 
     <ScrollView
         android:layout_width="match_parent"

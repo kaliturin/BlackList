@@ -9,7 +9,7 @@
         android:id="@+id/date_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorTitleBackground"
+        android:background="?colorTitleBackground"
         android:clickable="false"
         android:focusable="false"
         android:orientation="vertical"
@@ -20,19 +20,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@color/colorTitleBackground"
+            android:background="?colorTitleBackground"
             android:paddingBottom="2dp"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingTop="10dp"
-            android:textColor="@color/colorAccent"
+            android:textColor="?colorAccent"
             android:textSize="18sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/colorAccent" />
+            android:background="?colorAccent" />
 
     </RelativeLayout>
 
@@ -40,7 +40,7 @@
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/selector_control"
+        android:background="?selector_control"
         android:focusable="true"
         android:orientation="horizontal">
 
@@ -58,14 +58,14 @@
                 android:id="@+id/icon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:tint="@color/colorBorder" />
+                android:tint="?colorBorder" />
 
             <TextView
                 android:id="@+id/time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/colorText2"
+                android:textColor="?android:textColorSecondary"
                 android:textSize="13sp" />
 
         </LinearLayout>
@@ -83,7 +83,6 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
-                android:textColor="@color/colorText"
                 android:textSize="22sp" />
 
             <TextView
@@ -91,7 +90,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="2dp"
-                android:textColor="@color/colorText2"
+                android:textColor="?android:textColorSecondary"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -108,9 +107,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
-                android:button="@drawable/selector_checkbox"
+                android:button="?selector_checkbox"
                 android:clickable="false"
-                app:buttonTint="@drawable/selector_checkbox_tint" />
+                app:buttonTint="?selector_checkbox_tint" />
 
         </LinearLayout>
 

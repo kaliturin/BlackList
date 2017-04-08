@@ -1,7 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorWindow"
     android:orientation="vertical">
 
     <ScrollView
@@ -21,13 +20,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorTitleBackground"
+                android:background="?colorTitleBackground"
                 android:orientation="vertical"
-                android:paddingLeft="4dp"
-                android:paddingStart="4dp"
-                android:paddingRight="4dp"
+                android:paddingBottom="6dp"
                 android:paddingEnd="4dp"
-                android:paddingBottom="6dp">
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingStart="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -39,8 +38,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center"
-                        android:text="@string/Contact_name_"
-                        android:textColor="@color/colorText" />
+                        android:text="@string/Contact_name_" />
 
                 </LinearLayout>
 
@@ -48,7 +46,7 @@
                     android:id="@+id/edit_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/selector_edit_text"
+                    android:background="?selector_edit"
                     android:hint="@string/Contact_name_nn"
                     android:maxLength="100"
                     android:padding="3dp" />
@@ -66,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:background="@drawable/selector_control">
+                android:background="?selector_control">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -83,7 +81,7 @@
                     android:clickable="false"
                     android:contentDescription="@string/Add_contact"
                     android:src="@drawable/ic_add"
-                    android:tint="@color/colorAccent" />
+                    android:tint="?colorAccent" />
 
             </LinearLayout>
 

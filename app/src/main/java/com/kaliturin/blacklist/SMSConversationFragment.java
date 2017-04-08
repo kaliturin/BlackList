@@ -102,7 +102,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         inflater.inflate(R.menu.main, menu);
 
         MenuItem writeMessageItem = menu.findItem(R.id.write_message);
-        Utils.setMenuIconTint(getContext(), writeMessageItem, R.color.colorAccent);
+        Utils.setMenuIconTint(getContext(), writeMessageItem, R.attr.colorAccent);
         writeMessageItem.setVisible(true);
 
         writeMessageItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {

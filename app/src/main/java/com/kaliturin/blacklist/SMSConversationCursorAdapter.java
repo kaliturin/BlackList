@@ -4,8 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -182,12 +182,12 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
                 padding = paddingStart;
                 gravity = Gravity.START;
                 //drawableId = R.drawable.bubble_in;
-                color = R.color.colorIncomeSms;
+                color = R.attr.colorIncomeSms;
             } else {
                 padding = paddingEnd;
                 gravity = Gravity.END;
                 //drawableId = R.drawable.bubble_out;
-                color = R.color.colorOutcomeSms;
+                color = R.attr.colorOutcomeSms;
             }
 
             // set alignments

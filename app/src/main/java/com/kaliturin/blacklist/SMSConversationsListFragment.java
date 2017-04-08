@@ -138,7 +138,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         inflater.inflate(R.menu.main, menu);
 
         MenuItem writeSMS = menu.findItem(R.id.write_message);
-        Utils.setMenuIconTint(getContext(), writeSMS, R.color.colorAccent);
+        Utils.setMenuIconTint(getContext(), writeSMS, R.attr.colorAccent);
         writeSMS.setVisible(true);
 
         writeSMS.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {

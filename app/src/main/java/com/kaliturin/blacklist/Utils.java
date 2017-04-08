@@ -1,16 +1,20 @@
 package com.kaliturin.blacklist;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
+import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -31,20 +35,22 @@ public class Utils {
     static final String TAG = Utils.class.getName();
 
     /** Tints menu icon **/
-    public static void setMenuIconTint(Context context, MenuItem item, @ColorRes int colorRes) {
+    public static void setMenuIconTint(Context context, MenuItem item, @AttrRes int colorRef) {
         Drawable drawable = DrawableCompat.wrap(item.getIcon());
         drawable.mutate();
-        setDrawableTint(context, drawable, colorRes);
+        setDrawableTint(context, drawable, colorRef);
     }
 
     /** Sets the tint color of the drawable **/
-    public static void setDrawableTint(Context context, Drawable drawable, @ColorRes int colorRes) {
+    public static void setDrawableTint(Context context, Drawable drawable, @AttrRes int colorRef) {
+        int colorRes = getResourceId(context, colorRef);
         int color = ContextCompat.getColor(context, colorRes);
         DrawableCompat.setTint(drawable, color);
     }
 
     /** Sets the background color of the drawable **/
-    public static void setDrawableColor(Context context, Drawable drawable, @ColorRes int colorRes) {
+    public static void setDrawableColor(Context context, Drawable drawable, @AttrRes int colorRef) {
+        int colorRes = getResourceId(context, colorRef);
         int color = ContextCompat.getColor(context, colorRes);
         if (drawable instanceof ShapeDrawable) {
             ((ShapeDrawable)drawable).getPaint().setColor(color);
@@ -69,6 +75,16 @@ public class Utils {
             view.setBackground(drawable);
         }
     }
+
+    /** Resolves theme's attribute returning referenced resource id **/
+    public static int getResourceId(Context context, @AttrRes int reference) {
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = context.getTheme();
+        theme.resolveAttribute(reference, typedValue, true);
+        return typedValue.resourceId;
+    }
+
+//----------------------------------------------------------------------------
 
     /** Copies passed text to clipboard **/
     @SuppressWarnings("deprecation")

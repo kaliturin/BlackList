@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@drawable/selector_control"
+    android:background="?selector_control"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:paddingBottom="15dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="15dp"
-        android:orientation="horizontal">
+        android:paddingTop="15dp">
 
         <TextView
             android:id="@+id/text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="@color/colorText"
             android:textSize="18sp" />
 
         <android.support.v7.widget.AppCompatCheckBox
             android:id="@+id/cb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:button="@drawable/selector_checkbox"
-            app:buttonTint="@drawable/selector_checkbox_tint"
             android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            android:button="?selector_checkbox"
             android:clickable="false"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:buttonTint="?selector_checkbox_tint" />
 
         <ImageView
             android:id="@+id/image"
@@ -44,14 +43,14 @@
             android:clickable="false"
             android:contentDescription="@string/Menu_button"
             android:src="@drawable/ic_play_circle"
-            android:tint="@color/colorAccent"
-            android:visibility="gone"/>
+            android:tint="?colorAccent"
+            android:visibility="gone" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBorder"/>
+        android:background="?colorBorder" />
 
 </LinearLayout>
