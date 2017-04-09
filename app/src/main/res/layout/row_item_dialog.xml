@@ -9,7 +9,7 @@
     <View
         android:id="@+id/item_top_border"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:background="?colorBorder"
         android:visibility="gone" />
 
@@ -36,7 +36,7 @@
             android:clickable="false"
             android:contentDescription="@string/Menu_button"
             android:src="@drawable/ic_play_circle"
-            android:tint="?colorAccent" />
+            android:tint="?colorAccentSecondary" />
 
     </LinearLayout>
 

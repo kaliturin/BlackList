@@ -154,12 +154,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
             public void onClick(View view) {
                 // trigger checked row
                 adapter.triggerRowChecked(view);
-                // apply the new theme
-                if(Settings.getBooleanValue(getContext(), Settings.UI_THEME_DARK)) {
-
-                } else {
-
-                }
+                restartApp();
             }
         });
 
@@ -466,7 +461,18 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         return true;
     }
 
+    // Shows toast
     private void toast(@StringRes int messageId) {
         Toast.makeText(getContext(), messageId, Toast.LENGTH_SHORT).show();
+    }
+
+    // Restarts the current app and opens settings fragment
+    private void restartApp() {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setAction(MainActivity.ACTION_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getActivity().finish();
+        startActivity(intent);
     }
 }

@@ -23,13 +23,18 @@ public class MainActivity extends AppCompatActivity
 
     public static final String ACTION_JOURNAL = "ACTION_JOURNAL";
     public static final String ACTION_SMS_CONVERSATIONS = "ACTION_SMS_CONVERSATIONS";
+    public static final String ACTION_SETTINGS = "ACTION_SETTINGS";
     public static final String ACTION_SMS_SEND_TO = "android.intent.action.SENDTO";
 
     private static final String CURRENT_ITEM_ID = "CURRENT_ITEM_ID";
     private FragmentSwitcher fragmentSwitcher = new FragmentSwitcher();
+    private NavigationView navigationView;
+    private DrawerLayout drawer;
+    private int selectedMenuItemId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        applyCurrentTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -44,14 +49,14 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.Open_navigation_drawer, R.string.Close_navigation_drawer);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         // navigation menu
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         int itemId;
@@ -61,24 +66,27 @@ public class MainActivity extends AppCompatActivity
             itemId = savedInstanceState.getInt(CURRENT_ITEM_ID);
             // select drawer's menu item
             navigationView.setCheckedItem(itemId);
-            fragmentSwitcher.setCurrentItemId(itemId);
         } else {
-            // process actions
+            // choose the fragment in main activity
             if(isAction(ACTION_SMS_SEND_TO)) {
                 // show SMS sending activity
                 showSendSMSActivity();
-                // switch to SMS conversations fragment in main activity
+                // switch to SMS conversations fragment
                 itemId = R.id.nav_sms;
             } else
             if(isAction(ACTION_SMS_CONVERSATIONS)) {
-                // switch to SMS conversations fragment in main activity
+                // switch to SMS conversations fragment
                 itemId = R.id.nav_sms;
+            } else
+            if(isAction(ACTION_SETTINGS)) {
+                // switch to settings fragment
+                itemId = R.id.nav_settings;
             } else {
-                // switch to journal fragment in main activity
+                // switch to journal fragment
                 itemId = R.id.nav_journal;
             }
             // select drawer's menu item
-            navigationView.setCheckedItem(itemId);
+            navigationView.getMenu().findItem(itemId).setChecked(true);
             // switch to chosen fragment
             fragmentSwitcher.switchFragment(itemId);
         }
@@ -87,13 +95,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(CURRENT_ITEM_ID, fragmentSwitcher.getCurrentItemId());
+        outState.putInt(CURRENT_ITEM_ID, selectedMenuItemId);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if(drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if(!fragmentSwitcher.onBackPressed()) {
@@ -105,13 +112,30 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
+
+        // exit item was clicked
         if(itemId == R.id.nav_exit) {
             finish();
+            return true;
         }
+
+        // switch to the new fragment
         fragmentSwitcher.switchFragment(itemId);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        return true;
+
+        // Normally we don't need to select navigation items manually. But in API 10
+        // (and maybe some another) there is bug of menu item selection/deselection.
+        // To resolve this problem we deselect the old selected item and select the
+        // new one manually. And it's why we return false in the current method.
+        // This way of deselection of the item was found as the most appropriate.
+        // Because of some side effects of all others tried.
+        navigationView.getMenu().clear();
+        navigationView.inflateMenu(R.menu.activity_main_drawer);
+        navigationView.getMenu().findItem(itemId).setChecked(true);
+        // save selected item
+        selectedMenuItemId = itemId;
+
+        return false;
     }
 
     @Override
@@ -119,7 +143,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         // check for result code from the child activity
         // (it could be a dialog-activity)
-        if (resultCode == RESULT_OK) {
+        if(resultCode == RESULT_OK) {
             fragmentSwitcher.updateFragment();
         }
     }
@@ -136,7 +160,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_MENU) {
+        if(keyCode == KeyEvent.KEYCODE_MENU) {
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             if(drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
@@ -150,7 +174,17 @@ public class MainActivity extends AppCompatActivity
 
 //----------------------------------------------------------------------------
 
-    boolean isAction(String name) {
+    // Applies the current UI theme depending on settings
+    private void applyCurrentTheme() {
+        if(Settings.getBooleanValue(this, Settings.UI_THEME_DARK)) {
+            setTheme(R.style.AppTheme_Dark);
+        } else {
+            setTheme(R.style.AppTheme_Light);
+        }
+    }
+
+    // Returns true if intent action equals to passed string
+    private boolean isAction(String name) {
         String action = getIntent().getAction();
         return (action != null && action.equals(name));
     }
@@ -163,7 +197,6 @@ public class MainActivity extends AppCompatActivity
         private JournalFragment journalFragment = new JournalFragment();
         private SettingsFragment settingsFragment = new SettingsFragment();
         private SMSConversationsListFragment smsFragment = new SMSConversationsListFragment();
-        private int currentItemId;
 
         boolean onBackPressed() {
             return journalFragment.dismissSnackBar() ||
@@ -171,17 +204,8 @@ public class MainActivity extends AppCompatActivity
                     whiteListFragment.dismissSnackBar();
         }
 
-        int getCurrentItemId() {
-            return currentItemId;
-        }
-
-        void setCurrentItemId(int itemId) {
-            currentItemId = itemId;
-        }
-
         // Switches fragment by navigation menu item
         void switchFragment(@IdRes int itemId) {
-            setCurrentItemId(itemId);
             Bundle arguments = new Bundle();
             switch (itemId) {
                 case R.id.nav_journal:
@@ -213,7 +237,7 @@ public class MainActivity extends AppCompatActivity
         private void switchFragment(Fragment fragment, Bundle arguments) {
             // replace the current showed fragment
             Fragment current = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
-            if (current != fragment) {
+            if(current != fragment) {
                 fragment.setArguments(arguments);
                 getSupportFragmentManager().beginTransaction().
                         replace(R.id.frame_layout, fragment, CURRENT_FRAGMENT).commit();
@@ -223,7 +247,7 @@ public class MainActivity extends AppCompatActivity
         // Updates the current fragment with the new arguments
         private void updateFragment() {
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
-            if (fragment != null) {
+            if(fragment != null) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.detach(fragment).attach(fragment).commit();
             }
@@ -232,7 +256,7 @@ public class MainActivity extends AppCompatActivity
 
     private void showSendSMSActivity() {
         Uri uri = getIntent().getData();
-        if (uri == null) {
+        if(uri == null) {
             return;
         }
         // get phone number where to send the SMS
@@ -243,7 +267,7 @@ public class MainActivity extends AppCompatActivity
         String person = null;
         ContactsAccessHelper db = ContactsAccessHelper.getInstance(this);
         Contact contact = db.getContact(this, number);
-        if (contact != null) {
+        if(contact != null) {
             person = contact.name;
         }
 

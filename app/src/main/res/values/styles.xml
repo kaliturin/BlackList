@@ -1,21 +1,25 @@
 <resources>
 
     <!-- Light theme -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppTheme.Light" parent="Theme.AppCompat.Light">
         <!-- Custom resources -->
         <item name="colorAccent">@color/accent</item>
+        <item name="colorAccentSecondary">@color/accent2</item>
         <item name="colorTitleBackground">@color/titleBackground</item>
         <item name="colorBorder">@color/border</item>
         <item name="colorIncomeSms">@color/incomeSms</item>
         <item name="colorOutcomeSms">@color/outcomeSms</item>
+        <item name="colorTextSms">@color/textSms</item>
         <item name="colorPressed">@color/pressed</item>
         <item name="colorChecked">@color/checked</item>
         <item name="colorText">@color/text</item>
+        <item name="colorTextSecondary">@color/text2</item>
         <item name="colorEdit">@color/edit</item>
+        <item name="colorWindowBackground">?android:windowBackground</item>
 
         <!-- Android resources -->
         <item name="android:textColor">?colorText</item>
-        <item name="android:textColorSecondary">@color/text2</item>
+        <item name="android:textColorSecondary">?colorTextSecondary</item>
         <item name="android:textColorLink">@color/link</item>
         <item name="android:textSize">16sp</item>
 
@@ -25,28 +29,88 @@
         <item name="selector_checkbox_tint">@drawable/selector_checkbox_tint_light</item>
         <item name="selector_checkbox">@drawable/selector_checkbox</item>
         <item name="shape_unread_sms">@drawable/shape_unread_sms_light</item>
-    </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
-
-    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <!-- Action bar -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
+        <!-- Style refs -->
+        <item name="AppTheme.PopupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="AppTheme.AppBarOverlay">@style/ThemeOverlay.AppCompat.ActionBar</item>
+        <item name="AppTheme.ToolbarTitle">@style/AppTheme.ToolbarTitle</item>
+        <item name="AppTheme.Toolbar">@style/AppTheme.Toolbar.Light</item>
+        <item name="AppTheme.ListView">@style/AppTheme.ListView.Light</item>
     </style>
 
-    <style name="AppTheme.Toolbar" parent="AppTheme">
+    <!-- Toolbar light theme -->
+    <style name="AppTheme.Toolbar.Light" parent="AppTheme.Light">
         <item name="android:textColorSecondary">?colorAccent</item>
     </style>
 
-    <style name="ToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <!-- ListView light theme -->
+    <style name="AppTheme.ListView.Light" parent="AppTheme.Light">
+        <item name="android:divider">?colorBorder</item>
+        <item name="android:dividerHeight">0.5dp</item>
+        <item name="android:scrollbars">vertical</item>
+    </style>
+
+    <!-- Toolbar title theme -->
+    <style name="AppTheme.ToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="AppTheme.ListView" parent="AppTheme">
+    <!-- Dark theme -->
+    <style name="AppTheme.Dark" parent="Theme.AppCompat">
+        <!-- Custom resources -->
+        <!--item name="colorPrimary">@color/primary_d</item-->
+        <item name="colorAccent">@color/accent_d</item>
+        <item name="colorAccentSecondary">@color/accent2_d</item>
+        <item name="colorTitleBackground">@color/titleBackground_d</item>
+        <item name="colorBorder">@color/border_d</item>
+        <item name="colorIncomeSms">@color/incomeSms_d</item>
+        <item name="colorOutcomeSms">@color/outcomeSms_d</item>
+        <item name="colorTextSms">@color/textSms_d</item>
+        <item name="colorPressed">@color/pressed_d</item>
+        <item name="colorChecked">@color/checked_d</item>
+        <item name="colorText">@color/text_d</item>
+        <item name="colorTextSecondary">@color/text2_d</item>
+        <item name="colorEdit">@color/edit_d</item>
+        <item name="colorWindowBackground">?android:windowBackground</item>
+
+        <!-- Android resources -->
+        <item name="android:textColor">?colorText</item>
+        <item name="android:textColorSecondary">?colorTextSecondary</item>
+        <item name="android:textColorLink">@color/link_d</item>
+        <item name="android:textSize">16sp</item>
+
+        <!-- Drawables -->
+        <item name="selector_control">@drawable/selector_control_dark</item>
+        <item name="selector_edit">@drawable/selector_edit_dark</item>
+        <item name="selector_checkbox_tint">@drawable/selector_checkbox_tint_dark</item>
+        <item name="selector_checkbox">@drawable/selector_checkbox</item>
+        <item name="shape_unread_sms">@drawable/shape_unread_sms_dark</item>
+
+        <!-- Action bar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- Style refs -->
+        <item name="AppTheme.PopupOverlay">@style/ThemeOverlay.AppCompat</item>
+        <item name="AppTheme.AppBarOverlay">@style/ThemeOverlay.AppCompat.ActionBar</item>
+        <item name="AppTheme.ToolbarTitle">@style/AppTheme.ToolbarTitle</item>
+        <item name="AppTheme.Toolbar">@style/AppTheme.Toolbar.Dark</item>
+        <item name="AppTheme.ListView">@style/AppTheme.ListView.Dark</item>
+    </style>
+
+    <!-- Toolbar dark theme -->
+    <style name="AppTheme.Toolbar.Dark" parent="AppTheme.Dark">
+        <item name="android:textColorSecondary">?colorAccent</item>
+    </style>
+
+    <!-- ListView dark theme -->
+    <style name="AppTheme.ListView.Dark" parent="AppTheme.Dark">
         <item name="android:divider">?colorBorder</item>
-        <item name="android:dividerHeight">1dp</item>
+        <item name="android:dividerHeight">0.5dp</item>
         <item name="android:scrollbars">vertical</item>
     </style>
 

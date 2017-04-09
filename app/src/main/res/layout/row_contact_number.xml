@@ -50,6 +50,7 @@
                 android:layout_weight="1"
                 android:background="?selector_edit"
                 android:hint="@string/Digits_symbols"
+                android:textColorHint="?colorTextSecondary"
                 android:maxLength="50"
                 android:padding="3dp" />
 

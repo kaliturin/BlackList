@@ -13,9 +13,9 @@
         android:id="@+id/content_shape"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:background="@drawable/shape_sms_body"
         android:focusable="true"
-        android:orientation="vertical"
-        android:background="@drawable/shape_sms_body">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/body"
@@ -26,6 +26,7 @@
             android:longClickable="true"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
+            android:textColor="?colorTextSms"
             android:textSize="18sp" />
 
         <TextView
@@ -35,6 +36,7 @@
             android:layout_gravity="end"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
+            android:textColor="?colorTextSms"
             android:textSize="14sp" />
     </LinearLayout>
 

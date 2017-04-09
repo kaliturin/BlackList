@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="colorAccent" format="color" />
+    <attr name="colorAccentSecondary" format="color" />
     <attr name="colorText" format="color" />
+    <attr name="colorTextSecondary" format="color" />
     <attr name="colorTitleBackground" format="color" />
+    <attr name="colorWindowBackground" format="color" />
     <attr name="colorBorder" format="color" />
     <attr name="colorIncomeSms" format="color" />
     <attr name="colorOutcomeSms" format="color" />
+    <attr name="colorTextSms" format="color" />
     <attr name="colorPressed" format="color" />
     <attr name="colorChecked" format="color" />
     <attr name="colorEdit" format="color" />
@@ -15,5 +19,11 @@
     <attr name="selector_checkbox_tint" format="reference" />
     <attr name="selector_checkbox" format="reference" />
     <attr name="shape_unread_sms" format="reference" />
+
+    <attr name="AppTheme.PopupOverlay" format="reference" />
+    <attr name="AppTheme.AppBarOverlay" format="reference" />
+    <attr name="AppTheme.ToolbarTitle" format="reference" />
+    <attr name="AppTheme.Toolbar" format="reference" />
+    <attr name="AppTheme.ListView" format="reference" />
 
 </resources>

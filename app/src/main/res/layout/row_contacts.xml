@@ -29,7 +29,7 @@
                 android:id="@+id/contact_numbers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:textColorSecondary"
+                android:textColor="?colorTextSecondary"
                 android:textSize="16sp" />
 
         </LinearLayout>

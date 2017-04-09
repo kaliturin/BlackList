@@ -9,7 +9,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:choiceMode="none"
-        android:theme="@style/AppTheme.ListView" />
+        android:theme="?AppTheme.ListView" />
 
     <include
         layout="@layout/row_3_buttons"

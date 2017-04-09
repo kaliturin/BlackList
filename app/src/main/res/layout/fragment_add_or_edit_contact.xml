@@ -48,6 +48,7 @@
                     android:layout_height="wrap_content"
                     android:background="?selector_edit"
                     android:hint="@string/Contact_name_nn"
+                    android:textColorHint="?colorTextSecondary"
                     android:maxLength="100"
                     android:padding="3dp" />
 

@@ -7,6 +7,12 @@
     android:focusable="false"
     android:orientation="vertical">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_alignParentTop="true"
+        android:background="?colorBorder" />
+
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
@@ -15,7 +21,7 @@
         android:paddingBottom="2dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="10dp"
+        android:paddingTop="20dp"
         android:textColor="?colorAccent"
         android:textSize="18sp" />
 

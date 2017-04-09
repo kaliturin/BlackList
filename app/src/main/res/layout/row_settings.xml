@@ -40,14 +40,14 @@
             android:layout_gravity="center"
             android:contentDescription="@string/Menu_button"
             android:src="@drawable/ic_play_circle"
-            android:tint="?colorAccent"
+            android:tint="?colorAccentSecondary"
             android:visibility="gone" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:background="?colorBorder" />
 
 </LinearLayout>
