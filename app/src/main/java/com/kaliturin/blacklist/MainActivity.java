@@ -2,6 +2,7 @@ package com.kaliturin.blacklist;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 
@@ -47,6 +49,14 @@ public class MainActivity extends AppCompatActivity
         // toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Show custom toolbar shadow on pre LOLLIPOP devices
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            View view = findViewById(R.id.toolbar_shadow);
+            if(view != null) {
+                view.setVisibility(View.VISIBLE);
+            }
+        }
 
         // drawer
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -223,7 +233,7 @@ public class MainActivity extends AppCompatActivity
                     switchFragment(whiteListFragment, arguments);
                     break;
                 case R.id.nav_sms:
-                    arguments.putString(TITLE, getString(R.string.SMS_messaging));
+                    arguments.putString(TITLE, getString(R.string.Messaging));
                     switchFragment(smsFragment, arguments);
                     break;
                 default:

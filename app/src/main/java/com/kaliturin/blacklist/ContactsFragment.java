@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
 import com.kaliturin.blacklist.ContactsAccessHelper.ContactSourceType;
@@ -172,6 +173,10 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         listView = (ListView) view.findViewById(R.id.contacts_list);
         listView.setAdapter(cursorAdapter);
 
+        // on list empty comment
+        TextView textEmptyView = (TextView) view.findViewById(R.id.text_empty);
+        listView.setEmptyView(textEmptyView);
+
         // init and run the contact items loader
         //getLoaderManager().initLoader(0, null, newLoaderCallbacks(null, false));
         // load the list view
@@ -310,10 +315,13 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
 
     // Loads SMS conversations to the list view
     private void loadListViewItems(String itemsFilter, boolean deleteItems, int listPosition) {
+        if(!isAdded()) {
+            return;
+        }
         int loaderId = 0;
         ContactsLoaderCallbacks callbacks =
-                new ContactsLoaderCallbacks(getContext(), contactType,
-                        cursorAdapter, itemsFilter, deleteItems, listView, listPosition);
+                new ContactsLoaderCallbacks(getContext(), contactType, cursorAdapter,
+                        itemsFilter, deleteItems, listView, listPosition);
         LoaderManager manager = getLoaderManager();
         if (manager.getLoader(loaderId) == null) {
             // init and run the items loader
@@ -400,7 +408,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         }
 
         @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
             cursorAdapter.changeCursor(data);
 
             if(listView != null) {

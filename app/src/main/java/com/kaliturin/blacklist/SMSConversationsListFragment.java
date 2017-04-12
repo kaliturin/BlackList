@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kaliturin.blacklist.ContactsAccessHelper.SMSConversation;
@@ -83,6 +84,10 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         // add cursor listener to the list
         listView = (ListView) view.findViewById(R.id.rows_list);
         listView.setAdapter(cursorAdapter);
+
+        // on list empty comment
+        TextView textEmptyView = (TextView) view.findViewById(R.id.text_empty);
+        listView.setEmptyView(textEmptyView);
 
         // init internal broadcast event receiver
         internalEventBroadcast = new InternalEventBroadcast() {
@@ -158,7 +163,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
 //----------------------------------------------------------------------
 
     // On row click listener
-    class OnRowClickListener implements View.OnClickListener {
+    private class OnRowClickListener implements View.OnClickListener {
         @Override
         public void onClick(final View row) {
             // get the clicked conversation
@@ -177,7 +182,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
     }
 
     // On row long click listener
-    class OnRowLongClickListener implements View.OnLongClickListener {
+    private class OnRowLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View row) {
             final SMSConversation sms = cursorAdapter.getSMSConversation(row);
@@ -248,6 +253,9 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
 
     // Loads SMS conversations to the list view
     private void loadListViewItems(int listPosition) {
+        if(!isAdded()) {
+            return;
+        }
         int loaderId = 0;
         ConversationsLoaderCallbacks callbacks =
                 new ConversationsLoaderCallbacks(getContext(),
@@ -306,7 +314,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             cursorAdapter.changeCursor(cursor);
 
-            if(listView != null) {
+            if(!cursorAdapter.isEmpty()) {
                 // scroll list to saved position
                 listView.post(new Runnable() {
                     @Override

@@ -149,6 +149,9 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
     // Loads SMS conversation to the list view
     private void loadListViewItems(int threadId, int unreadCount, int listPosition) {
+        if(!isAdded()) {
+            return;
+        }
         int loaderId = 0;
         ConversationLoaderCallbacks callbacks =
             new ConversationLoaderCallbacks(getContext(),
@@ -212,16 +215,18 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             // apply loaded data to cursor adapter
             cursorAdapter.changeCursor(cursor);
 
-            // scroll list to bottom
-            listView.post(new Runnable() {
-                @Override
-                public void run() {
-                    int pos = (listPosition == END_OF_LIST ?
-                            cursorAdapter.getCount() - 1 : listPosition);
-                    listView.setSelection(pos);
-                    listView.setVisibility(View.VISIBLE);
-                }
-            });
+            if(!cursorAdapter.isEmpty()) {
+                // scroll list to bottom
+                listView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int pos = (listPosition == END_OF_LIST ?
+                                cursorAdapter.getCount() - 1 : listPosition);
+                        listView.setSelection(pos);
+                        listView.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
 
             // is there unread sms in the thread
             if(unreadCount > 0) {

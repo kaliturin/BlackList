@@ -111,7 +111,7 @@ class Notifications {
             builder.setSound(ringtone);
         }
         if(vibration) {
-            builder.setVibrate(new long[]{1000, 1000});
+            builder.setVibrate(new long[]{1000});
         }
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);

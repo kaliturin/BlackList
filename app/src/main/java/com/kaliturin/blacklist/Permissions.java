@@ -6,12 +6,15 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,8 +66,28 @@ class Permissions {
 
     /** Checks for permissions and notifies the user if they aren't granted **/
     static void notifyIfNotGranted(@NonNull Context context) {
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
         for(String permission : PERMISSIONS) {
-            notifyIfNotGranted(context, permission);
+            if(!isGranted(context, permission)) {
+                String info = getPermissionInfo(context, permission);
+                sb.append(info);
+                sb.append(";\n");
+                count++;
+            }
+        }
+
+        if(count > 0) {
+            int duration;
+            String message = "\"" + context.getString(R.string.app_name) + "\" ";
+            if(count == 1) {
+                duration= Toast.LENGTH_SHORT;
+                message += context.getString(R.string.needs_permission) + ":\n" + sb.toString();
+            } else {
+                duration= Toast.LENGTH_LONG;
+                message += context.getString(R.string.needs_permissions) + ":\n" + sb.toString();
+            }
+            Toast.makeText(context, message, duration).show();
         }
     }
 
@@ -77,8 +100,9 @@ class Permissions {
         return false;
     }
 
-    /** Notifies the user if permission isn't granted **/
-    private static void notify(@NonNull Context context, @NonNull String permission) {
+    /** Returns information string about permission **/
+    @Nullable
+    private static String getPermissionInfo(@NonNull Context context, @NonNull String permission) {
         context = context.getApplicationContext();
         PackageManager pm = context.getPackageManager();
         PermissionInfo info = null;
@@ -93,9 +117,18 @@ class Permissions {
             if(label == null) {
                 label = info.nonLocalizedLabel;
             }
-            String message = "\"" + context.getString(R.string.app_name) + "\" " +
-                    context.getString(R.string.needs_permission) + ": " + label;
+            return label.toString();
+        }
 
+        return null;
+    }
+
+    /** Notifies the user if permission isn't granted **/
+    private static void notify(@NonNull Context context, @NonNull String permission) {
+        String info = getPermissionInfo(context, permission);
+        if(info != null) {
+            String message = "\"" + context.getString(R.string.app_name) + "\" " +
+                    context.getString(R.string.needs_permission) + ": " + info;
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
     }

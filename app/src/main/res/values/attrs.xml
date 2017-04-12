@@ -18,7 +18,10 @@
     <attr name="selector_edit" format="reference" />
     <attr name="selector_checkbox_tint" format="reference" />
     <attr name="selector_checkbox" format="reference" />
+    <attr name="selector_nav_bar" format="reference" />
     <attr name="shape_unread_sms" format="reference" />
+    <attr name="shape_border" format="reference" />
+    <attr name="shape_side_nav_bar" format="reference" />
 
     <attr name="AppTheme.PopupOverlay" format="reference" />
     <attr name="AppTheme.AppBarOverlay" format="reference" />

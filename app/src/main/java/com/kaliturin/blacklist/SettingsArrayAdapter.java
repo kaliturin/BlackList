@@ -1,12 +1,9 @@
 package com.kaliturin.blacklist;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Settings array adapter
+ * Settings list array adapter
  */
 
 class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
@@ -97,35 +94,37 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
         return (viewHolder != null ? viewHolder.model.property : null);
     }
 
-    private void addModel(int type, @StringRes int titleId, String property, View.OnClickListener listener) {
-        boolean isChecked = false;
-        if (property != null) {
-            isChecked = Settings.getBooleanValue(getContext(), property);
-        }
-        String title = getContext().getString(titleId);
-        add(new Model(type, title, property, isChecked, listener));
+    private void addModel(int type, @StringRes int titleId, @StringRes int commentId,
+                          String property, View.OnClickListener listener) {
+        boolean isChecked = (property != null && Settings.getBooleanValue(getContext(), property));
+        add(new Model(type, getString(titleId), getString(commentId), property, isChecked, listener));
     }
 
     void addTitle(@StringRes int titleId) {
-        addModel(Model.TITLE, titleId, null, null);
+        addModel(Model.TITLE, titleId, 0, null, null);
     }
 
-    void addCheckbox(@StringRes int titleId, boolean isChecked, View.OnClickListener listener) {
-        String title = getContext().getString(titleId);
-        add(new Model(Model.CHECKBOX, title, null, isChecked, listener));
+    void addCheckbox(@StringRes int titleId, @StringRes int commentId, boolean isChecked,
+                     View.OnClickListener listener) {
+        add(new Model(Model.CHECKBOX, getString(titleId), getString(commentId), null, isChecked, listener));
     }
 
-    void addCheckbox(@StringRes int titleId, String property, View.OnClickListener listener) {
-        addModel(Model.CHECKBOX, titleId, property, listener);
+    void addCheckbox(@StringRes int titleId, @StringRes int commentId, String property,
+                     View.OnClickListener listener) {
+        addModel(Model.CHECKBOX, titleId, commentId, property, listener);
     }
 
-    void addCheckbox(@StringRes int titleId, String property) {
-        addCheckbox(titleId, property, null);
+    void addCheckbox(@StringRes int titleId, @StringRes int commentId, String property) {
+        addCheckbox(titleId, commentId, property, null);
     }
 
-    void addButton(@StringRes int titleId, View.OnClickListener listener) {
-        String title = getContext().getString(titleId);
-        add(new Model(Model.BUTTON, title, null, false, listener));
+    void addButton(@StringRes int titleId, @StringRes int commentId, View.OnClickListener listener) {
+        add(new Model(Model.BUTTON, getString(titleId), getString(commentId), null, false, listener));
+    }
+
+    @Nullable
+    private String getString(@StringRes int stringRes) {
+        return (stringRes != 0 ? getContext().getString(stringRes) : null);
     }
 
     // Row item data
@@ -136,14 +135,16 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
 
         final int type;
         final String title;
+        final String comment;
         final String property;
         final View.OnClickListener listener;
         private boolean checked;
 
-        Model(int type, String title, String property,
+        Model(int type, String title, String comment, String property,
                       boolean checked, View.OnClickListener listener) {
             this.type = type;
             this.title = title;
+            this.comment = comment;
             this.property = property;
             this.checked = checked;
             this.listener = listener;
@@ -165,7 +166,7 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
         final Model model;
         final View rowView;
         final CheckBox checkBox;
-        final int position;
+
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,17 +178,25 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
             }
         };
 
-        ViewHolder(View rowView, Model model, final int position) {
+        ViewHolder(View rowView, Model model, int position) {
             this.rowView = rowView;
             this.model = model;
-            this.position = position;
 
             rowView.setTag(this);
 
             // title
-            TextView titleView = (TextView) rowView.findViewById(R.id.text);
+            TextView titleView = (TextView) rowView.findViewById(R.id.text_title);
             if(titleView != null) {
                 titleView.setText(model.title);
+            }
+
+            // comment
+            if(model.comment != null) {
+                TextView commentView = (TextView) rowView.findViewById(R.id.text_comment);
+                if (commentView != null) {
+                    commentView.setText(model.comment);
+                    commentView.setVisibility(View.VISIBLE);
+                }
             }
 
             // checkbox
@@ -212,6 +221,16 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
                 ImageView imageView = (ImageView) rowView.findViewById(R.id.image);
                 if(imageView != null) {
                     imageView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            // title
+            if(model.type == Model.TITLE) {
+                if(position == 0) {
+                    View borderView = rowView.findViewById(R.id.top_border);
+                    if(borderView != null) {
+                        borderView.setVisibility(View.GONE);
+                    }
                 }
             }
         }

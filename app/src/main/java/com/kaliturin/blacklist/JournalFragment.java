@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -142,6 +143,10 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         listView = (ListView) view.findViewById(R.id.journal_list);
         listView.setAdapter(cursorAdapter);
 
+        // on list empty comment
+        TextView textEmptyView = (TextView) view.findViewById(R.id.text_empty);
+        listView.setEmptyView(textEmptyView);
+
         // load the list view
         loadListViewItems(itemsFilter, false, listPosition);
     }
@@ -150,6 +155,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
     public void onDestroyView() {
         getLoaderManager().destroyLoader(0);
         internalEventBroadcast.unregister(getContext());
+        cursorAdapter.changeCursor(null);
         super.onDestroyView();
     }
 
@@ -303,6 +309,9 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
     // Loads items to the list view
     private void loadListViewItems(String itemsFilter,  boolean deleteItems, int listPosition) {
+        if(!isAdded()) {
+            return;
+        }
         int loaderId = 0;
         JournalItemsLoaderCallbacks callbacks =
                 new JournalItemsLoaderCallbacks(getContext(), cursorAdapter,

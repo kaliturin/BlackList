@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     android:gravity="start"
     android:orientation="vertical"
-    android:paddingEnd="50dp"
     android:paddingLeft="5dp"
+    android:paddingStart="5dp"
     android:paddingRight="50dp"
-    android:paddingStart="5dp">
+    android:paddingEnd="50dp">
 
     <LinearLayout
         android:id="@+id/content_shape"

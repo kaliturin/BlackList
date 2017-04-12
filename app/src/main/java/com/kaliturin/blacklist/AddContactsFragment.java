@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.kaliturin.blacklist.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
@@ -127,6 +128,10 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         ListView listView = (ListView) view.findViewById(R.id.contacts_list);
         listView.setAdapter(cursorAdapter);
 
+        // on list empty comment
+        TextView textEmptyView = (TextView) view.findViewById(R.id.text_empty);
+        listView.setEmptyView(textEmptyView);
+
         // init and run the loader of contacts
         getLoaderManager().initLoader(0, null, newLoaderCallbacks(null));
     }
@@ -226,7 +231,9 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     private void reloadItems(String itemsFilter) {
         contactIdToNumber.clear();
         dismissSnackBar();
-        getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter));
+        if(isAdded()) {
+            getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter));
+        }
     }
 
     // Creates new contacts loader

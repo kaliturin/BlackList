@@ -28,7 +28,10 @@
         <item name="selector_edit">@drawable/selector_edit_light</item>
         <item name="selector_checkbox_tint">@drawable/selector_checkbox_tint_light</item>
         <item name="selector_checkbox">@drawable/selector_checkbox</item>
+        <item name="selector_nav_bar">@drawable/selector_nav_bar_light</item>
         <item name="shape_unread_sms">@drawable/shape_unread_sms_light</item>
+        <item name="shape_border">@drawable/shape_border_light</item>
+        <item name="shape_side_nav_bar">@drawable/shape_side_nav_bar_light</item>
 
         <!-- Action bar -->
         <item name="windowActionBar">false</item>
@@ -88,7 +91,10 @@
         <item name="selector_edit">@drawable/selector_edit_dark</item>
         <item name="selector_checkbox_tint">@drawable/selector_checkbox_tint_dark</item>
         <item name="selector_checkbox">@drawable/selector_checkbox</item>
+        <item name="selector_nav_bar">@drawable/selector_nav_bar_dark</item>
         <item name="shape_unread_sms">@drawable/shape_unread_sms_dark</item>
+        <item name="shape_border">@drawable/shape_border_dark</item>
+        <item name="shape_side_nav_bar">@drawable/shape_side_nav_bar_dark</item>
 
         <!-- Action bar -->
         <item name="windowActionBar">false</item>

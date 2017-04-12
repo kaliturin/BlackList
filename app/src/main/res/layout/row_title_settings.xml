@@ -8,13 +8,14 @@
     android:orientation="vertical">
 
     <View
+        android:id="@+id/top_border"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_alignParentTop="true"
         android:background="?colorBorder" />
 
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/text_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

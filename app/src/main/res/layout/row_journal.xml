@@ -49,10 +49,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:orientation="vertical"
-            android:paddingEnd="6dp"
             android:paddingLeft="6dp"
-            android:paddingRight="6dp"
-            android:paddingStart="6dp">
+            android:paddingRight="6dp">
 
             <ImageView
                 android:id="@+id/icon"

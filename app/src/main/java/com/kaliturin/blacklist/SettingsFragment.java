@@ -90,8 +90,8 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         if(isDefaultSmsAppAvailable) {
             // show sms default app switch
             adapter.addTitle(R.string.SMS_default_app);
-            adapter.addCheckbox(R.string.Set_as_default_SMS_app, isDefaultSmsApp,
-                    new View.OnClickListener() {
+            adapter.addCheckbox(R.string.Default_SMS_app, R.string.Set_as_default_SMS_app,
+                    isDefaultSmsApp, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Activity activity = SettingsFragment.this.getActivity();
@@ -104,52 +104,65 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         if(isDefaultSmsApp) {
             // sms blocking settings
             adapter.addTitle(R.string.SMS_blocking);
-            adapter.addCheckbox(R.string.Block_all_SMS, Settings.BLOCK_ALL_SMS);
-            adapter.addCheckbox(R.string.Block_SMS_from_black_list, Settings.BLOCK_SMS_FROM_BLACK_LIST);
-            adapter.addCheckbox(R.string.Block_SMS_not_from_contacts, Settings.BLOCK_SMS_NOT_FROM_CONTACTS);
-            adapter.addCheckbox(R.string.Block_SMS_not_from_inbox, Settings.BLOCK_SMS_NOT_FROM_INBOX);
-            adapter.addCheckbox(R.string.Block_hidden_SMS, Settings.BLOCK_HIDDEN_SMS);
-            adapter.addCheckbox(R.string.Write_SMS_to_journal, Settings.WRITE_SMS_JOURNAL);
+            adapter.addCheckbox(R.string.All_SMS, R.string.Block_all_SMS, Settings.BLOCK_ALL_SMS);
+            adapter.addCheckbox(R.string.Black_list, R.string.Block_SMS_from_black_list,
+                    Settings.BLOCK_SMS_FROM_BLACK_LIST);
+            adapter.addCheckbox(R.string.Phones_contacts, R.string.Block_SMS_not_from_contacts,
+                    Settings.BLOCK_SMS_NOT_FROM_CONTACTS);
+            adapter.addCheckbox(R.string.Inbox_SMS, R.string.Block_SMS_not_from_inbox,
+                    Settings.BLOCK_SMS_NOT_FROM_INBOX);
+            adapter.addCheckbox(R.string.Private_numbers, R.string.Block_SMS_from_private,
+                    Settings.BLOCK_HIDDEN_SMS);
+            adapter.addCheckbox(R.string.Journal, R.string.Write_SMS_to_journal,
+                    Settings.WRITE_SMS_JOURNAL);
 
             // sms notifications settings
             adapter.addTitle(R.string.SMS_notification);
-            adapter.addCheckbox(R.string.Notify_in_status_bar_blocked_SMS, Settings.BLOCKED_SMS_STATUS_NOTIFICATION,
-                    new DependentRowOnClickListener());
-            adapter.addCheckbox(R.string.Notify_with_sound_blocked_SMS, Settings.BLOCKED_SMS_SOUND_NOTIFICATION,
-                    new RingtonePickerOnClickListener(BLOCKED_SMS));
-            adapter.addCheckbox(R.string.Notify_with_vibration_blocked_SMS, Settings.BLOCKED_SMS_VIBRATION_NOTIFICATION,
-                    new DependentRowOnClickListener());
+            adapter.addCheckbox(R.string.Status_bar, R.string.Notify_in_status_bar_blocked_SMS,
+                    Settings.BLOCKED_SMS_STATUS_NOTIFICATION, new DependentRowOnClickListener());
+            adapter.addCheckbox(R.string.Sound, R.string.Notify_with_sound_blocked_SMS,
+                    Settings.BLOCKED_SMS_SOUND_NOTIFICATION, new RingtonePickerOnClickListener(BLOCKED_SMS));
+            adapter.addCheckbox(R.string.Vibration, R.string.Notify_with_vibration_blocked_SMS,
+                    Settings.BLOCKED_SMS_VIBRATION_NOTIFICATION, new DependentRowOnClickListener());
         }
 
         // sms receiving/sending
         adapter.addTitle(R.string.SMS_receiving_sending);
-        adapter.addCheckbox(R.string.Notify_with_sound_received_SMS, Settings.RECEIVED_SMS_SOUND_NOTIFICATION,
-                new RingtonePickerOnClickListener(RECEIVED_SMS));
-        adapter.addCheckbox(R.string.Notify_with_vibration_received_SMS, Settings.RECEIVED_SMS_VIBRATION_NOTIFICATION);
-        adapter.addCheckbox(R.string.Notify_on_delivery_SMS, Settings.DELIVERY_SMS_NOTIFICATION);
+        adapter.addCheckbox(R.string.Sound, R.string.Notify_with_sound_received_SMS,
+                Settings.RECEIVED_SMS_SOUND_NOTIFICATION, new RingtonePickerOnClickListener(RECEIVED_SMS));
+        adapter.addCheckbox(R.string.Vibration, R.string.Notify_with_vibration_received_SMS,
+                Settings.RECEIVED_SMS_VIBRATION_NOTIFICATION);
+        adapter.addCheckbox(R.string.SMS_delivery, R.string.Notify_on_SMS_delivery,
+                Settings.DELIVERY_SMS_NOTIFICATION);
 
         // calls blocking settings
         adapter.addTitle(R.string.Calls_blocking);
-        adapter.addCheckbox(R.string.Block_all_calls, Settings.BLOCK_ALL_CALLS);
-        adapter.addCheckbox(R.string.Block_calls_from_black_list, Settings.BLOCK_CALLS_FROM_BLACK_LIST);
-        adapter.addCheckbox(R.string.Block_calls_not_from_contacts, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS);
-        adapter.addCheckbox(R.string.Block_calls_not_from_SMS_inbox, Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX);
-        adapter.addCheckbox(R.string.Block_hidden_calls, Settings.BLOCK_HIDDEN_CALLS);
-        adapter.addCheckbox(R.string.Write_calls_to_journal, Settings.WRITE_CALLS_JOURNAL);
+        adapter.addCheckbox(R.string.All_calls, R.string.Block_all_calls, Settings.BLOCK_ALL_CALLS);
+        adapter.addCheckbox(R.string.Black_list, R.string.Block_calls_from_black_list,
+                Settings.BLOCK_CALLS_FROM_BLACK_LIST);
+        adapter.addCheckbox(R.string.Phones_contacts, R.string.Block_calls_not_from_contacts,
+                Settings.BLOCK_CALLS_NOT_FROM_CONTACTS);
+        adapter.addCheckbox(R.string.Inbox_SMS, R.string.Block_calls_not_from_SMS_inbox,
+                Settings.BLOCK_CALLS_NOT_FROM_SMS_INBOX);
+        adapter.addCheckbox(R.string.Private_numbers, R.string.Block_calls_from_private,
+                Settings.BLOCK_HIDDEN_CALLS);
+        adapter.addCheckbox(R.string.Journal, R.string.Write_calls_to_journal,
+                Settings.WRITE_CALLS_JOURNAL);
 
         // calls notifications settings
         adapter.addTitle(R.string.Calls_notification);
-        adapter.addCheckbox(R.string.Notify_in_status_bar_blocked_call, Settings.BLOCKED_CALL_STATUS_NOTIFICATION,
-                new DependentRowOnClickListener());
-        adapter.addCheckbox(R.string.Notify_with_sound_blocked_call, Settings.BLOCKED_CALL_SOUND_NOTIFICATION,
-                new RingtonePickerOnClickListener(BLOCKED_CALL));
-        adapter.addCheckbox(R.string.Notify_with_vibration_blocked_call, Settings.BLOCKED_CALL_VIBRATION_NOTIFICATION,
-                new DependentRowOnClickListener());
+        adapter.addCheckbox(R.string.Status_bar, R.string.Notify_in_status_bar_blocked_call,
+                Settings.BLOCKED_CALL_STATUS_NOTIFICATION, new DependentRowOnClickListener());
+        adapter.addCheckbox(R.string.Sound, R.string.Notify_with_sound_blocked_call,
+                Settings.BLOCKED_CALL_SOUND_NOTIFICATION, new RingtonePickerOnClickListener(BLOCKED_CALL));
+        adapter.addCheckbox(R.string.Vibration, R.string.Notify_with_vibration_blocked_call,
+                Settings.BLOCKED_CALL_VIBRATION_NOTIFICATION, new DependentRowOnClickListener());
 
         // app interface
         adapter.addTitle(R.string.Application_interface);
-        adapter.addCheckbox(R.string.Journal_SMS_text_folding, Settings.FOLD_SMS_TEXT_IN_JOURNAL);
-        adapter.addCheckbox(R.string.UI_theme_dark, Settings.UI_THEME_DARK, new View.OnClickListener() {
+        adapter.addCheckbox(R.string.Text_folding, R.string.Journal_SMS_text_folding,
+                Settings.FOLD_SMS_TEXT_IN_JOURNAL);
+        adapter.addCheckbox(R.string.UI_theme_dark, 0, Settings.UI_THEME_DARK, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // trigger checked row
@@ -161,14 +174,15 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         // app data export/import
         adapter.addTitle(R.string.Application_data);
         // export DB file
-        adapter.addButton(R.string.Export_data, new View.OnClickListener() {
+        adapter.addButton(R.string.Export_data, R.string.Write_data_into_external,
+                new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // check permissions
                 if(Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
                     return;
                 }
-                // open the dialog for getting the DB file path
+                // open the dialog for getting the exporting DB file path
                 showFilePathDialog(R.string.Export_data, new TextView.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
@@ -181,14 +195,15 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
             }
         });
         // import DB file
-        adapter.addButton(R.string.Import_data, new View.OnClickListener() {
+        adapter.addButton(R.string.Import_data, R.string.Load_data_from_external,
+                new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // check permissions
                 if(Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
                     return;
                 }
-                // open the dialog for getting the DB file path
+                // open the dialog for getting the importing DB file path
                 showFilePathDialog(R.string.Import_data, new TextView.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
@@ -470,8 +485,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     private void restartApp() {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         intent.setAction(MainActivity.ACTION_SETTINGS);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getActivity().finish();
         startActivity(intent);
     }

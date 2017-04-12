@@ -3,6 +3,7 @@ package com.kaliturin.blacklist;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 
 /**
@@ -37,6 +39,14 @@ public class CustomFragmentActivity extends AppCompatActivity {
             if(actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setTitle(title);
+            }
+
+            // Show custom toolbar shadow on pre LOLLIPOP devices
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                View view = findViewById(R.id.toolbar_shadow);
+                if(view != null) {
+                    view.setVisibility(View.VISIBLE);
+                }
             }
         }
 

@@ -5,6 +5,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+/** Flow layout allows to place views into layout in line and wraps to
+ * the next line if there is no space in the current one **/
 public class FlowLayout extends ViewGroup {
     private int lineHeight;
 
