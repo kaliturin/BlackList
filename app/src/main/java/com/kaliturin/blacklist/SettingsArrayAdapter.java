@@ -39,7 +39,7 @@ class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Model> {
             int layoutId = R.layout.row_settings;
             if(model != null) {
                 if (model.type == Model.TITLE) {
-                    layoutId = R.layout.row_title_settings;
+                    layoutId = R.layout.row_title;
                 }
             }
             // create row

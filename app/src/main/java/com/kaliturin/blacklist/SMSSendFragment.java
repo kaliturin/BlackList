@@ -85,8 +85,10 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
 
         // phone number edit
         final EditText numberEdit = (EditText) view.findViewById(R.id.edit_number);
-        View addButton = view.findViewById(R.id.button_add_number);
-        addButton.setOnClickListener(new View.OnClickListener() {
+
+        // add contact from contacts list
+        View addContactView = view.findViewById(R.id.button_add_contact);
+        addContactView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String number = numberEdit.getText().toString().trim();
@@ -98,15 +100,6 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                     // open menu dialog
                     showAddContactsMenuDialog();
                 }
-            }
-        });
-
-        // add contact from contacts list
-        View addContactView = view.findViewById(R.id.button_add_contact);
-        addContactView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddContactsMenuDialog();
             }
         });
 
@@ -300,7 +293,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     // Shows menu dialog of contacts adding
     private void showAddContactsMenuDialog() {
         // create and show menu dialog for actions with the contact
-        DialogBuilder dialog = new DialogBuilder(getActivity());
+        DialogBuilder dialog = new DialogBuilder(getContext());
         dialog.setTitle(R.string.Add_number).
                 addItem(R.string.From_contacts_list, new View.OnClickListener() {
                     @Override

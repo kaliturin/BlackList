@@ -77,7 +77,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         snackBar.show();
 
         // 'add new row' button click listener
-        View addAnother = view.findViewById(R.id.view_add_another);
+        View addAnother = view.findViewById(R.id.button_add_another);
         addAnother.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,7 +196,6 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         });
         // scroll list down
         moveScroll(parent);
-        setFocus(row);
     }
 
     private void moveScroll(View parent) {
@@ -209,23 +208,13 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         });
     }
 
-    private void setFocus(final View row) {
-        row.post(new Runnable() {
-            @Override
-            public void run() {
-                EditText numberEdit = (EditText) row.findViewById(R.id.edit_number);
-                numberEdit.requestFocus();
-            }
-        });
-    }
-
     private String getName(View parent) {
         EditText nameEdit = (EditText) parent.findViewById(R.id.edit_name);
         return nameEdit.getText().toString().trim();
     }
 
     private void setName(View parent, String name) {
-        EditText nameEdit = (EditText) parent.findViewById(R.id.edit_name);
+        final EditText nameEdit = (EditText) parent.findViewById(R.id.edit_name);
         nameEdit.setText(name);
     }
 
@@ -243,11 +232,11 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         Spinner numberTypeSpinner = (Spinner) row.findViewById(R.id.spinner_number_type);
         switch (numberTypeSpinner.getSelectedItemPosition()) {
             case 1:
-                return ContactNumber.TYPE_STARTS;
-            case 2:
-                return ContactNumber.TYPE_ENDS;
-            case 3:
                 return ContactNumber.TYPE_CONTAINS;
+            case 2:
+                return ContactNumber.TYPE_STARTS;
+            case 3:
+                return ContactNumber.TYPE_ENDS;
         }
 
         return ContactNumber.TYPE_EQUALS;
@@ -256,13 +245,13 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
     private void setNumberType(View row, int type) {
         int position = 0;
         switch (type) {
-            case ContactNumber.TYPE_STARTS:
+            case ContactNumber.TYPE_CONTAINS:
                 position = 1;
                 break;
-            case ContactNumber.TYPE_ENDS:
+            case ContactNumber.TYPE_STARTS:
                 position = 2;
                 break;
-            case ContactNumber.TYPE_CONTAINS:
+            case ContactNumber.TYPE_ENDS:
                 position = 3;
                 break;
         }

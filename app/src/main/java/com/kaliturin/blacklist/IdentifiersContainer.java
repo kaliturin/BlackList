@@ -17,7 +17,7 @@ public class IdentifiersContainer implements Cloneable {
         this.capacity = (capacity > 0 ? capacity : 0);
     }
 
-    // Returns true if contains all identifiers
+    // Returns true if container is full
     public boolean isFull() {
         return (all && ids.size() == 0);
     }
@@ -53,8 +53,8 @@ public class IdentifiersContainer implements Cloneable {
     }
 
     // Sets all identifiers added/removed
-    public boolean setAll(boolean added) {
-        return (added ? addAll() : removeAll());
+    public boolean setAll(boolean all) {
+        return (all ? addAll() : removeAll());
     }
 
     // Adds the identifier
@@ -94,6 +94,11 @@ public class IdentifiersContainer implements Cloneable {
             return capacity - ids.size();
         }
         return ids.size();
+    }
+
+    // Returns 'all' flag of container
+    public boolean isAll() {
+        return all;
     }
 
     // Returns the list of identifiers

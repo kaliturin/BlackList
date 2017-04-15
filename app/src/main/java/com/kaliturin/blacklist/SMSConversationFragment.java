@@ -188,12 +188,13 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
     // SMS conversation loader callbacks
     private static class ConversationLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+        private ProgressDialogHolder progress = new ProgressDialogHolder();
+        private SMSConversationCursorAdapter cursorAdapter;
         private Context context;
         private int threadId;
         private int unreadCount;
         private ListView listView;
         private int listPosition;
-        private SMSConversationCursorAdapter cursorAdapter;
 
         ConversationLoaderCallbacks(Context context, int threadId, int unreadCount, ListView listView,
                                     int listPosition, SMSConversationCursorAdapter cursorAdapter) {
@@ -207,6 +208,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            //progress.show(context, R.string.Loading_);
             return new ConversationLoader(context, threadId);
         }
 
@@ -233,11 +235,14 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                 // mark sms ot the thread are read
                 new SMSReadMarker(context).execute(threadId);
             }
+
+            progress.dismiss();
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
+            progress.dismiss();
         }
     }
 
@@ -275,7 +280,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             final String person = (sms.person != null ? sms.person : sms.number);
 
             // create menu dialog
-            DialogBuilder dialog = new DialogBuilder(getActivity());
+            DialogBuilder dialog = new DialogBuilder(getContext());
             // add dialog title as message snippet
             dialog.setTitle(sms.body, 1);
             // 'copy text' to clipboard

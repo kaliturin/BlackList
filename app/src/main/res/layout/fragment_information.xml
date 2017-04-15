@@ -3,18 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.kaliturin.blacklist.SMSConversationFragment">
+    tools:context=".InformationFragment">
 
     <android.support.v7.widget.ListViewCompat
-        android:id="@+id/rows_list"
+        android:id="@+id/help_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:choiceMode="none"
         android:divider="@android:color/transparent"
-        android:dividerHeight="1dp"
-        android:visibility="invisible"
-        android:fastScrollEnabled="true"
-        android:theme="?AppTheme.ListView"/>
+        android:dividerHeight="0dp"
+        android:theme="?AppTheme.ListView" />
 
 </LinearLayout>

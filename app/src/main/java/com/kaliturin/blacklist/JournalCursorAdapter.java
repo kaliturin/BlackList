@@ -34,9 +34,8 @@ public class JournalCursorAdapter extends CursorAdapter {
     private IdentifiersContainer checkedItems = new IdentifiersContainer(0);
     private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;
-    private final RowOnClickListener rowOnClickListener = new RowOnClickListener();
-    private final RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
-    private long lastRecordTime = 0;
+    private final OnClickListener onClickListener = new OnClickListener();
+    private final OnLongClickListener onLongClickListener = new OnLongClickListener();
     private boolean foldSMSText = false;
     private final int currentYear;
 
@@ -60,7 +59,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.row_journal, parent, false);
 
-        // link row-view to view holder
+        // link view to holder
         view.setTag(new ViewHolder(view));
 
         return view;
@@ -70,21 +69,24 @@ public class JournalCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // get cursor wrapper
         JournalRecordCursorWrapper cursorWrapper = (JournalRecordCursorWrapper) cursor;
-        // FIXME consider to read record's id at first and whole record at second (for memory saving)
+        // FIXME consider to read record's id at first and here the whole record (for sake of memory saving)
         // get journal item
         JournalRecord record = cursorWrapper.getJournalRecord();
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
+        // get previous record time
+        long previousRecordTime = cursorWrapper.getTime(cursorWrapper.getPosition()-1);
+
         // define date format of showing record
-        calendar.setTimeInMillis(lastRecordTime);
+        calendar.setTimeInMillis(previousRecordTime);
         int lastRecordDay = calendar.get(Calendar.DAY_OF_YEAR);
         int lastRecordYear = calendar.get(Calendar.YEAR);
         calendar.setTimeInMillis(record.time);
         int currentRecordDay = calendar.get(Calendar.DAY_OF_YEAR);
         int currentRecordYear = calendar.get(Calendar.YEAR);
         DateFormat df = null;
-        // if date of previous record isn't the same as current one - show date in record view
+        // if date of the previous record isn't the same as the current one - show date
         if(lastRecordDay != currentRecordDay || lastRecordYear != currentRecordYear) {
             // if current year - do not show it
             if(currentRecordYear == currentYear) {
@@ -94,11 +96,8 @@ public class JournalCursorAdapter extends CursorAdapter {
             }
         }
 
-        // update the view holder with new record
+        // update the view holder with the new record
         viewHolder.setModel(record, df);
-
-        // save last time
-        lastRecordTime = record.time;
     }
 
     @Override
@@ -107,7 +106,6 @@ public class JournalCursorAdapter extends CursorAdapter {
         // rebuild checked items container
         int size = (cursor != null ? cursor.getCount() : 0);
         checkedItems = new IdentifiersContainer(size);
-        lastRecordTime = 0;
     }
 
     void setOnClickListener(View.OnClickListener onClickListener) {
@@ -136,7 +134,7 @@ public class JournalCursorAdapter extends CursorAdapter {
     }
 
     // Row on click listener
-    private class RowOnClickListener implements View.OnClickListener {
+    private class OnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             ViewHolder viewHolder = (ViewHolder) view.getTag();
@@ -148,7 +146,7 @@ public class JournalCursorAdapter extends CursorAdapter {
     }
 
     // Row on long click listener
-    private class RowOnLongClickListener implements View.OnLongClickListener {
+    private class OnLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View view) {
             return  (outerOnLongClickListener != null &&
@@ -208,10 +206,10 @@ public class JournalCursorAdapter extends CursorAdapter {
             textTextView.setTag(this);
 
             // add on click listeners
-            contentLayout.setOnClickListener(rowOnClickListener);
-            contentLayout.setOnLongClickListener(rowOnLongClickListener);
+            contentLayout.setOnClickListener(onClickListener);
+            contentLayout.setOnLongClickListener(onLongClickListener);
             if(foldSMSText) {
-                textTextView.setOnLongClickListener(rowOnLongClickListener);
+                textTextView.setOnLongClickListener(onLongClickListener);
                 textTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

@@ -74,8 +74,6 @@ public class MainActivity extends AppCompatActivity
         if(savedInstanceState != null) {
             // current navigation menu item
             itemId = savedInstanceState.getInt(CURRENT_ITEM_ID);
-            // select drawer's menu item
-            navigationView.setCheckedItem(itemId);
         } else {
             // choose the fragment in main activity
             if(isAction(ACTION_SMS_SEND_TO)) {
@@ -95,11 +93,11 @@ public class MainActivity extends AppCompatActivity
                 // switch to journal fragment
                 itemId = R.id.nav_journal;
             }
-            // select drawer's menu item
-            navigationView.getMenu().findItem(itemId).setChecked(true);
-            // switch to chosen fragment
-            fragmentSwitcher.switchFragment(itemId);
         }
+        // select navigation menu item
+        selectNavigationMenuItem(itemId);
+        // switch to chosen fragment
+        fragmentSwitcher.switchFragment(itemId);
     }
 
     @Override
@@ -139,11 +137,7 @@ public class MainActivity extends AppCompatActivity
         // new one manually. And it's why we return false in the current method.
         // This way of deselection of the item was found as the most appropriate.
         // Because of some side effects of all others tried.
-        navigationView.getMenu().clear();
-        navigationView.inflateMenu(R.menu.activity_main_drawer);
-        navigationView.getMenu().findItem(itemId).setChecked(true);
-        // save selected item
-        selectedMenuItemId = itemId;
+        selectNavigationMenuItem(itemId);
 
         return false;
     }
@@ -184,6 +178,14 @@ public class MainActivity extends AppCompatActivity
 
 //----------------------------------------------------------------------------
 
+    private void selectNavigationMenuItem(int itemId) {
+        navigationView.getMenu().clear();
+        navigationView.inflateMenu(R.menu.activity_main_drawer);
+        navigationView.getMenu().findItem(itemId).setChecked(true);
+        // save selected item
+        selectedMenuItemId = itemId;
+    }
+
     // Applies the current UI theme depending on settings
     private void applyCurrentTheme() {
         if(Settings.getBooleanValue(this, Settings.UI_THEME_DARK)) {
@@ -206,6 +208,7 @@ public class MainActivity extends AppCompatActivity
         private ContactsFragment whiteListFragment = new ContactsFragment();
         private JournalFragment journalFragment = new JournalFragment();
         private SettingsFragment settingsFragment = new SettingsFragment();
+        private InformationFragment informationFragment = new InformationFragment();
         private SMSConversationsListFragment smsFragment = new SMSConversationsListFragment();
 
         boolean onBackPressed() {
@@ -236,9 +239,13 @@ public class MainActivity extends AppCompatActivity
                     arguments.putString(TITLE, getString(R.string.Messaging));
                     switchFragment(smsFragment, arguments);
                     break;
-                default:
+                case R.id.nav_settings:
                     arguments.putString(TITLE, getString(R.string.Settings));
                     switchFragment(settingsFragment, arguments);
+                    break;
+                default:
+                    arguments.putString(TITLE, getString(R.string.Information));
+                    switchFragment(informationFragment, arguments);
                     break;
             }
         }

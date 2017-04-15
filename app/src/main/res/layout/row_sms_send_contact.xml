@@ -2,33 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingTop="5dp">
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center"
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:background="?shape_border"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/contact_number"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center"
-            android:layout_weight="1"
-            android:padding="5dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="18sp"
+            android:textColor="?colorText"
             android:text="@string/Phone_number" />
 
-        <ImageButton
-            android:id="@+id/button_remove"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="start|center"
-            android:contentDescription="@string/Remove_contact"
-            android:src="@drawable/ic_remove"
-            android:tint="?colorAccent" />
-
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/button_remove"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="start|center"
+        android:contentDescription="@string/Remove_contact"
+        android:src="@drawable/ic_remove"
+        android:tint="?colorAccent" />
 
 </LinearLayout>

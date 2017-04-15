@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * Builder of a dialog with a items list menu
+ * Builder of a dialog with an items list
  */
 class DialogBuilder {
     private Context context;
@@ -40,6 +40,8 @@ class DialogBuilder {
         TextView titleView = (TextView) getView().findViewById(R.id.dialog_title);
         titleView.setText(title);
         titleView.setVisibility(View.VISIBLE);
+        View lineView = getView().findViewById(R.id.title_line);
+        lineView.setVisibility(View.VISIBLE);
         return this;
     }
 
@@ -53,36 +55,38 @@ class DialogBuilder {
             titleView.setSingleLine(true);
         }
         titleView.setVisibility(View.VISIBLE);
+        View lineView = getView().findViewById(R.id.title_line);
+        lineView.setVisibility(View.VISIBLE);
         return this;
     }
 
-    /** Adds the new item to the menu list with title and click listener **/
+    /** Adds the new item to the list with title and click listener **/
     DialogBuilder addItem(@StringRes int titleId, View.OnClickListener listener) {
         return addItem(-1, titleId, null, listener);
     }
 
-    /** Adds the new item to the menu list with id, title, and click listener **/
+    /** Adds the new item to the list with id, title, and click listener **/
     DialogBuilder addItem(int id, @StringRes int titleId, View.OnClickListener listener) {
         return addItem(id, titleId, null, listener);
     }
 
-    /** Adds the new item to the menu list with id, title, tag, and click listener **/
+    /** Adds the new item to the list with id, title, tag, and click listener **/
     DialogBuilder addItem(int id, @StringRes int titleId, Object tag, View.OnClickListener listener) {
         String title = context.getString(titleId);
         return addItem(id, title, tag, listener);
     }
 
-    /** Adds the new item to the menu list with title and click listener **/
+    /** Adds the new item to the list with title and click listener **/
     DialogBuilder addItem(String title, final View.OnClickListener listener) {
         return addItem(-1, title, null, listener);
     }
 
-    /** Adds the new item to the menu list with id, title and click listener **/
+    /** Adds the new item to the list with id, title and click listener **/
     DialogBuilder addItem(int id, String title, final View.OnClickListener listener) {
         return addItem(id, title, null, listener);
     }
 
-    /** Adds the new item to the menu list with id, title, tag and click listener **/
+    /** Adds the new item to the list with id, title, tag and click listener **/
     DialogBuilder addItem(int id, String title, Object tag, final View.OnClickListener listener) {
         // inflate row using default layout
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -113,7 +117,13 @@ class DialogBuilder {
         return addItem(itemView);
     }
 
-    /** Adds the new edit to the menu list with id, text and hint **/
+    /** Adds the new item to the list **/
+    DialogBuilder addItem(View itemView) {
+        listLayout.addView(itemView);
+        return this;
+    }
+
+    /** Adds the new edit to the list with id, text and hint **/
     DialogBuilder addEdit(int id, String text, String hint) {
         // inflate row using default layout
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -134,12 +144,6 @@ class DialogBuilder {
         editText.setId(id);
 
         return addItem(itemView);
-    }
-
-    /** Adds the new item to the menu list **/
-    DialogBuilder addItem(View itemView) {
-        listLayout.addView(itemView);
-        return this;
     }
 
     /** Adds bottom-left button to the dialog **/
@@ -200,7 +204,14 @@ class DialogBuilder {
     }
 
     // Shows the dialog
-    void show() {
-        getDialog().show();
+    Dialog show() {
+        Dialog dialog = getDialog();
+        dialog.show();
+        return dialog;
+    }
+
+    DialogBuilder setOnCancelListener(DialogInterface.OnCancelListener listener) {
+        getDialog().setOnCancelListener(listener);
+        return this;
     }
 }

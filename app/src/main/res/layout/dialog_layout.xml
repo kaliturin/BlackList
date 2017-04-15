@@ -16,9 +16,11 @@
         android:visibility="gone" />
 
     <View
+        android:id="@+id/title_line"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="?colorAccent" />
+        android:background="?colorAccent"
+        android:visibility="gone" />
 
     <ScrollView
         android:layout_width="match_parent"

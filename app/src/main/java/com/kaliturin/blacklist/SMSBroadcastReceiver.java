@@ -59,7 +59,8 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                     // get name for notification
                     String name = (contact == null ? number : contact.name);
                     // notify user
-                    Notifications.onSmsReceived(context, name);
+                    String body = getSMSMessageBody(context, messages);
+                    Notifications.onSmsReceived(context, name, body);
                 }
             }
         }

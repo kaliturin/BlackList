@@ -18,7 +18,6 @@
         <item name="colorWindowBackground">?android:windowBackground</item>
 
         <!-- Android resources -->
-        <item name="android:textColor">?colorText</item>
         <item name="android:textColorSecondary">?colorTextSecondary</item>
         <item name="android:textColorLink">@color/link</item>
         <item name="android:textSize">16sp</item>
@@ -65,7 +64,6 @@
     <!-- Dark theme -->
     <style name="AppTheme.Dark" parent="Theme.AppCompat">
         <!-- Custom resources -->
-        <!--item name="colorPrimary">@color/primary_d</item-->
         <item name="colorAccent">@color/accent_d</item>
         <item name="colorAccentSecondary">@color/accent2_d</item>
         <item name="colorTitleBackground">@color/titleBackground_d</item>
@@ -81,7 +79,6 @@
         <item name="colorWindowBackground">?android:windowBackground</item>
 
         <!-- Android resources -->
-        <item name="android:textColor">?colorText</item>
         <item name="android:textColorSecondary">?colorTextSecondary</item>
         <item name="android:textColorLink">@color/link_d</item>
         <item name="android:textSize">16sp</item>

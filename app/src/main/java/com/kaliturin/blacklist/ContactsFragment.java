@@ -135,7 +135,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                 final Contact contact = cursorAdapter.getContact(row);
                 if(contact != null) {
                     // create and show menu dialog for actions with the contact
-                    DialogBuilder dialog = new DialogBuilder(getActivity());
+                    DialogBuilder dialog = new DialogBuilder(getContext());
                     dialog.setTitle(contact.name).
                             // add menu item of contact editing
                             addItem(R.string.Edit_contact, new View.OnClickListener() {
@@ -177,8 +177,6 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         TextView textEmptyView = (TextView) view.findViewById(R.id.text_empty);
         listView.setEmptyView(textEmptyView);
 
-        // init and run the contact items loader
-        //getLoaderManager().initLoader(0, null, newLoaderCallbacks(null, false));
         // load the list view
         loadListViewItems(itemsFilter, false, listPosition);
     }
@@ -374,6 +372,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
 
     // Contact items loader callbacks
     private static class ContactsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+        ProgressDialogHolder progress = new ProgressDialogHolder();
         private Context context;
         private int contactType;
         private String itemsFilter;
@@ -400,6 +399,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            //progress.show(context, R.string.Loading_);
             IdentifiersContainer deletingItems = null;
             if(deleteItems) {
                 deletingItems = cursorAdapter.getCheckedItems().clone();
@@ -420,11 +420,14 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                     }
                 });
             }
+
+            progress.dismiss();
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
+            progress.dismiss();
         }
     }
 
@@ -433,7 +436,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
     // Shows menu dialog of contacts adding
     private void showAddContactsMenuDialog() {
         // create and show menu dialog for actions with the contact
-        DialogBuilder dialog = new DialogBuilder(getActivity());
+        DialogBuilder dialog = new DialogBuilder(getContext());
         dialog.setTitle(R.string.Add_contact).
                 addItem(R.string.From_contacts_list, new View.OnClickListener() {
                     @Override

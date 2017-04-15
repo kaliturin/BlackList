@@ -2,67 +2,70 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="5dp">
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:paddingTop="10dp"
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="?shape_border"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp">
+            android:background="?shape_border"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start|center"
+                android:textColor="?colorText"
                 android:text="@string/Phone_number" />
 
             <Spinner
                 android:id="@+id/spinner_number_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:textColor="?colorText"
                 android:entries="@array/phone_metadata" />
 
         </LinearLayout>
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/edit_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingEnd="0dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="0dp"
-            android:paddingStart="4dp">
+            android:background="?selector_edit"
+            android:ellipsize="end"
+            android:hint="@string/Phone_number"
+            android:inputType="text"
+            android:lines="1"
+            android:maxLength="25"
+            android:maxLines="1"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:scrollHorizontally="true"
+            android:textColorHint="?colorTextSecondary"
+            android:textSize="18sp" />
 
-            <EditText
-                android:id="@+id/edit_number"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:background="?selector_edit"
-                android:hint="@string/Digits_symbols"
-                android:textColorHint="?colorTextSecondary"
-                android:maxLength="50"
-                android:padding="3dp" />
-
-            <ImageButton
-                android:id="@+id/button_remove"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:contentDescription="@string/Remove_contact"
-                android:src="@drawable/ic_remove"
-                android:tint="?colorAccent" />
-
-        </LinearLayout>
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/button_remove"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/Remove_contact"
+        android:src="@drawable/ic_remove"
+        android:tint="?colorAccent" />
 
 </LinearLayout>

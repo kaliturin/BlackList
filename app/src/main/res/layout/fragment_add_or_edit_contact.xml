@@ -1,6 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    android:gravity="center"
     android:orientation="vertical">
 
     <ScrollView
@@ -13,29 +15,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingEnd="4dp"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="3dp">
+            android:paddingRight="4dp"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?shape_border"
-                android:orientation="vertical"
-                android:paddingBottom="6dp"
-                android:paddingLeft="4dp"
-                android:paddingRight="4dp">
+                android:paddingEnd="4dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="4dp"
+                android:paddingStart="0dp"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingBottom="6dp">
+                    android:background="?shape_border"
+                    android:orientation="horizontal"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingTop="2dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="start|center"
+                        android:textColor="?colorText"
                         android:text="@string/Contact_name_" />
 
                 </LinearLayout>
@@ -45,10 +53,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?selector_edit"
+                    android:ellipsize="end"
                     android:hint="@string/Contact_name_nn"
-                    android:textColorHint="?colorTextSecondary"
+                    android:inputType="text"
+                    android:lines="1"
                     android:maxLength="100"
-                    android:padding="3dp" />
+                    android:maxLines="1"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingTop="2dp"
+                    android:scrollHorizontally="true"
+                    android:textColorHint="?colorTextSecondary"
+                    android:textSize="18sp" />
 
             </LinearLayout>
 
@@ -59,21 +76,34 @@
                 android:orientation="vertical" />
 
             <LinearLayout
-                android:id="@+id/view_add_another"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:background="?selector_control">
+                android:paddingTop="3dp"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:background="?shape_border"
+                    android:orientation="horizontal"
+                    android:paddingBottom="2dp"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:text="@string/Add_another" />
+                    android:paddingTop="2dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textColor="?colorText"
+                        android:text="@string/Add_another" />
+
+                </LinearLayout>
 
                 <ImageButton
+                    android:id="@+id/button_add_another"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"

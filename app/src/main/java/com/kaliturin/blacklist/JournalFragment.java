@@ -128,7 +128,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         cursorAdapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (cursorAdapter.hasCheckedItems()) {
+                if(cursorAdapter.hasCheckedItems()) {
                     snackBar.show();
                 } else {
                     snackBar.dismiss();
@@ -329,7 +329,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 //--------------------------------------------
 
     // On row long click listener
-    class OnLongClickListener implements View.OnLongClickListener {
+    private class OnLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View view) {
             // get contact from the clicked row
@@ -338,7 +338,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
             // find contacts in black and white lists by record's caller and number
             Contact blackContact = null, whiteContact = null;
-            String number = (record.number == null ? record.caller : record.number);
+            final String number = (record.number == null ? record.caller : record.number);
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
             if(db != null) {
                 List<Contact> contacts = db.getContacts(number, false);
@@ -354,10 +354,18 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             }
 
             // create menu dialog
-            DialogBuilder dialog = new DialogBuilder(getActivity());
+            DialogBuilder dialog = new DialogBuilder(getContext());
             dialog.setTitle(record.caller);
+            // add menu item of record deletion
+            dialog.addItem(R.string.Delete_record, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteItem(record.id);
+                    reloadItems(itemsFilter, true);
+                }
+            });
+            // add menu item of record copying
             if(record.text != null && !record.text.isEmpty()) {
-                // add menu item of record copying
                 dialog.addItem(R.string.Copy_text, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -368,12 +376,14 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                     }
                 });
             }
-            // add menu item of record deletion
-            dialog.addItem(R.string.Delete_record, new View.OnClickListener() {
+            // add menu item of number copying
+            dialog.addItem(R.string.Copy_number, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    deleteItem(record.id);
-                    reloadItems(itemsFilter, true);
+                    if(Utils.copyTextToClipboard(getContext(), number)) {
+                        Toast.makeText(getContext(), R.string.Copied_to_clipboard,
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
             // add menu item records searching
@@ -386,7 +396,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             });
 
             // if contact is found in the black list
-            if (blackContact != null) {
+            if(blackContact != null) {
                 // add menu item of excluding the contact from the black list
                 final long contactId = blackContact.id;
                 dialog.addItem(R.string.Exclude_from_black_list, new View.OnClickListener() {
@@ -451,6 +461,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
     // Journal items loader callbacks
     private static class JournalItemsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+        private ProgressDialogHolder progress = new ProgressDialogHolder();
         private Context context;
         private String itemsFilter;
         private JournalCursorAdapter cursorAdapter;
@@ -474,6 +485,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            //progress.show(context, R.string.Loading_);
             IdentifiersContainer deletingItems = null;
             if(deleteItems) {
                 deletingItems = cursorAdapter.getCheckedItems().clone();
@@ -494,12 +506,15 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                     }
                 });
             }
+
+            progress.dismiss();
         }
 
         // TODO: check whether cursor is closing
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
+            progress.dismiss();
         }
     }
 }

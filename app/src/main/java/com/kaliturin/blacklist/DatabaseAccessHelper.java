@@ -244,6 +244,18 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             String text = getString(TEXT);
             return new JournalRecord(id, time, caller, number, text);
         }
+
+        long getTime(int position) {
+            long time = 0;
+            if(0 <= position && position < getCount()) {
+                int curPosition = getPosition();
+                if(moveToPosition(position)) {
+                    time = getLong(TIME);
+                    moveToPosition(curPosition);
+                }
+            }
+            return time;
+        }
     }
 
     // Selects journal record by id
@@ -299,7 +311,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     int deleteJournalRecords(IdentifiersContainer contactIds, @Nullable String filter) {
         if(contactIds.isEmpty()) return 0;
 
-        boolean all = contactIds.isFull();
+        boolean all = contactIds.isAll();
         List<String> ids = contactIds.getIdentifiers(new LinkedList<String>());
 
         // build 'WHERE' clause
@@ -388,9 +400,9 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     // ContactsNumber table item
     static class ContactNumber {
         static final int TYPE_EQUALS = 0;
-        static final int TYPE_STARTS = 1;
-        static final int TYPE_ENDS = 2;
-        static final int TYPE_CONTAINS = 3;
+        static final int TYPE_CONTAINS = 1;
+        static final int TYPE_STARTS = 2;
+        static final int TYPE_ENDS = 3;
 
         final long id;
         final String number;
@@ -798,7 +810,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     int deleteContacts(int type, IdentifiersContainer contactIds, @Nullable  String filter) {
         if(contactIds.isEmpty()) return 0;
 
-        boolean all = contactIds.isFull();
+        boolean all = contactIds.isAll();
         List<String> ids = contactIds.getIdentifiers(new LinkedList<String>());
 
         // build 'WHERE' clause

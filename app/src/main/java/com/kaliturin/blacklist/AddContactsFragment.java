@@ -2,7 +2,6 @@ package com.kaliturin.blacklist;
 
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -189,7 +188,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Opens menu dialog with list of contact's numbers to choose
     private void askForContactNumber(final Contact contact) {
-        DialogBuilder dialog = new DialogBuilder(getActivity());
+        DialogBuilder dialog = new DialogBuilder(getContext());
         dialog.setTitle(contact.name);
         for(ContactNumber number : contact.numbers) {
             dialog.addItem(0, number.number, number.number, new View.OnClickListener() {
@@ -265,6 +264,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Contact items loader callbacks
     private static class ContactsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+        ProgressDialogHolder progress = new ProgressDialogHolder();
         private Context context;
         private ContactSourceType sourceType;
         private ContactsCursorAdapter cursorAdapter;
@@ -282,17 +282,20 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            progress.show(context, 0, R.string.Loading_);
             return new ContactsLoader(context, sourceType, itemsFilter);
         }
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             cursorAdapter.changeCursor(data);
+            progress.dismiss();
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
+            progress.dismiss();
         }
     }
 
@@ -321,22 +324,13 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Async task - writes contacts to the DB
     private class ContactsWriter extends AsyncTask<Void, Integer, Void> {
+        ProgressDialogHolder progress = new ProgressDialogHolder();
         List<Contact> contactList;
         private int contactType;
-        private ProgressDialog progressBar;
 
         ContactsWriter(Context context, int contactType, List<Contact> contactList) {
             this.contactType = contactType;
             this.contactList = contactList;
-
-            progressBar = new ProgressDialog(context);
-            progressBar.setCancelable(true);
-            progressBar.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    ContactsWriter.this.cancel(true);
-                }
-            });
         }
 
         @Override
@@ -356,26 +350,30 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         @Override
         protected void onCancelled() {
             super.onCancelled();
-            progressBar.dismiss();
+            progress.dismiss();
             finishActivity(Activity.RESULT_OK);
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            progressBar.dismiss();
+            progress.dismiss();
             finishActivity(Activity.RESULT_OK);
         }
 
         @Override
         protected void onPreExecute() {
-            progressBar.setMessage(getString(R.string.Saving_) + " 0%");
-            progressBar.show();
+            progress.show(getContext(), new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    ContactsWriter.this.cancel(true);
+                }
+            });
+            progress.setMessage(getString(R.string.Saving_) + " 0%");
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-            progressBar.setProgress(values[0]);
-            progressBar.setMessage(getString(R.string.Saving_) + " " + values[0] + "%");
+            progress.setMessage(getString(R.string.Saving_) + " " + values[0] + "%");
         }
     }
 }

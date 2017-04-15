@@ -1,7 +1,6 @@
 package com.kaliturin.blacklist;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -193,7 +192,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
             final String person = (sms.person != null ? sms.person : sms.number);
 
             // create menu dialog
-            DialogBuilder dialog = new DialogBuilder(getActivity());
+            DialogBuilder dialog = new DialogBuilder(getContext());
             dialog.setTitle(person);
             // add menu item of sms deletion
             dialog.addItem(R.string.Delete_thread, new View.OnClickListener() {
@@ -287,11 +286,11 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
 
     // SMS conversations loader callbacks
     private static class ConversationsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+        private ProgressDialogHolder progress = new ProgressDialogHolder();
+        private SMSConversationsListCursorAdapter cursorAdapter;
         private Context context;
         private ListView listView;
         private int listPosition;
-        private ProgressDialog progressBar;
-        private SMSConversationsListCursorAdapter cursorAdapter;
 
         ConversationsLoaderCallbacks(Context context, ListView listView, int listPosition,
                                      SMSConversationsListCursorAdapter cursorAdapter) {
@@ -299,14 +298,11 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
             this.listView = listView;
             this.listPosition = listPosition;
             this.cursorAdapter = cursorAdapter;
-            this.progressBar = new ProgressDialog(context);
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            progressBar.setMessage(context.getString(R.string.Loading_));
-            progressBar.setCancelable(true);
-            progressBar.show();
+            progress.show(context, R.string.Loading_);
             return new ConversationsLoader(context);
         }
 
@@ -330,13 +326,13 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 new SMSSeenMarker(context).execute();
             }
 
-            progressBar.dismiss();
+            progress.dismiss();
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
-            progressBar.dismiss();
+            progress.dismiss();
         }
     }
 

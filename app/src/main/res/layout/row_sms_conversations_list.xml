@@ -19,6 +19,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textColor="?colorText"
             android:textSize="22sp" />
 
         <TextView
@@ -29,6 +30,7 @@
             android:background="?shape_unread_sms"
             android:paddingLeft="6dp"
             android:paddingRight="6dp"
+            android:textColor="?colorText"
             android:textSize="15sp"
             android:visibility="gone" />
 

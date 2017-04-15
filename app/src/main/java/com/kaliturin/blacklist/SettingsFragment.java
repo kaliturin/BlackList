@@ -104,7 +104,19 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         if(isDefaultSmsApp) {
             // sms blocking settings
             adapter.addTitle(R.string.SMS_blocking);
-            adapter.addCheckbox(R.string.All_SMS, R.string.Block_all_SMS, Settings.BLOCK_ALL_SMS);
+            adapter.addCheckbox(R.string.All_SMS, R.string.Block_all_SMS, Settings.BLOCK_ALL_SMS,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // trigger checked row
+                            adapter.triggerRowChecked(view);
+                            if(adapter.isRowChecked(view)) {
+                                // show attention message
+                                Toast.makeText(getContext(), R.string.Attention_all_SMS_blocked,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
             adapter.addCheckbox(R.string.Black_list, R.string.Block_SMS_from_black_list,
                     Settings.BLOCK_SMS_FROM_BLACK_LIST);
             adapter.addCheckbox(R.string.Phones_contacts, R.string.Block_SMS_not_from_contacts,
@@ -117,7 +129,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                     Settings.WRITE_SMS_JOURNAL);
 
             // sms notifications settings
-            adapter.addTitle(R.string.SMS_notification);
+            adapter.addTitle(R.string.SMS_blocking_notification);
             adapter.addCheckbox(R.string.Status_bar, R.string.Notify_in_status_bar_blocked_SMS,
                     Settings.BLOCKED_SMS_STATUS_NOTIFICATION, new DependentRowOnClickListener());
             adapter.addCheckbox(R.string.Sound, R.string.Notify_with_sound_blocked_SMS,
@@ -127,7 +139,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         }
 
         // sms receiving/sending
-        adapter.addTitle(R.string.SMS_receiving_sending);
+        adapter.addTitle(R.string.SMS_receiving_notification);
         adapter.addCheckbox(R.string.Sound, R.string.Notify_with_sound_received_SMS,
                 Settings.RECEIVED_SMS_SOUND_NOTIFICATION, new RingtonePickerOnClickListener(RECEIVED_SMS));
         adapter.addCheckbox(R.string.Vibration, R.string.Notify_with_vibration_received_SMS,
@@ -137,7 +149,20 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         // calls blocking settings
         adapter.addTitle(R.string.Calls_blocking);
-        adapter.addCheckbox(R.string.All_calls, R.string.Block_all_calls, Settings.BLOCK_ALL_CALLS);
+        adapter.addCheckbox(R.string.All_calls, R.string.Block_all_calls, Settings.BLOCK_ALL_CALLS,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // trigger checked row
+                        adapter.triggerRowChecked(view);
+                        if(adapter.isRowChecked(view)) {
+                            // show attention message
+                            Toast.makeText(getContext(), R.string.Attention_all_calls_blocked,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
         adapter.addCheckbox(R.string.Black_list, R.string.Block_calls_from_black_list,
                 Settings.BLOCK_CALLS_FROM_BLACK_LIST);
         adapter.addCheckbox(R.string.Phones_contacts, R.string.Block_calls_not_from_contacts,
@@ -150,7 +175,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 Settings.WRITE_CALLS_JOURNAL);
 
         // calls notifications settings
-        adapter.addTitle(R.string.Calls_notification);
+        adapter.addTitle(R.string.Calls_blocking_notification);
         adapter.addCheckbox(R.string.Status_bar, R.string.Notify_in_status_bar_blocked_call,
                 Settings.BLOCKED_CALL_STATUS_NOTIFICATION, new DependentRowOnClickListener());
         adapter.addCheckbox(R.string.Sound, R.string.Notify_with_sound_blocked_call,
@@ -379,7 +404,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         @IdRes final int editId = 1;
         // create dialog
-        DialogBuilder dialog = new DialogBuilder(getActivity());
+        DialogBuilder dialog = new DialogBuilder(getContext());
         dialog.setTitle(titleId);
         dialog.addEdit(editId, filePath, getString(R.string.File_path));
         dialog.addButtonLeft(getString(R.string.CANCEL), null);
@@ -413,11 +438,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         // check destination file
         File dstFile = new File(dstFilePath);
-        if(dstFile.exists()) {
-            toast(R.string.Error_file_already_exists);
-            return false;
-        }
-        // check destination file path
         if(dstFile.getParent() == null) {
             toast(R.string.Error_invalid_file_path);
             return false;
@@ -484,8 +504,9 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     // Restarts the current app and opens settings fragment
     private void restartApp() {
         Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(MainActivity.ACTION_SETTINGS);
-        getActivity().finish();
         startActivity(intent);
+        getActivity().finish();
     }
 }

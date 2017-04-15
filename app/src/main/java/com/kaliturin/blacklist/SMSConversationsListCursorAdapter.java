@@ -164,12 +164,17 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
                 rowView.setVisibility(View.GONE);
             } else {
                 rowView.setVisibility(View.VISIBLE);
-                String address = (model.person != null ? model.person : model.number);
+                String address;
+                if(model.person != null) {
+                    address = model.person + " (" + model.number + ")";
+                } else {
+                    address = model.number;
+                }
                 addressTextView.setText(address);
                 snippetTextView.setText(model.snippet);
                 dateTextView.setText(dateFormat.format(toDate(model.date)));
 
-                if (model.unread > 0) {
+                if(model.unread > 0) {
                     unreadTextView.setText(String.valueOf(model.unread));
                     unreadTextView.setVisibility(View.VISIBLE);
                 } else {
