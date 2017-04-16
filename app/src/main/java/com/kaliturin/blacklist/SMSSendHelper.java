@@ -88,7 +88,7 @@ class SMSSendHelper {
         smsManager.sendMultipartTextMessage(phoneNumber, null, messageParts, sentIntents, deliveryIntents);
 
         // write the sent SMS to the Outbox
-        writeSMSToOutbox(context, phoneNumber, message, timeSent);
+        writeSMSToOutbox(context, phoneNumber, message);
 
         return true;
     }
@@ -133,7 +133,8 @@ class SMSSendHelper {
 
         // notify user about delivery
         String message = createNotificationMessage(context, intent, stringId);
-        Notifications.onSmsDelivery(context, message);
+        String phoneNumber = intent.getStringExtra(PHONE_NUMBER);
+        Notifications.onSmsDelivery(context, phoneNumber, message);
     }
 
     /** Cleans pending results **/
@@ -149,10 +150,6 @@ class SMSSendHelper {
     private String createNotificationMessage(Context context, Intent intent, @StringRes int stringId) {
         // create message with SMS part id if it is defined
         String text = context.getString(stringId);
-        String phoneNumber = intent.getStringExtra(PHONE_NUMBER);
-        if(phoneNumber != null) {
-            text = phoneNumber + " : " + text;
-        }
         int messageParts = intent.getIntExtra(MESSAGE_PARTS, 0);
         if(messageParts > 1) {
             int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
@@ -162,12 +159,13 @@ class SMSSendHelper {
     }
 
     // Writes the sent SMS to the Outbox
-    private void writeSMSToOutbox(Context context, String phoneNumber, String message, long timeSent) {
-        // is app isn't default - the SMS will be written by the system
-        if(DefaultSMSAppHelper.isDefault(context)) {
+    private void writeSMSToOutbox(Context context, String phoneNumber, String message) {
+        // if above KITKAT and if app isn't default - the SMS will be written by the system
+        if(!DefaultSMSAppHelper.isAvailable() ||
+           DefaultSMSAppHelper.isDefault(context)) {
             // write the sent SMS to the Outbox
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            db.writeSMSMessageToOutbox(context, phoneNumber, message, timeSent);
+            db.writeSMSMessageToOutbox(context, phoneNumber, message);
         }
 
         // send internal event message

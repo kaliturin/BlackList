@@ -21,6 +21,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:choiceMode="none"
+        android:visibility="invisible"
         android:fastScrollEnabled="true"
         android:theme="?AppTheme.ListView" />
 

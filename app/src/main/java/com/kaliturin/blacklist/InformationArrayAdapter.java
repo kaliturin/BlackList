@@ -34,7 +34,7 @@ class InformationArrayAdapter extends ArrayAdapter<InformationArrayAdapter.Model
             // get model by position
             Model model = getItem(position);
             // get row layout
-            int layoutId = R.layout.row_settings;
+            int layoutId = R.layout.row_info;
             if(model != null) {
                 if (model.type == Model.TITLE) {
                     layoutId = R.layout.row_title;
@@ -60,8 +60,16 @@ class InformationArrayAdapter extends ArrayAdapter<InformationArrayAdapter.Model
         addModel(Model.TITLE, titleId, 0);
     }
 
-    void addButton(@StringRes int titleId, @StringRes int commentId) {
-        add(new Model(Model.BUTTON, getString(titleId), getString(commentId)));
+    void addText(@StringRes int titleId, @StringRes int commentId) {
+        addText(getString(titleId), getString(commentId));
+    }
+
+    void addText(@StringRes int commentId) {
+        addText(null, getString(commentId));
+    }
+
+    void addText(String title, String comment) {
+        add(new Model(Model.TEXT, title, comment));
     }
 
     @Nullable
@@ -72,7 +80,7 @@ class InformationArrayAdapter extends ArrayAdapter<InformationArrayAdapter.Model
     // Row item data
     class Model {
         private static final int TITLE = 1;
-        private static final int BUTTON = 2;
+        private static final int TEXT = 2;
 
         final int type;
         final String title;
@@ -98,7 +106,12 @@ class InformationArrayAdapter extends ArrayAdapter<InformationArrayAdapter.Model
             // title
             TextView titleView = (TextView) rowView.findViewById(R.id.text_title);
             if(titleView != null) {
-                titleView.setText(model.title);
+                if(model.title != null) {
+                    titleView.setText(model.title);
+                    titleView.setVisibility(View.VISIBLE);
+                } else {
+                    titleView.setVisibility(View.GONE);
+                }
             }
             if(model.type == Model.TITLE) {
                 if (position == 0) {

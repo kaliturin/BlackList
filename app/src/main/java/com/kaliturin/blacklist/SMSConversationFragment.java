@@ -268,7 +268,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
     }
 
     // On row long click listener
-    class RowOnLongClickListener implements View.OnLongClickListener {
+    private class RowOnLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View view) {
             // view here may be as row itself as some of child view of row

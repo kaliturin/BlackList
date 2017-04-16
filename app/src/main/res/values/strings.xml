@@ -6,10 +6,10 @@
     <string name="Settings_action">Settings</string>
     <string name="Calls_blocking">Calls blocking</string>
     <string name="Calls_blocking_notification">Calls blocking notification</string>
-    <string name="Application_interface">Application interface</string>
+    <string name="App_interface">Application interface</string>
     <string name="Text_folding">Text folding</string>
     <string name="Journal_SMS_text_folding">Show folded SMS-text in the Event log</string>
-    <string name="Application_data">Application data</string>
+    <string name="App_data">Application data</string>
     <string name="Export_data">Export data</string>
     <string name="Write_data_into_external">Write application data into external file</string>
     <string name="Import_data">Import data</string>
@@ -99,7 +99,7 @@
     <string name="Move_to_white_list">Move contact to the White list</string>
     <string name="Move_to_black_list">Move contact to the Black list</string>
     <string name="Default_SMS_app">Default SMS app</string>
-    <string name="Set_as_default_SMS_app">Set as default SMS app is needed for SMS blocking since Android 4.4 and later</string>
+    <string name="Set_as_default_SMS_app">Set as default SMS app is needed for SMS blocking since Android 4.4 and newer</string>
     <string name="SMS_default_app">SMS application</string>
     <string name="New_message">New message</string>
     <string name="needs_permission">needs permission</string>
@@ -136,11 +136,22 @@
     <string name="Import_complete">Import complete</string>
     <string name="UI_theme_dark">Dark UI theme</string>
     <string name="List_is_empty">List is empty</string>
-    <string name="Logo_motto">Your protection from unwanted calls and SMS</string>
-    <string name="Help_black_list">Help black list</string>
-    <string name="Help_white_list">Help white list</string>
+    <string name="Logo_motto">Protection from unwanted \n calls and SMS</string>
     <string name="Attention_all_SMS_blocked">Attention! All incoming SMS will be blocked!</string>
     <string name="Attention_all_calls_blocked">Attention! All incoming calls will be blocked!</string>
+
+    <string name="About">About</string>
+    <string name="Info_about">Info intro</string>
+    <string name="Attention">Attention</string>
+    <string name="Info_attention">Info attention</string>
+    <string name="Info_black_list">Info black list</string>
+    <string name="Info_white_list">Info white list</string>
+    <string name="Info_settings">Info settings"</string>
+    <string name="Licence">Licence</string>
+    <string name="Info_licence">Info licence</string>
+    <string name="App_version">Application version</string>
+    <string name="Author">Author</string>
+    <string name="Info_author">Info author</string>
 
     <string-array name="phone_metadata">
         <item>equals to:</item>

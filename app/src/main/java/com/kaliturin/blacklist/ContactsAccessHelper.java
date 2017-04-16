@@ -511,7 +511,9 @@ class ContactsAccessHelper {
         Cursor cursor = contentResolver.query(
                 Uri.parse("content://sms"),
                 null,
-                " thread_id = ? ",
+                " thread_id = ? " +
+                // FIXME support drafts
+                " AND address NOT NULL",
                 new String[]{String.valueOf(threadId)},
                 orderClause + limitClause);
 
@@ -727,33 +729,26 @@ class ContactsAccessHelper {
     }
 
     // Writes SMS message to the Outbox
-    // Needed only since API19 - where only default SMS app can write to content resolver
-    @TargetApi(19)
-    boolean writeSMSMessageToOutbox(Context context, String number, String message, long timeSent) {
-        return writeSMSMessage(context, Telephony.Sms.Outbox.CONTENT_URI, number, message, timeSent);
+    boolean writeSMSMessageToOutbox(Context context, String number, String message) {
+        return writeSMSMessage(context, Uri.parse("content://sms/outbox"), number, message);
     }
 
     // Writes SMS message to the Sent box
-    // Needed only since API19 - where only default SMS app can write to content resolver
-    @TargetApi(19)
-    boolean writeSMSMessageToSentBox(Context context, String number, String message, long timeSent) {
-        return writeSMSMessage(context, Telephony.Sms.Sent.CONTENT_URI, number, message, timeSent);
+    boolean writeSMSMessageToSentBox(Context context, String number, String message) {
+        return writeSMSMessage(context, Uri.parse("content://sms/sent"), number, message);
     }
 
     // Writes SMS message
-    // Needed only since API19 - where only default SMS app can write to content resolver
-    @TargetApi(19)
-    private boolean writeSMSMessage(Context context, Uri uri, String number, String message, long timeSent) {
+    private boolean writeSMSMessage(Context context, Uri uri, String number, String message) {
         // check write permission
         if(!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
         // get contact by SMS address
         Contact contact = getContact(context, number);
         // write SMS
         ContentValues values = new ContentValues();
-        values.put(Telephony.Sms.ADDRESS, number);
-        values.put(Telephony.Sms.BODY, message);
-        values.put(Telephony.Sms.PERSON, (contact == null ? null : contact.id));
-        values.put(Telephony.Sms.DATE_SENT, timeSent);
+        values.put("address", number);
+        values.put("body", message);
+        values.put("person", (contact == null ? null : contact.id));
         contentResolver.insert(uri, values);
 
         return true;

@@ -184,7 +184,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 Settings.BLOCKED_CALL_VIBRATION_NOTIFICATION, new DependentRowOnClickListener());
 
         // app interface
-        adapter.addTitle(R.string.Application_interface);
+        adapter.addTitle(R.string.App_interface);
         adapter.addCheckbox(R.string.Text_folding, R.string.Journal_SMS_text_folding,
                 Settings.FOLD_SMS_TEXT_IN_JOURNAL);
         adapter.addCheckbox(R.string.UI_theme_dark, 0, Settings.UI_THEME_DARK, new View.OnClickListener() {
@@ -197,7 +197,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         });
 
         // app data export/import
-        adapter.addTitle(R.string.Application_data);
+        adapter.addTitle(R.string.App_data);
         // export DB file
         adapter.addButton(R.string.Export_data, R.string.Write_data_into_external,
                 new View.OnClickListener() {
