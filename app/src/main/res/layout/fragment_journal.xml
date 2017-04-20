@@ -20,8 +20,7 @@
         android:layout_weight="1"
         android:choiceMode="none"
         android:fastScrollEnabled="true"
-        android:theme="?AppTheme.ListView"
-        android:visibility="invisible" />
+        android:theme="?AppTheme.ListView" />
 
     <include
         layout="@layout/row_3_buttons"

@@ -36,6 +36,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
     private InternalEventBroadcast internalEventBroadcast = null;
     private SMSConversationsListCursorAdapter cursorAdapter = null;
     private ListView listView = null;
+    private int listPosition = 0;
 
     public SMSConversationsListFragment() {
         // Required empty public constructor
@@ -61,6 +62,10 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if(savedInstanceState != null) {
+            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
+        }
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_sms_conversations_list, container, false);
     }
@@ -114,12 +119,6 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         };
         internalEventBroadcast.register(getContext());
 
-        // get saved list position
-        int listPosition = 0;
-        if(savedInstanceState != null) {
-            listPosition = savedInstanceState.getInt(LIST_POSITION);
-        }
-
         // load SMS conversations to the list
         loadListViewItems(listPosition);
     }
@@ -157,6 +156,12 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         });
 
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        listPosition = listView.getFirstVisiblePosition();
     }
 
 //----------------------------------------------------------------------
@@ -315,8 +320,10 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 listView.post(new Runnable() {
                     @Override
                     public void run() {
-                        listView.setSelection(listPosition);
-                        listView.setVisibility(View.VISIBLE);
+                        if(cursorAdapter.getCount() > 0) {
+                            listView.setSelection(listPosition);
+                            listView.setVisibility(View.VISIBLE);
+                        }
                     }
                 });
             }

@@ -222,10 +222,12 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                 listView.post(new Runnable() {
                     @Override
                     public void run() {
-                        int pos = (listPosition == END_OF_LIST ?
-                                cursorAdapter.getCount() - 1 : listPosition);
-                        listView.setSelection(pos);
-                        listView.setVisibility(View.VISIBLE);
+                        int count = cursorAdapter.getCount();
+                        if(count > 0) {
+                            int pos = (listPosition == END_OF_LIST ? count - 1 : listPosition);
+                            listView.setSelection(pos);
+                            listView.setVisibility(View.VISIBLE);
+                        }
                     }
                 });
             }

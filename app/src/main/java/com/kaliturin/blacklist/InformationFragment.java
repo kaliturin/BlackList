@@ -1,14 +1,11 @@
 package com.kaliturin.blacklist;
 
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +21,6 @@ import android.widget.ListView;
 public class InformationFragment extends Fragment implements FragmentArguments {
     private static final String TAG = InformationFragment.class.getName();
     private static final String LIST_POSITION = "LIST_POSITION";
-    private InformationArrayAdapter adapter = null;
     private ListView listView = null;
     private int listPosition = 0;
 
@@ -60,7 +56,7 @@ public class InformationFragment extends Fragment implements FragmentArguments {
 
         listView = (ListView) view.findViewById(R.id.help_list);
 
-        adapter = new InformationArrayAdapter(getContext());
+        InformationArrayAdapter adapter = new InformationArrayAdapter(getContext());
 
         adapter.addTitle(R.string.About);
         String title = getString(R.string.app_name) + " (v" + getAppVersion() + ")";
@@ -69,11 +65,17 @@ public class InformationFragment extends Fragment implements FragmentArguments {
         adapter.addTitle(R.string.Attention);
         adapter.addText(R.string.Info_attention);
 
+        adapter.addTitle(R.string.Journal);
+        adapter.addText(R.string.Info_journal);
+
         adapter.addTitle(R.string.Black_list);
         adapter.addText(R.string.Info_black_list);
 
         adapter.addTitle(R.string.White_list);
         adapter.addText(R.string.Info_white_list);
+
+        adapter.addTitle(R.string.Messaging);
+        adapter.addText(R.string.Info_messaging);
 
         adapter.addTitle(R.string.Settings);
         adapter.addText(R.string.Info_settings);
@@ -93,6 +95,12 @@ public class InformationFragment extends Fragment implements FragmentArguments {
         super.onSaveInstanceState(outState);
         // save first showed row position
         outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        listPosition = listView.getFirstVisiblePosition();
     }
 
     @Nullable

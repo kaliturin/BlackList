@@ -3,8 +3,8 @@ package com.kaliturin.blacklist;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.widget.CursorAdapter;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +27,7 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
     private View.OnLongClickListener outerOnLongClickListener = null;
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
     private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
-    private SparseArray<SMSConversation> smsConversationCache = new SparseArray<>();
+    private LongSparseArray<SMSConversation> smsConversationCache = new LongSparseArray<>();
 
     SMSConversationsListCursorAdapter(Context context) {
         super(context, null, 0);
@@ -53,7 +53,7 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // try to get a model from the cache
-        int itemId = (int) getItemId(cursor.getPosition());
+        long itemId = getItemId(cursor.getPosition());
         SMSConversation model = smsConversationCache.get(itemId);
         if(model == null) {
             // get cursor wrapper
@@ -162,24 +162,24 @@ class SMSConversationsListCursorAdapter extends CursorAdapter {
             this.model = model;
             if(model == null) {
                 rowView.setVisibility(View.GONE);
+                return;
+            }
+            rowView.setVisibility(View.VISIBLE);
+            String address;
+            if(model.person != null) {
+                address = model.person + " (" + model.number + ")";
             } else {
-                rowView.setVisibility(View.VISIBLE);
-                String address;
-                if(model.person != null) {
-                    address = model.person + " (" + model.number + ")";
-                } else {
-                    address = model.number;
-                }
-                addressTextView.setText(address);
-                snippetTextView.setText(model.snippet);
-                dateTextView.setText(dateFormat.format(toDate(model.date)));
+                address = model.number;
+            }
+            addressTextView.setText(address);
+            snippetTextView.setText(model.snippet);
+            dateTextView.setText(dateFormat.format(toDate(model.date)));
 
-                if(model.unread > 0) {
-                    unreadTextView.setText(String.valueOf(model.unread));
-                    unreadTextView.setVisibility(View.VISIBLE);
-                } else {
-                    unreadTextView.setVisibility(View.GONE);
-                }
+            if(model.unread > 0) {
+                unreadTextView.setText(String.valueOf(model.unread));
+                unreadTextView.setVisibility(View.VISIBLE);
+            } else {
+                unreadTextView.setVisibility(View.GONE);
             }
         }
 

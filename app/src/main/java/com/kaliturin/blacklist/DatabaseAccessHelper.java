@@ -15,7 +15,6 @@ import org.sqlite.util.StringUtils;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -188,18 +187,23 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                             Column.TEXT + " TEXT " +
                             ")";
 
-            static final String SELECT =
-                    "SELECT * " +
+            static final String SELECT_FIRST_PART =
+                    "SELECT " +
+                            Column.ID + ", " +
+                            Column.TIME +
                             " FROM " + JournalTable.NAME +
                             " ORDER BY " + Column.TIME +
                             " DESC";
 
-            static final String SELECT_BY_ID =
-                    "SELECT * " +
+            static final String SELECT_LAST_PART_BY_ID =
+                    "SELECT " +
+                            Column.CALLER + ", " +
+                            Column.NUMBER + ", " +
+                            Column.TEXT +
                             " FROM " + JournalTable.NAME +
                             " WHERE _id = ? ";
 
-            static final String SELECT_BY_FILTER =
+            static final String SELECT_FIRST_PART_BY_FILTER =
                     "SELECT * " +
                             " FROM " + JournalTable.NAME +
                             " WHERE " + Column.CALLER + " LIKE ? " +
@@ -231,27 +235,19 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     class JournalRecordCursorWrapper extends CursorWrapper {
         private final int ID;
         private final int TIME;
-        private final int CALLER;
-        private final int NUMBER;
-        private final int TEXT;
 
         JournalRecordCursorWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
             ID = cursor.getColumnIndex(JournalTable.Column.ID);
             TIME = cursor.getColumnIndex(JournalTable.Column.TIME);
-            CALLER = cursor.getColumnIndex(JournalTable.Column.CALLER);
-            NUMBER = cursor.getColumnIndex(JournalTable.Column.NUMBER);
-            TEXT = cursor.getColumnIndex(JournalTable.Column.TEXT);
         }
 
         JournalRecord getJournalRecord() {
             long id = getLong(ID);
             long time = getLong(TIME);
-            String caller = getString(CALLER);
-            String number = getString(NUMBER);
-            String text = getString(TEXT);
-            return new JournalRecord(id, time, caller, number, text);
+            String[] parts = getJournalRecordPartsById(id);
+            return new JournalRecord(id, time, parts[0], parts[1], parts[2]);
         }
 
         long getTime(int position) {
@@ -267,38 +263,35 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Selects journal record by id
-    @Nullable
-    JournalRecord getJournalRecordById(long id) {
+    // Selects journal record's parts by id
+    private String[] getJournalRecordPartsById(long id) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT_BY_ID,
+        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT_LAST_PART_BY_ID,
                 new String[]{String.valueOf(id)});
 
-        JournalRecord record = null;
+        String[] parts;
         if(validate(cursor)) {
             cursor.moveToFirst();
-            final int TIME = cursor.getColumnIndex(JournalTable.Column.TIME);
             final int CALLER = cursor.getColumnIndex(JournalTable.Column.CALLER);
             final int NUMBER = cursor.getColumnIndex(JournalTable.Column.NUMBER);
             final int TEXT = cursor.getColumnIndex(JournalTable.Column.TEXT);
-
-            long time = cursor.getLong(TIME);
-            String caller = cursor.getString(CALLER);
-            String number = cursor.getString(NUMBER);
-            String text = cursor.getString(TEXT);
-            record = new JournalRecord(id, time, caller, number, text);
-
+            parts = new String[] {
+                    cursor.getString(CALLER),
+                    cursor.getString(NUMBER),
+                    cursor.getString(TEXT)};
             cursor.close();
+        } else {
+            parts = new String[] {"?", "?", "?"};
         }
 
-        return record;
+        return parts;
     }
 
     // Selects all journal records
     @Nullable
     private JournalRecordCursorWrapper getJournalRecords() {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT, null);
+        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT_FIRST_PART, null);
 
         return (validate(cursor) ? new JournalRecordCursorWrapper(cursor) : null);
     }
@@ -310,7 +303,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             return getJournalRecords();
         }
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT_BY_FILTER,
+        Cursor cursor = db.rawQuery(JournalTable.Statement.SELECT_FIRST_PART_BY_FILTER,
                 new String[]{"%" + filter + "%", "%" + filter + "%"});
 
         return (validate(cursor) ? new JournalRecordCursorWrapper(cursor) : null);
@@ -453,33 +446,6 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
             long contactId = getLong(CONTACT_ID);
             return new ContactNumber(id, number, type, contactId);
         }
-    }
-
-    // Adds the contact number to the contact
-    private long addContactNumber(long contactId, @NonNull String number, int numberType) {
-        // try to find existing number for this contact
-        ContactNumberCursorWrapper cursor = getContactNumbersByContactId(contactId);
-        if(cursor != null) {
-            try {
-                do {
-                    ContactNumber contactNumber = cursor.getNumber();
-                    if(contactNumber.type == numberType &&
-                            contactNumber.number.equals(number)) {
-                        // found
-                        return contactNumber.id;
-                    }
-                } while (cursor.moveToNext());
-            } finally {
-                cursor.close();
-            }
-        }
-        // add a new number to the contact
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(ContactNumberTable.Column.NUMBER, number);
-        values.put(ContactNumberTable.Column.TYPE, numberType);
-        values.put(ContactNumberTable.Column.CONTACT_ID, contactId);
-        return db.insert(ContactNumberTable.NAME, null, values);
     }
 
     // Deletes contact number by id

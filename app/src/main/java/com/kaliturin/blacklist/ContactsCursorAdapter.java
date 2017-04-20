@@ -15,6 +15,8 @@ import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Contacts' cursor adapter
@@ -186,8 +188,7 @@ class ContactsCursorAdapter extends CursorAdapter {
 
             // show contact name
             String name = contact.name;
-            final int size = contact.numbers.size();
-            if(size == 1) {
+            if(contact.numbers.size() == 1) {
                 ContactNumber number = contact.numbers.get(0);
                 if(name.equals(number.number)) {
                     // there is just 1 number and it equals to the contact name
@@ -201,12 +202,12 @@ class ContactsCursorAdapter extends CursorAdapter {
             // show contact numbers
             sb.setLength(0);
             if(!oneNumberEquals) {
-                for (int i = 0; i < size; i++) {
-                    ContactNumber number = contact.numbers.get(i);
-                    sb.append(getNumberTypeTitle(context, number.type));
-                    sb.append(number.number);
-                    if (i < size - 1) {
-                        sb.append("\n");
+                String[] titles = getSortedNumberTitles(context, contact.numbers);
+                String separator = (titles.length > 5 ? ", " : "\n");
+                for (int i = 0; i < titles.length; i++) {
+                    sb.append(titles[i]);
+                    if (i < titles.length - 1) {
+                        sb.append(separator);
                     }
                 }
             }
@@ -236,6 +237,14 @@ class ContactsCursorAdapter extends CursorAdapter {
             checkBox.setChecked(checked);
             rowView.setChecked(checked);
         }
+    }
+
+    private String[] getSortedNumberTitles(Context context, List<ContactNumber> numbers) {
+        Set<String> titles = new TreeSet<>();
+        for (ContactNumber number : numbers) {
+            titles.add(getNumberTypeTitle(context, number.type) + number.number);
+        }
+        return titles.toArray(new String[titles.size()]);
     }
 
     private String getNumberTypeTitle(Context context, int type) {

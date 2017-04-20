@@ -503,7 +503,6 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                     @Override
                     public void run() {
                         listView.setSelection(listPosition);
-                        listView.setVisibility(View.VISIBLE);
                     }
                 });
             }

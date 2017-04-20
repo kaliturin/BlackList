@@ -69,15 +69,13 @@ public class JournalCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // get cursor wrapper
         JournalRecordCursorWrapper cursorWrapper = (JournalRecordCursorWrapper) cursor;
-        // FIXME consider to read record's id at first and here the whole record (for sake of memory saving)
         // get journal item
         JournalRecord record = cursorWrapper.getJournalRecord();
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         // get previous record time
-        long previousRecordTime = cursorWrapper.getTime(cursorWrapper.getPosition()-1);
-
+        long previousRecordTime = cursorWrapper.getTime(cursor.getPosition()-1);
         // define date format of showing record
         calendar.setTimeInMillis(previousRecordTime);
         int lastRecordDay = calendar.get(Calendar.DAY_OF_YEAR);
