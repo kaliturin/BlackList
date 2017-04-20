@@ -120,11 +120,11 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             abort = true;
         }
 
-        // if number is from the SMS inbox
-        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_INBOX) &&
+        // if number is from the SMS content
+        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_SMS_CONTENT) &&
                 Permissions.isGranted(context, Permissions.READ_SMS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.containsNumberInSMSInbox(context, number)) {
+            if(db.containsNumberInSMSContent(context, number)) {
                 return false;
             }
             abort = true;

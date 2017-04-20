@@ -69,10 +69,10 @@ public class MainActivity extends AppCompatActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        int itemId;
         // if there was a screen rotation
+        int itemId;
         if(savedInstanceState != null) {
-            // current navigation menu item
+            // get saved current navigation menu item
             itemId = savedInstanceState.getInt(CURRENT_ITEM_ID);
         } else {
             // choose the fragment in main activity
@@ -93,11 +93,12 @@ public class MainActivity extends AppCompatActivity
                 // switch to journal fragment
                 itemId = R.id.nav_journal;
             }
+            // switch to chosen fragment
+            fragmentSwitcher.switchFragment(itemId);
         }
+
         // select navigation menu item
         selectNavigationMenuItem(itemId);
-        // switch to chosen fragment
-        fragmentSwitcher.switchFragment(itemId);
     }
 
     @Override

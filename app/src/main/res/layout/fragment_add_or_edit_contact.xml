@@ -70,49 +70,21 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layout_number_list"
+                android:id="@+id/numbers_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
                 android:orientation="vertical" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageButton
+                android:id="@+id/button_add_another"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="end"
-                android:paddingTop="3dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?shape_border"
-                    android:orientation="horizontal"
-                    android:paddingBottom="2dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:paddingTop="2dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:textColor="?colorText"
-                        android:text="@string/Add_another" />
-
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/button_add_another"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:clickable="false"
-                    android:contentDescription="@string/Add_contact"
-                    android:src="@drawable/ic_add"
-                    android:tint="?colorAccent" />
-
-            </LinearLayout>
+                android:clickable="false"
+                android:contentDescription="@string/Add_contact"
+                android:src="@drawable/ic_person_add"
+                android:tint="?colorAccent" />
 
         </LinearLayout>
 

@@ -2,9 +2,12 @@ package com.kaliturin.blacklist;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +17,16 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 
+import com.kaliturin.blacklist.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
-import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
 import com.kaliturin.blacklist.DatabaseAccessHelper.ContactCursorWrapper;
+import com.kaliturin.blacklist.DatabaseAccessHelper.ContactNumber;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Fragment for adding or editing contact
@@ -27,6 +34,7 @@ import java.util.List;
 public class AddOrEditContactFragment extends Fragment implements FragmentArguments {
     private int contactType = 0;
     private int contactId = -1;
+    private LinearLayout numbersViewList;
 
     public AddOrEditContactFragment() {
         // Required empty public constructor
@@ -36,7 +44,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle arguments = getArguments();
-        if(arguments != null) {
+        if (arguments != null) {
             contactType = arguments.getInt(CONTACT_TYPE, 0);
             contactId = arguments.getInt(CONTACT_ID, -1);
         }
@@ -48,6 +56,8 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        numbersViewList = (LinearLayout) view.findViewById(R.id.numbers_list);
 
         // snack bar
         ButtonsBar snackBar = new ButtonsBar(view, R.id.three_buttons_bar);
@@ -66,7 +76,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(!Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+                        if (!Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
                             int result = (saveContact() ?
                                     Activity.RESULT_OK :
                                     Activity.RESULT_CANCELED);
@@ -77,77 +87,141 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         snackBar.show();
 
         // 'add new row' button click listener
-        View addAnother = view.findViewById(R.id.button_add_another);
-        addAnother.setOnClickListener(new View.OnClickListener() {
+        View button = view.findViewById(R.id.button_add_another);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // add another row by button click
-                numberListAddRow("", ContactNumber.TYPE_EQUALS);
+                showAddContactsMenuDialog();
             }
         });
 
-        if(contactId < 0) {
-            // add the first row to the numbers list
-            numberListAddRow("", ContactNumber.TYPE_EQUALS);
-        } else {
-            // get contact by id
-            DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-            if(db != null) {
-                ContactCursorWrapper cursor = db.getContact(contactId);
-                if (cursor != null) {
-                    initView(view, cursor.getContact());
-                    cursor.close();
-                } else {
-                    finishActivity(Activity.RESULT_CANCELED);
+        if (savedInstanceState == null) {
+            if (contactId < 0) {
+                // add the first empty row to the numbers list
+                addRowToNumbersList("", ContactNumber.TYPE_EQUALS);
+            } else {
+                // get contact by id
+                DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
+                if (db != null) {
+                    ContactCursorWrapper cursor = db.getContact(contactId);
+                    if (cursor != null) {
+                        // add contact numbers to the list
+                        addRowsToNumbersList(cursor.getContact());
+                        cursor.close();
+                    } else {
+                        finishActivity(Activity.RESULT_CANCELED);
+                    }
                 }
             }
         }
     }
 
-    // Initializes the view with contact's data
-    private void initView(View view, Contact contact) {
-        // contact name edit
-        setName(view, contact.name);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // save numbers and types to the lists
+        ArrayList<String> numbers = new ArrayList<>();
+        ArrayList<Integer> types = new ArrayList<>();
+        Set<Pair<String, Integer>> numbers2TypeSet = getNumber2TypePairs();
+        for (Pair<String, Integer> pair : numbers2TypeSet) {
+            numbers.add(pair.first);
+            types.add(pair.second);
+        }
 
-        // add numbers rows
-        for(ContactNumber number : contact.numbers) {
-            numberListAddRow(number.number, number.type);
+        // save lists to state
+        outState.putStringArrayList(CONTACT_NUMBERS, numbers);
+        outState.putIntegerArrayList(CONTACT_NUMBER_TYPES, types);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // this is calling for receiving results from GetContactsFragment
+        if (resultCode == Activity.RESULT_OK) {
+            // add chosen resulting data to the list
+            addRowsToNumbersList(data.getExtras());
         }
     }
 
-    // Saves contact data from view to DB
-    private boolean saveContact() {
-        View parent = getView();
-        if(parent == null) return false;
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        // restore numbers list from saved state
+        addRowsToNumbersList(savedInstanceState);
+    }
 
-        // get contact name
-        String name = getName(parent);
+//------------------------------------------------------------------------------------
 
-        // get list of contact phones
-        List<ContactNumber> numbers = new LinkedList<>();
-        LinearLayout numberListLayout = (LinearLayout) parent.findViewById(R.id.layout_number_list);
-        for(int i=0; i<numberListLayout.getChildCount(); i++) {
-            View row = numberListLayout.getChildAt(i);
-            String number = getNumber(row);
-            if(!number.isEmpty()) {
-                int type = getNumberType(row);
-                numbers.add(new ContactNumber(i, number, type, 0));
+    // Initializes the view with contact's data
+    private void addRowsToNumbersList(Contact contact) {
+        // contact name edit
+        setName(contact.name);
+        // add rows
+        for (ContactNumber number : contact.numbers) {
+            addRowToNumbersList(number.number, number.type);
+        }
+    }
+
+    // Initializes the view with bundle data
+    private void addRowsToNumbersList(Bundle data) {
+        if (data == null) {
+            return;
+        }
+        // get numbers and types from parameters
+        ArrayList<String> numbers = data.getStringArrayList(CONTACT_NUMBERS);
+        ArrayList<Integer> types = data.getIntegerArrayList(CONTACT_NUMBER_TYPES);
+        if (numbers != null && types != null && numbers.size() == types.size()) {
+            // get the set of unique pairs of numbers/types form the current view
+            Set<Pair<String, Integer>> numbers2TypeSet = getNumber2TypePairs();
+            for (int i = 0; i < numbers.size(); i++) {
+                String number = numbers.get(i);
+                int type = types.get(i);
+                // add to View only rows with unique pair of number/type
+                if (numbers2TypeSet.add(new Pair<>(number, type))) {
+                    addRowToNumbersList(number, type);
+                }
             }
         }
+    }
 
-        // if there is not any number - take name as number
-        if(numbers.isEmpty() && !name.isEmpty()) {
+    // Returns the set of unique pairs of numbers/types from the view
+    private Set<Pair<String, Integer>> getNumber2TypePairs() {
+        Set<Pair<String, Integer>> numbers2TypeSet = new HashSet<>();
+        for (int i = 0; i < numbersViewList.getChildCount(); i++) {
+            View row = numbersViewList.getChildAt(i);
+            String number = getNumber(row);
+            if (!number.isEmpty()) {
+                int type = getNumberType(row);
+                numbers2TypeSet.add(new Pair<>(number, type));
+            }
+        }
+        return numbers2TypeSet;
+    }
+
+    // Saves contact data from the View to DB
+    private boolean saveContact() {
+        // get contact name
+        String name = getName();
+
+        // fill in the list of unique contact numbers
+        List<ContactNumber> numbers = new LinkedList<>();
+        Set<Pair<String, Integer>> numbers2TypeSet = getNumber2TypePairs();
+        for (Pair<String, Integer> pair : numbers2TypeSet) {
+            numbers.add(new ContactNumber(0, pair.first, pair.second, 0));
+        }
+
+        // if there is not any number - take a name as a number
+        if (numbers.isEmpty() && !name.isEmpty()) {
             numbers.add(new ContactNumber(0, name, 0));
         }
 
         // nothing to save
-        if(numbers.isEmpty()) {
+        if (numbers.isEmpty()) {
             return false;
         }
 
-        if(name.isEmpty()) {
+        if (name.isEmpty()) {
             // if name isn't defined
-            if(numbers.size() == 1) {
+            if (numbers.size() == 1) {
                 // if a single number - get it as a name
                 name = numbers.get(0).number;
             } else {
@@ -157,7 +231,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         }
 
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        if(db != null) {
+        if (db != null) {
             if (contactId >= 0) {
                 // delete the old contact
                 db.deleteContact(contactId);
@@ -169,53 +243,61 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         return true;
     }
 
-    // Adds row to the phones list
-    private void numberListAddRow(String number, int type) {
-        View parent = getView();
-        if(parent == null) {
-            return;
-        }
-        final LinearLayout numberRowsListLayout =
-                (LinearLayout) parent.findViewById(R.id.layout_number_list);
+    // Adds row to the numbers list
+    private boolean addRowToNumbersList(@NonNull String number, int type) {
+        // create and add the new row
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        // create new row
-        View row = inflater.inflate(R.layout.row_contact_number, numberRowsListLayout, false);
-        // save row
-        numberRowsListLayout.addView(row);
+        View row = inflater.inflate(R.layout.row_contact_number, numbersViewList, false);
+        numbersViewList.addView(row);
+
         // init row with number data
         setNumberType(row, type);
         setNumber(row, number);
+
         // init 'row remove' button
         ImageButton buttonRemove = (ImageButton) row.findViewById(R.id.button_remove);
         buttonRemove.setTag(row);
         buttonRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                numberRowsListLayout.removeView((View)v.getTag());
+                numbersViewList.removeView((View) v.getTag());
             }
         });
+
         // scroll list down
-        moveScroll(parent);
+        moveScroll();
+
+        return true;
     }
 
-    private void moveScroll(View parent) {
-        final ScrollView scroll = (ScrollView) parent.findViewById(R.id.scroll);
-        scroll.post(new Runnable() {
-            @Override
-            public void run() {
-                scroll.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });
+    private void moveScroll() {
+        View view = getView();
+        if (view != null) {
+            final ScrollView scroll = (ScrollView) view.findViewById(R.id.scroll);
+            scroll.post(new Runnable() {
+                @Override
+                public void run() {
+                    scroll.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            });
+        }
     }
 
-    private String getName(View parent) {
-        EditText nameEdit = (EditText) parent.findViewById(R.id.edit_name);
-        return nameEdit.getText().toString().trim();
+    private String getName() {
+        View view = getView();
+        if (view != null) {
+            EditText nameEdit = (EditText) view.findViewById(R.id.edit_name);
+            return nameEdit.getText().toString().trim();
+        }
+        return "";
     }
 
-    private void setName(View parent, String name) {
-        final EditText nameEdit = (EditText) parent.findViewById(R.id.edit_name);
-        nameEdit.setText(name);
+    private void setName(String name) {
+        View view = getView();
+        if (view != null) {
+            EditText nameEdit = (EditText) view.findViewById(R.id.edit_name);
+            nameEdit.setText(name);
+        }
     }
 
     private String getNumber(View row) {
@@ -262,5 +344,53 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
     private void finishActivity(int result) {
         getActivity().setResult(result);
         getActivity().finish();
+    }
+
+    // Shows menu dialog of contacts adding
+    private void showAddContactsMenuDialog() {
+        // create and show menu dialog for actions with the contact
+        DialogBuilder dialog = new DialogBuilder(getContext());
+        dialog.setTitle(R.string.Add_number).
+                addItem(R.string.From_contacts_list, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showGetContactsFragment(ContactSourceType.FROM_CONTACTS);
+                    }
+                }).
+                addItem(R.string.From_calls_list, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showGetContactsFragment(ContactSourceType.FROM_CALLS_LOG);
+                    }
+                }).
+                addItem(R.string.From_SMS_list, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showGetContactsFragment(ContactSourceType.FROM_SMS_LIST);
+                    }
+                }).
+                addItem(R.string.From_Black_list, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showGetContactsFragment(ContactSourceType.FROM_BLACK_LIST);
+                    }
+                }).
+                addItem(R.string.From_White_list, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showGetContactsFragment(ContactSourceType.FROM_WHITE_LIST);
+                    }
+                }).
+                addItem(R.string.Manually, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addRowToNumbersList("", ContactNumber.TYPE_EQUALS);
+                    }
+                }).
+                show();
+    }
+
+    private void showGetContactsFragment(ContactSourceType sourceType) {
+        GetContactsFragment.show(this, sourceType, true);
     }
 }

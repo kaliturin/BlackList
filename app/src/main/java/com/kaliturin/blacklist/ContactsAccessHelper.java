@@ -12,7 +12,6 @@ import android.provider.*;
 import android.provider.CallLog.Calls;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
@@ -59,30 +58,56 @@ class ContactsAccessHelper {
     enum ContactSourceType {
         FROM_CONTACTS,
         FROM_CALLS_LOG,
-        FROM_SMS_INBOX
+        FROM_SMS_LIST,
+        FROM_BLACK_LIST,
+        FROM_WHITE_LIST
+    }
+
+    @Nullable
+    static String getPermission(ContactSourceType sourceType) {
+        switch (sourceType) {
+            case FROM_CONTACTS:
+                return Permissions.READ_CONTACTS;
+            case FROM_CALLS_LOG:
+                return Permissions.READ_CALL_LOG;
+            case FROM_SMS_LIST:
+                return Permissions.READ_SMS;
+            case FROM_BLACK_LIST:
+            case FROM_WHITE_LIST:
+                return Permissions.WRITE_EXTERNAL_STORAGE;
+        }
+        return null;
     }
 
     // Returns contacts from specified source
     @Nullable
     Cursor getContacts(Context context, ContactSourceType sourceType, @Nullable String filter) {
+        // check permission
+        final String permission = getPermission(sourceType);
+        if(permission == null || !Permissions.isGranted(context, permission)) {
+            return null;
+        }
+        // return contacts
         switch (sourceType) {
             case FROM_CONTACTS:
-                if(Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
-                    return getContacts(filter);
-                }
-                break;
+                return getContacts(filter);
             case FROM_CALLS_LOG:
-                if(Permissions.isGranted(context, Permissions.READ_CALL_LOG)) {
-                    return getContactsFromCallsLog(filter);
+                return getContactsFromCallsLog(filter);
+            case FROM_SMS_LIST:
+                return getContactsFromSMSList(filter);
+            case FROM_BLACK_LIST: {
+                DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
+                if(db != null) {
+                    return db.getContacts(Contact.TYPE_BLACK_LIST, filter);
                 }
-                break;
-            case FROM_SMS_INBOX:
-                if(Permissions.isGranted(context, Permissions.READ_SMS)) {
-                    return getContactsFromSMSInbox(filter);
+            }
+            case FROM_WHITE_LIST: {
+                DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
+                if(db != null) {
+                    return db.getContacts(Contact.TYPE_WHITE_LIST, filter);
                 }
-                break;
+            }
         }
-
         return null;
     }
 
@@ -235,8 +260,8 @@ class ContactsAccessHelper {
 
 //-------------------------------------------------------------------------------------
 
-    // Returns true if passed number contains in SMS inbox
-    boolean containsNumberInSMSInbox(Context context, @NonNull String number) {
+    // Returns true if passed number contains in SMS content list
+    boolean containsNumberInSMSContent(Context context, @NonNull String number) {
         if(!Permissions.isGranted(context, Permissions.READ_SMS)) {
             return false;
         }
@@ -246,7 +271,7 @@ class ContactsAccessHelper {
         final String PERSON = "person";
 
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms/inbox"),
+                Uri.parse("content://sms"),
                 new String[]{"DISTINCT " + ID, ADDRESS, PERSON},
                 ADDRESS + " = ? ) GROUP BY (" + ADDRESS,
                 new String[]{number},
@@ -260,9 +285,9 @@ class ContactsAccessHelper {
         return false;
     }
 
-    // Selects contacts from SMS inbox filtering by contact name or number
+    // Selects contacts from SMS list filtering by contact name or number
     @Nullable
-    private ContactFromSMSCursorWrapper getContactsFromSMSInbox(@Nullable String filter) {
+    private ContactFromSMSCursorWrapper getContactsFromSMSList(@Nullable String filter) {
         filter = (filter == null ? "" : filter.toLowerCase());
         final String ID = "_id";
         final String ADDRESS = "address"; // number
@@ -270,7 +295,7 @@ class ContactsAccessHelper {
 
         // filter by address (number) if person (contact id) is null
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms/inbox"),
+                Uri.parse("content://sms"),
                 new String[]{"DISTINCT " + ID, ADDRESS, PERSON},
                 ADDRESS + " IS NOT NULL AND (" +
                 PERSON + " IS NOT NULL OR " +
@@ -634,7 +659,7 @@ class ContactsAccessHelper {
 
     // SMS message
     class SMSMessage {
-        static final int TYPE_INBOX = 1;
+        static final int TYPE_INBOX = 1; // system type of sms from inbox
 
         final long id;
         final int type;

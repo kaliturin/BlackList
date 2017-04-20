@@ -458,8 +458,8 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                     @Override
                     public void onClick(View v) {
                         showAddContactsActivity(Permissions.READ_SMS,
-                                ContactSourceType.FROM_SMS_INBOX,
-                                R.string.List_of_inbox_SMS);
+                                ContactSourceType.FROM_SMS_LIST,
+                                R.string.List_of_SMS);
                     }
                 }).
                 addItem(R.string.Manually, new View.OnClickListener() {
@@ -483,12 +483,12 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         Bundle arguments = new Bundle();
         Class<? extends Fragment> fragmentClass;
         if (sourceType != null) {
-            // create fragment of adding contacts from inbox/calls
+            // fragment of adding contacts from sms content / calls log
             arguments.putInt(CONTACT_TYPE, contactType);
             arguments.putSerializable(SOURCE_TYPE, sourceType);
             fragmentClass = AddContactsFragment.class;
         } else {
-            // create fragment of adding contacts manually
+            // fragment of adding contacts manually
             arguments.putInt(CONTACT_TYPE, contactType);
             fragmentClass = AddOrEditContactFragment.class;
         }

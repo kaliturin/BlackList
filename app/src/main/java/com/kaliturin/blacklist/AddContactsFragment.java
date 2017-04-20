@@ -40,7 +40,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     private ContactSourceType sourceType = null;
     private int contactType = 0;
     private boolean singleNumberMode = false;
-    private LongSparseArray<String> contactIdToNumber = new LongSparseArray<>();
+    private LongSparseArray<ContactNumber> contactIdToNumber = new LongSparseArray<>();
 
     public AddContactsFragment() {
         // Required empty public constructor
@@ -57,7 +57,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
                              Bundle savedInstanceState) {
 
         Bundle arguments = getArguments();
-        if(arguments != null) {
+        if (arguments != null) {
             contactType = arguments.getInt(CONTACT_TYPE);
             sourceType = (ContactSourceType) arguments.getSerializable(SOURCE_TYPE);
             singleNumberMode = arguments.getBoolean(SINGLE_NUMBER_MODE);
@@ -114,9 +114,9 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
                     snackBar.dismiss();
                 }
 
-                if(singleNumberMode && cursorAdapter.isItemChecked(row)) {
+                if (singleNumberMode && cursorAdapter.isItemChecked(row)) {
                     Contact contact = cursorAdapter.getContact(row);
-                    if(contact != null && contact.numbers.size() > 1) {
+                    if (contact != null && contact.numbers.size() > 1) {
                         askForContactNumber(contact);
                     }
                 }
@@ -190,14 +190,22 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     private void askForContactNumber(final Contact contact) {
         DialogBuilder dialog = new DialogBuilder(getContext());
         dialog.setTitle(contact.name);
-        for(ContactNumber number : contact.numbers) {
-            dialog.addItem(0, number.number, number.number, new View.OnClickListener() {
+        for (ContactNumber contactNumber : contact.numbers) {
+            dialog.addItem(0, contactNumber.number, contactNumber, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String number = (String) v.getTag();
-                    if(number != null) {
-                        contactIdToNumber.put(contact.id, number);
+                    ContactNumber contactNumber = (ContactNumber) v.getTag();
+                    if (contactNumber != null) {
+                        contactIdToNumber.put(contact.id, contactNumber);
                     }
+                }
+            });
+        }
+        if (contact.numbers.size() > 1) {
+            dialog.addItem(0, R.string.Select_all, null, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    contactIdToNumber.remove(contact.id);
                 }
             });
         }
@@ -207,7 +215,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     // Clears all items selection
     private void clearCheckedItems() {
         contactIdToNumber.clear();
-        if(cursorAdapter != null) {
+        if (cursorAdapter != null) {
             cursorAdapter.setAllItemsChecked(false);
         }
     }
@@ -215,7 +223,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     // Sets all items selected
     private void setCheckedAllItems() {
         contactIdToNumber.clear();
-        if(cursorAdapter != null) {
+        if (cursorAdapter != null) {
             cursorAdapter.setAllItemsChecked(true);
         }
     }
@@ -230,7 +238,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     private void reloadItems(String itemsFilter) {
         contactIdToNumber.clear();
         dismissSnackBar();
-        if(isAdded()) {
+        if (isAdded()) {
             getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter));
         }
     }
@@ -314,10 +322,10 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     }
 
     // Writes checked contacts to the database
-    protected void addContacts(List<Contact> contacts, LongSparseArray<String> contactIdToNumber) {
+    protected void addContacts(List<Contact> contacts, LongSparseArray<ContactNumber> contactIdToNumber) {
         // if permission is granted
-        if(!Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
-            ContactsWriter writer = new ContactsWriter(getContext(), contactType, contacts);
+        if (!Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
+            ContactsWriter writer = new ContactsWriter(contactType, contacts);
             writer.execute();
         }
     }
@@ -328,7 +336,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         List<Contact> contactList;
         private int contactType;
 
-        ContactsWriter(Context context, int contactType, List<Contact> contactList) {
+        ContactsWriter(int contactType, List<Contact> contactList) {
             this.contactType = contactType;
             this.contactList = contactList;
         }
@@ -336,7 +344,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         @Override
         protected Void doInBackground(Void... params) {
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-            if(db != null) {
+            if (db != null) {
                 int count = 1;
                 for (Contact contact : contactList) {
                     if (isCancelled()) break;
