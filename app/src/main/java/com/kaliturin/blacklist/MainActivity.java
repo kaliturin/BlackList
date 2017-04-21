@@ -79,19 +79,24 @@ public class MainActivity extends AppCompatActivity
             if(isAction(ACTION_SMS_SEND_TO)) {
                 // show SMS sending activity
                 showSendSMSActivity();
-                // switch to SMS conversations fragment
+                // switch to SMS chat fragment
                 itemId = R.id.nav_sms;
             } else
             if(isAction(ACTION_SMS_CONVERSATIONS)) {
-                // switch to SMS conversations fragment
+                // switch to SMS chat fragment
                 itemId = R.id.nav_sms;
             } else
             if(isAction(ACTION_SETTINGS)) {
                 // switch to settings fragment
                 itemId = R.id.nav_settings;
             } else {
-                // switch to journal fragment
-                itemId = R.id.nav_journal;
+                if(Settings.getBooleanValue(this, Settings.GO_TO_JOURNAL_AT_START)) {
+                    // switch to journal fragment
+                    itemId = R.id.nav_journal;
+                } else {
+                    // switch to SMS chat fragment
+                    itemId = R.id.nav_sms;
+                }
             }
             // switch to chosen fragment
             fragmentSwitcher.switchFragment(itemId);

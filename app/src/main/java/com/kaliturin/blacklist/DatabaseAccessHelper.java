@@ -777,6 +777,13 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     }
 
     // Adds contact with single number
+    long addContact(int contactType, @NonNull String contactName, @NonNull ContactNumber contactNumber) {
+        List<ContactNumber> numbers = new LinkedList<>();
+        numbers.add(contactNumber);
+        return addContact(contactType, contactName, numbers);
+    }
+
+    // Adds contact with single number with default type
     long addContact(int contactType, @NonNull String contactName, @Nullable String number) {
         if(number == null) {
             number = contactName;

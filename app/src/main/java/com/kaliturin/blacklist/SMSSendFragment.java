@@ -323,6 +323,12 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                         showGetContactsFragment(ContactSourceType.FROM_SMS_LIST);
                     }
                 }).
+                addItem(R.string.From_White_list, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showGetContactsFragment(ContactSourceType.FROM_WHITE_LIST);
+                    }
+                }).
                 show();
     }
 

@@ -462,6 +462,22 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                                 R.string.List_of_SMS);
                     }
                 }).
+                addItem(R.string.From_Black_list, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
+                                ContactSourceType.FROM_BLACK_LIST,
+                                R.string.Black_list);
+                    }
+                }).
+                addItem(R.string.From_White_list, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
+                                ContactSourceType.FROM_WHITE_LIST,
+                                R.string.White_list);
+                    }
+                }).
                 addItem(R.string.Manually, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -486,6 +502,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
             // fragment of adding contacts from sms content / calls log
             arguments.putInt(CONTACT_TYPE, contactType);
             arguments.putSerializable(SOURCE_TYPE, sourceType);
+            arguments.putBoolean(SINGLE_NUMBER_MODE, true);
             fragmentClass = AddContactsFragment.class;
         } else {
             // fragment of adding contacts manually

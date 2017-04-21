@@ -38,7 +38,7 @@ class Settings {
     static final String DELIVERY_SMS_NOTIFICATION = "DELIVERY_SMS_NOTIFICATION";
     static final String FOLD_SMS_TEXT_IN_JOURNAL = "FOLD_SMS_TEXT_IN_JOURNAL";
     static final String UI_THEME_DARK = "UI_THEME_DARK";
-
+    static final String GO_TO_JOURNAL_AT_START = "GO_TO_JOURNAL_AT_START";
     static final String DEFAULT_SMS_APP_NATIVE_PACKAGE = "DEFAULT_SMS_APP_NATIVE_PACKAGE";
 
     private static final String TRUE = "TRUE";
@@ -95,7 +95,6 @@ class Settings {
         map.put(BLOCKED_CALL_STATUS_NOTIFICATION, TRUE);
         map.put(BLOCKED_CALL_SOUND_NOTIFICATION, FALSE);
         map.put(BLOCKED_CALL_VIBRATION_NOTIFICATION, FALSE);
-
         map.put(BLOCK_SMS_FROM_BLACK_LIST, TRUE);
         map.put(BLOCK_ALL_SMS, FALSE);
         map.put(BLOCK_SMS_NOT_FROM_CONTACTS, FALSE);
@@ -108,10 +107,10 @@ class Settings {
         map.put(BLOCKED_SMS_SOUND_NOTIFICATION, FALSE);
         map.put(RECEIVED_SMS_VIBRATION_NOTIFICATION, TRUE);
         map.put(BLOCKED_SMS_VIBRATION_NOTIFICATION, FALSE);
-
         map.put(DELIVERY_SMS_NOTIFICATION, TRUE);
         map.put(FOLD_SMS_TEXT_IN_JOURNAL, TRUE);
         map.put(UI_THEME_DARK, FALSE);
+        map.put(GO_TO_JOURNAL_AT_START, FALSE);
 
         for(Map.Entry<String, String> entry : map.entrySet()) {
             String setting = entry.getKey();

@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_journal"
-            android:icon="@drawable/ic_journal"
-            android:title="@string/Journal" />
+            android:id="@+id/nav_sms"
+            android:icon="@drawable/ic_message"
+            android:title="@string/Messaging" />
         <item
             android:id="@+id/nav_black_list"
             android:icon="@drawable/ic_blacklist"
@@ -14,9 +14,9 @@
             android:icon="@drawable/ic_white_list"
             android:title="@string/White_list" />
         <item
-            android:id="@+id/nav_sms"
-            android:icon="@drawable/ic_message"
-            android:title="@string/Messaging" />
+            android:id="@+id/nav_journal"
+            android:icon="@drawable/ic_journal"
+            android:title="@string/Journal" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings"

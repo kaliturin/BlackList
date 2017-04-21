@@ -187,6 +187,8 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         adapter.addTitle(R.string.App_interface);
         adapter.addCheckbox(R.string.Text_folding, R.string.Journal_SMS_text_folding,
                 Settings.FOLD_SMS_TEXT_IN_JOURNAL);
+        adapter.addCheckbox(R.string.Journal, R.string.Go_to_Journal_at_start,
+                Settings.GO_TO_JOURNAL_AT_START);
         adapter.addCheckbox(R.string.UI_theme_dark, 0, Settings.UI_THEME_DARK, new View.OnClickListener() {
             @Override
             public void onClick(View view) {

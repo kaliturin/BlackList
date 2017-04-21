@@ -40,7 +40,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     private ContactSourceType sourceType = null;
     private int contactType = 0;
     private boolean singleNumberMode = false;
-    private LongSparseArray<ContactNumber> contactIdToNumber = new LongSparseArray<>();
+    private LongSparseArray<ContactNumber> singleContactNumbers = new LongSparseArray<>();
 
     public AddContactsFragment() {
         // Required empty public constructor
@@ -117,7 +117,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
                 if (singleNumberMode && cursorAdapter.isItemChecked(row)) {
                     Contact contact = cursorAdapter.getContact(row);
                     if (contact != null && contact.numbers.size() > 1) {
-                        askForContactNumber(contact);
+                        askForSingleContactNumber(contact);
                     }
                 }
             }
@@ -187,7 +187,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 //-------------------------------------------------------------------
 
     // Opens menu dialog with list of contact's numbers to choose
-    private void askForContactNumber(final Contact contact) {
+    private void askForSingleContactNumber(final Contact contact) {
         DialogBuilder dialog = new DialogBuilder(getContext());
         dialog.setTitle(contact.name);
         for (ContactNumber contactNumber : contact.numbers) {
@@ -196,7 +196,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
                 public void onClick(View v) {
                     ContactNumber contactNumber = (ContactNumber) v.getTag();
                     if (contactNumber != null) {
-                        contactIdToNumber.put(contact.id, contactNumber);
+                        singleContactNumbers.put(contact.id, contactNumber);
                     }
                 }
             });
@@ -205,7 +205,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
             dialog.addItem(0, R.string.Select_all, null, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    contactIdToNumber.remove(contact.id);
+                    singleContactNumbers.remove(contact.id);
                 }
             });
         }
@@ -214,7 +214,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Clears all items selection
     private void clearCheckedItems() {
-        contactIdToNumber.clear();
+        singleContactNumbers.clear();
         if (cursorAdapter != null) {
             cursorAdapter.setAllItemsChecked(false);
         }
@@ -222,7 +222,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Sets all items selected
     private void setCheckedAllItems() {
-        contactIdToNumber.clear();
+        singleContactNumbers.clear();
         if (cursorAdapter != null) {
             cursorAdapter.setAllItemsChecked(true);
         }
@@ -236,7 +236,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
     // Reloads items
     private void reloadItems(String itemsFilter) {
-        contactIdToNumber.clear();
+        singleContactNumbers.clear();
         dismissSnackBar();
         if (isAdded()) {
             getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter));
@@ -318,14 +318,14 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     private void addCheckedContacts() {
         // get list of contacts and write it to the DB
         List<Contact> contacts = cursorAdapter.extractCheckedContacts();
-        addContacts(contacts, contactIdToNumber);
+        addContacts(contacts, singleContactNumbers);
     }
 
     // Writes checked contacts to the database
-    protected void addContacts(List<Contact> contacts, LongSparseArray<ContactNumber> contactIdToNumber) {
+    protected void addContacts(List<Contact> contacts, LongSparseArray<ContactNumber> singleContactNumbers) {
         // if permission is granted
         if (!Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE)) {
-            ContactsWriter writer = new ContactsWriter(contactType, contacts);
+            ContactsWriter writer = new ContactsWriter(contactType, contacts, singleContactNumbers.clone());
             writer.execute();
         }
     }
@@ -333,12 +333,15 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     // Async task - writes contacts to the DB
     private class ContactsWriter extends AsyncTask<Void, Integer, Void> {
         ProgressDialogHolder progress = new ProgressDialogHolder();
-        List<Contact> contactList;
+        List<Contact> contacts;
+        LongSparseArray<ContactNumber> singleContactNumbers;
         private int contactType;
 
-        ContactsWriter(int contactType, List<Contact> contactList) {
+        ContactsWriter(int contactType, List<Contact> contacts,
+                       LongSparseArray<ContactNumber> singleContactNumbers) {
             this.contactType = contactType;
-            this.contactList = contactList;
+            this.contacts = contacts;
+            this.singleContactNumbers = singleContactNumbers;
         }
 
         @Override
@@ -346,10 +349,18 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
             if (db != null) {
                 int count = 1;
-                for (Contact contact : contactList) {
+                for (Contact contact : contacts) {
                     if (isCancelled()) break;
-                    db.addContact(contactType, contact.name, contact.numbers);
-                    publishProgress(100 / contactList.size() * count++);
+                    ContactNumber contactNumber = singleContactNumbers.get(contact.id);
+                    if (contactNumber != null) {
+                        // add only the single number of contact
+                        db.addContact(contactType, contact.name, contactNumber);
+                        publishProgress(100 / contacts.size() * count++);
+                    } else {
+                        // add all numbers of contact
+                        db.addContact(contactType, contact.name, contact.numbers);
+                        publishProgress(100 / contacts.size() * count++);
+                    }
                 }
             }
             return null;

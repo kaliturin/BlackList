@@ -19,13 +19,13 @@ import java.util.List;
  */
 public class GetContactsFragment extends AddContactsFragment {
     @Override
-    protected void addContacts(List<Contact> contacts, LongSparseArray<ContactNumber> contactIdToNumber) {
+    protected void addContacts(List<Contact> contacts, LongSparseArray<ContactNumber> singleContactNumbers) {
         // prepare returning arguments - data of the chosen contacts
         ArrayList<String> names = new ArrayList<>();
         ArrayList<String> numbers = new ArrayList<>();
         ArrayList<Integer> types = new ArrayList<>();
         for (Contact contact : contacts) {
-            ContactNumber contactNumber = contactIdToNumber.get(contact.id);
+            ContactNumber contactNumber = singleContactNumbers.get(contact.id);
             if (contactNumber != null) {
                 // add single number of the contact
                 names.add(contact.name);
