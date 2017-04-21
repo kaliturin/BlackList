@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -69,6 +70,13 @@ public class DialogBuilder {
     }
 
     /**
+     * Adds the new item to the list with title only
+     **/
+    public DialogBuilder addItem(@StringRes int titleId) {
+        return addItem(-1, titleId, null, null);
+    }
+
+    /**
      * Adds the new item to the list with title and click listener
      **/
     public DialogBuilder addItem(@StringRes int titleId, View.OnClickListener listener) {
@@ -113,6 +121,7 @@ public class DialogBuilder {
         View itemView = inflater.inflate(R.layout.row_item_dialog, null);
         itemView.setId(id);
         itemView.setTag(tag);
+
         // if there are some rows above
         if (listLayout.getChildCount() > 0) {
             // show top border
@@ -121,6 +130,12 @@ public class DialogBuilder {
                 borderView.setVisibility(View.VISIBLE);
             }
         }
+
+        if(listener == null) {
+            ImageView imageView = (ImageView) itemView.findViewById(R.id.item_image);
+            imageView.setVisibility(View.GONE);
+        }
+
         // wrap on click listener
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,6 +146,7 @@ public class DialogBuilder {
                 }
             }
         });
+
         TextView titleView = (TextView) itemView.findViewById(R.id.item_title);
         titleView.setText(title);
 

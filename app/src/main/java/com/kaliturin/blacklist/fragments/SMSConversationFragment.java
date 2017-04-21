@@ -193,7 +193,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         public Cursor loadInBackground() {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
             // get SMS records by thread id
-            return db.getSMSMessagesByThreadId(getContext(), threadId, false, 0);
+            return db.getSMSMessagesByThreadId2(getContext(), threadId, false, 0);
         }
     }
 

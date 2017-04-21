@@ -40,6 +40,7 @@ public class Settings {
     public static final String UI_THEME_DARK = "UI_THEME_DARK";
     public static final String GO_TO_JOURNAL_AT_START = "GO_TO_JOURNAL_AT_START";
     public static final String DEFAULT_SMS_APP_NATIVE_PACKAGE = "DEFAULT_SMS_APP_NATIVE_PACKAGE";
+    public static final String EXIT_ON_BACK_PRESSED = "EXIT_ON_BACK_PRESSED";
 
     private static final String TRUE = "TRUE";
     private static final String FALSE = "FALSE";
@@ -111,6 +112,7 @@ public class Settings {
         map.put(FOLD_SMS_TEXT_IN_JOURNAL, TRUE);
         map.put(UI_THEME_DARK, FALSE);
         map.put(GO_TO_JOURNAL_AT_START, FALSE);
+        map.put(EXIT_ON_BACK_PRESSED, TRUE);
 
         for (Map.Entry<String, String> entry : map.entrySet()) {
             String setting = entry.getKey();

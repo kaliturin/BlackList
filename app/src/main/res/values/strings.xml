@@ -142,7 +142,8 @@
     <string name="Logo_motto">Protection from unwanted \n calls and SMS</string>
     <string name="Attention_all_SMS_blocked">Attention! All incoming SMS will be blocked!</string>
     <string name="Attention_all_calls_blocked">Attention! All incoming calls will be blocked!</string>
-    <string name="Go_to_Journal_at_start">Go to the Event log at application start</string>
+    <string name="Go_to_Journal_at_start">Go to the Event log at the application start</string>
+    <string name="Exit_on_back_pressed">Exit the application on the phone\'s \"Back\" button pressed</string>
 
     <string name="About">About</string>
     <string name="Info_about">

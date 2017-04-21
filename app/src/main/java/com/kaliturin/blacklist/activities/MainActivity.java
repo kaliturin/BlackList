@@ -87,26 +87,37 @@ public class MainActivity extends AppCompatActivity
             // get saved current navigation menu item
             itemId = savedInstanceState.getInt(CURRENT_ITEM_ID);
         } else {
-            // choose the fragment in main activity
-            if (isAction(ACTION_SMS_SEND_TO)) {
-                // show SMS sending activity
-                showSendSMSActivity();
-                // switch to SMS chat fragment
-                itemId = R.id.nav_sms;
-            } else if (isAction(ACTION_SMS_CONVERSATIONS)) {
-                // switch to SMS chat fragment
-                itemId = R.id.nav_sms;
-            } else if (isAction(ACTION_SETTINGS)) {
-                // switch to settings fragment
-                itemId = R.id.nav_settings;
-            } else {
-                if (Settings.getBooleanValue(this, Settings.GO_TO_JOURNAL_AT_START)) {
-                    // switch to journal fragment
-                    itemId = R.id.nav_journal;
-                } else {
+            // choose the fragment by activity's action
+            String action = getIntent().getAction();
+            action = (action == null ? "" : action);
+            switch (action) {
+                case ACTION_SMS_SEND_TO:
+                    // show SMS sending activity
+                    showSendSMSActivity();
                     // switch to SMS chat fragment
                     itemId = R.id.nav_sms;
-                }
+                    break;
+                case ACTION_SMS_CONVERSATIONS:
+                    // switch to SMS chat fragment
+                    itemId = R.id.nav_sms;
+                    break;
+                case ACTION_SETTINGS:
+                    // switch to settings fragment
+                    itemId = R.id.nav_settings;
+                    break;
+                case ACTION_JOURNAL:
+                    // switch to journal fragment
+                    itemId = R.id.nav_journal;
+                    break;
+                default:
+                    if (Settings.getBooleanValue(this, Settings.GO_TO_JOURNAL_AT_START)) {
+                        // switch to journal fragment
+                        itemId = R.id.nav_journal;
+                    } else {
+                        // switch to SMS chat fragment
+                        itemId = R.id.nav_sms;
+                    }
+                    break;
             }
             // switch to chosen fragment
             fragmentSwitcher.switchFragment(itemId);
@@ -128,7 +139,9 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (!fragmentSwitcher.onBackPressed()) {
-                super.onBackPressed();
+                if (Settings.getBooleanValue(this, Settings.EXIT_ON_BACK_PRESSED)) {
+                    super.onBackPressed();
+                }
             }
         }
     }
@@ -209,12 +222,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             setTheme(R.style.AppTheme_Light);
         }
-    }
-
-    // Returns true if intent action equals to passed string
-    private boolean isAction(String name) {
-        String action = getIntent().getAction();
-        return (action != null && action.equals(name));
     }
 
     // Switcher of activity's fragments

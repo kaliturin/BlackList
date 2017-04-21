@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.telephony.SmsManager;
 import android.widget.Toast;
 
@@ -43,7 +42,6 @@ public class SMSSendHelper {
         ArrayList<String> messageParts = smsManager.divideMessage(message);
         ArrayList<PendingIntent> sentIntents = new ArrayList<>(messageParts.size());
         ArrayList<PendingIntent> deliveryIntents = new ArrayList<>(messageParts.size());
-        long timeSent = System.currentTimeMillis();
 
         // create intents and result receivers for each part of message
         for (int i = 0; i < messageParts.size(); i++) {
@@ -62,7 +60,7 @@ public class SMSSendHelper {
             receivers.add(receiver);
 
             // create unique intent name and register receiver
-            String intentName = "SMS_SENT" + "_" + hashCode() + "_" + timeSent + "_" + messagePartId;
+            String intentName = "SMS_SENT" + "_" + Integer.toHexString(receiver.hashCode());
             PendingIntent pendingIntent = receiver.register(context, intentName,
                     phoneNumber, messagePart, messagePartId, messageParts.size());
             sentIntents.add(pendingIntent);
@@ -80,7 +78,7 @@ public class SMSSendHelper {
                 receivers.add(receiver);
 
                 // create unique intent name and register receiver
-                intentName = "SMS_DELIVERED" + "_" + hashCode() + "_" + timeSent + "_" + messagePartId;
+                intentName = "SMS_DELIVERED" + "_" + Integer.toHexString(receiver.hashCode());
                 pendingIntent = receiver.register(context, intentName,
                         phoneNumber, messagePart, messagePartId, messageParts.size());
                 deliveryIntents.add(pendingIntent);
@@ -117,8 +115,13 @@ public class SMSSendHelper {
                 break;
         }
 
-        // notify user about sending
-        String message = createNotificationMessage(context, intent, stringId);
+        // notify user about sending the current part of SMS
+        int messageParts = intent.getIntExtra(MESSAGE_PARTS, 0);
+        int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
+        String message = context.getString(stringId);
+        if (messageParts > 1) {
+            message += " [" + messagePartId + "/" + messageParts + "]";
+        }
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
@@ -136,10 +139,17 @@ public class SMSSendHelper {
                 break;
         }
 
-        // notify user about delivery
-        String message = createNotificationMessage(context, intent, stringId);
+        // get SMS parameters
         String phoneNumber = intent.getStringExtra(PHONE_NUMBER);
-        Notifications.onSmsDelivery(context, phoneNumber, message);
+        int messageParts = intent.getIntExtra(MESSAGE_PARTS, 0);
+        int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
+
+        // notify user about delivery only the last part of the SMS
+        if (phoneNumber != null && messageParts > 0 &&
+                messagePartId == messageParts) {
+            String message = context.getString(stringId);
+            Notifications.onSmsDelivery(context, phoneNumber, message);
+        }
     }
 
     /**
@@ -151,18 +161,6 @@ public class SMSSendHelper {
             context.unregisterReceiver(receiver);
         }
         receivers.clear();
-    }
-
-    // Creates notification message on SMS sent/delivery
-    private String createNotificationMessage(Context context, Intent intent, @StringRes int stringId) {
-        // create message with SMS part id if it is defined
-        String text = context.getString(stringId);
-        int messageParts = intent.getIntExtra(MESSAGE_PARTS, 0);
-        if (messageParts > 1) {
-            int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
-            text += " [" + messagePartId + "]";
-        }
-        return text;
     }
 
     // Writes the sent SMS to the Outbox
@@ -183,15 +181,16 @@ public class SMSSendHelper {
     private abstract class ResultReceiver extends BroadcastReceiver {
         PendingIntent register(Context context, String intentName, String phoneNumber,
                                String messagePart, int messagePartId, int messageParts) {
-            // register receiver
-            context.registerReceiver(this, new IntentFilter(intentName));
             // create pending intent
             Intent intent = new Intent(intentName);
             intent.putExtra(PHONE_NUMBER, phoneNumber);
             intent.putExtra(MESSAGE_PART, messagePart);
             intent.putExtra(MESSAGE_PART_ID, messagePartId);
             intent.putExtra(MESSAGE_PARTS, messageParts);
-            return PendingIntent.getBroadcast(context, 0, intent, 0);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+            // register receiver
+            context.registerReceiver(this, new IntentFilter(intentName));
+            return pendingIntent;
         }
     }
 }

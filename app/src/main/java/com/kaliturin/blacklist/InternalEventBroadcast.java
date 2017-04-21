@@ -60,7 +60,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     }
 
     /**
-     * Method is called if SMS with thread id have been read from the Inbox/Outbox
+     * Method is called if SMS with thread id has been read from the Inbox/Outbox
      **/
     public void onSMSWasRead(int threadId) {
     }

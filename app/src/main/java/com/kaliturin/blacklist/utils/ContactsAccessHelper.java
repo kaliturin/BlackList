@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactNumber;
+import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
+import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactSource;
+
 /**
  * Contacts list access helper
  */
@@ -142,8 +146,8 @@ public class ContactsAccessHelper {
     }
 
     @Nullable
-    private DatabaseAccessHelper.Contact getContact(long contactId) {
-        DatabaseAccessHelper.Contact contact = null;
+    private Contact getContact(long contactId) {
+        Contact contact = null;
         ContactCursorWrapper cursor = getContactCursor(contactId);
         if (cursor != null) {
             contact = cursor.getContact(false);
@@ -169,12 +173,12 @@ public class ContactsAccessHelper {
     }
 
     @Nullable
-    public DatabaseAccessHelper.Contact getContact(Context context, String number) {
+    public Contact getContact(Context context, String number) {
         if (!Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             return null;
         }
 
-        DatabaseAccessHelper.Contact contact = null;
+        Contact contact = null;
         ContactCursorWrapper cursor = getContactCursor(number);
         if (cursor != null) {
             contact = cursor.getContact(false);
@@ -185,7 +189,7 @@ public class ContactsAccessHelper {
     }
 
     // Contact's cursor wrapper
-    private class ContactCursorWrapper extends CursorWrapper implements DatabaseAccessHelper.ContactSource {
+    private class ContactCursorWrapper extends CursorWrapper implements ContactSource {
         private final int ID;
         private final int NAME;
 
@@ -197,14 +201,14 @@ public class ContactsAccessHelper {
         }
 
         @Override
-        public DatabaseAccessHelper.Contact getContact() {
+        public Contact getContact() {
             return getContact(true);
         }
 
-        DatabaseAccessHelper.Contact getContact(boolean withNumbers) {
+        Contact getContact(boolean withNumbers) {
             long id = getLong(ID);
             String name = getString(NAME);
-            List<DatabaseAccessHelper.ContactNumber> numbers = new LinkedList<>();
+            List<ContactNumber> numbers = new LinkedList<>();
             if (withNumbers) {
                 ContactNumberCursorWrapper cursor = getContactNumbers(id);
                 if (cursor != null) {
@@ -212,14 +216,15 @@ public class ContactsAccessHelper {
                         // normalize the phone number (remove spaces and brackets)
                         String number = normalizeContactNumber(cursor.getNumber());
                         // create and add contact number instance
-                        DatabaseAccessHelper.ContactNumber contactNumber = new DatabaseAccessHelper.ContactNumber(cursor.getPosition(), number, id);
+                        ContactNumber contactNumber =
+                                new ContactNumber(cursor.getPosition(), number, id);
                         numbers.add(contactNumber);
                     } while (cursor.moveToNext());
                     cursor.close();
                 }
             }
 
-            return new DatabaseAccessHelper.Contact(id, name, 0, numbers);
+            return new Contact(id, name, 0, numbers);
         }
     }
 
@@ -318,7 +323,7 @@ public class ContactsAccessHelper {
                 } else {
                     // get person name from contacts
                     long contactId = cursor.getLong(_PERSON);
-                    DatabaseAccessHelper.Contact contact = getContact(contactId);
+                    Contact contact = getContact(contactId);
                     if (contact != null) {
                         person = contact.name;
                     }
@@ -336,7 +341,7 @@ public class ContactsAccessHelper {
     }
 
     // Contact from SMS cursor wrapper
-    private class ContactFromSMSCursorWrapper extends CursorWrapper implements DatabaseAccessHelper.ContactSource {
+    private class ContactFromSMSCursorWrapper extends CursorWrapper implements ContactSource {
         private final int ID;
         private final int ADDRESS;
         private final int PERSON;
@@ -350,14 +355,14 @@ public class ContactsAccessHelper {
         }
 
         @Override
-        public DatabaseAccessHelper.Contact getContact() {
+        public Contact getContact() {
             long id = getLong(ID);
             String name = getString(PERSON);
             String number = getString(ADDRESS);
-            List<DatabaseAccessHelper.ContactNumber> numbers = new LinkedList<>();
-            numbers.add(new DatabaseAccessHelper.ContactNumber(0, number, id));
+            List<ContactNumber> numbers = new LinkedList<>();
+            numbers.add(new ContactNumber(0, number, id));
 
-            return new DatabaseAccessHelper.Contact(id, name, 0, numbers);
+            return new Contact(id, name, 0, numbers);
         }
     }
 
@@ -411,7 +416,7 @@ public class ContactsAccessHelper {
     }
 
     // Contact from calls cursor wrapper
-    private class ContactFromCallsCursorWrapper extends CursorWrapper implements DatabaseAccessHelper.ContactSource {
+    private class ContactFromCallsCursorWrapper extends CursorWrapper implements ContactSource {
         private final int ID;
         private final int NUMBER;
         private final int NAME;
@@ -425,17 +430,17 @@ public class ContactsAccessHelper {
         }
 
         @Override
-        public DatabaseAccessHelper.Contact getContact() {
+        public Contact getContact() {
             long id = getLong(ID);
             String number = getString(NUMBER);
             String name = getString(NAME);
-            List<DatabaseAccessHelper.ContactNumber> numbers = new LinkedList<>();
-            numbers.add(new DatabaseAccessHelper.ContactNumber(0, number, id));
+            List<ContactNumber> numbers = new LinkedList<>();
+            numbers.add(new ContactNumber(0, number, id));
             if (name == null) {
                 name = number;
             }
 
-            return new DatabaseAccessHelper.Contact(id, name, 0, numbers);
+            return new Contact(id, name, 0, numbers);
         }
     }
 
@@ -523,7 +528,8 @@ public class ContactsAccessHelper {
 
     // Selects SMS messages by thread id
     @Nullable
-    public SMSMessageCursorWrapper getSMSMessagesByThreadId(Context context, int threadId, boolean desc, int limit) {
+    public SMSMessageCursorWrapper getSMSMessagesByThreadId(Context context, int threadId,
+                                                            boolean desc, int limit) {
         if (!Permissions.isGranted(context, Permissions.READ_SMS) ||
                 !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             return null;
@@ -541,6 +547,31 @@ public class ContactsAccessHelper {
                 orderClause + limitClause);
 
         return (validate(cursor) ? new SMSMessageCursorWrapper(cursor) : null);
+    }
+
+    // Selects SMS messages by thread id.
+    // Reads SMS in two steps: at first an index, at second all others data.
+    // This approach is efficient for memory saving.
+    @Nullable
+    public SMSMessageCursorWrapper2 getSMSMessagesByThreadId2(Context context, int threadId,
+                                                              boolean desc, int limit) {
+        if (!Permissions.isGranted(context, Permissions.READ_SMS) ||
+                !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
+            return null;
+        }
+
+        String orderClause = (desc ? " date DESC " : " date ASC ");
+        String limitClause = (limit > 0 ? " LIMIT " + limit : "");
+        Cursor cursor = contentResolver.query(
+                Uri.parse("content://sms"),
+                new String[]{" _id "},
+                " thread_id = ? " +
+                        // FIXME support drafts
+                        " AND address NOT NULL",
+                new String[]{String.valueOf(threadId)},
+                orderClause + limitClause);
+
+        return (validate(cursor) ? new SMSMessageCursorWrapper2(cursor) : null);
     }
 
     // Returns count of unread SMS messages by thread id
@@ -703,7 +734,7 @@ public class ContactsAccessHelper {
             String number = getString(NUMBER);
             String body = getString(BODY);
             String person = null;
-            DatabaseAccessHelper.Contact contact;
+            Contact contact;
             if (!isNull(PERSON)) {
                 // if person is defined - get contact name
                 long contactId = getLong(PERSON);
@@ -719,6 +750,47 @@ public class ContactsAccessHelper {
         }
     }
 
+    // SMS message cursor wrapper
+    public class SMSMessageCursorWrapper2 extends CursorWrapper {
+        private final int ID;
+
+        private SMSMessageCursorWrapper2(Cursor cursor) {
+            super(cursor);
+            cursor.moveToFirst();
+            ID = cursor.getColumnIndex("_id");
+        }
+
+        @Nullable
+        public SMSMessage getSMSMessage(Context context) {
+            long id = getLong(ID);
+            return getSMSMessagesById(context, id);
+        }
+    }
+
+    @Nullable
+    private SMSMessage getSMSMessagesById(Context context, long id) {
+//        if (!Permissions.isGranted(context, Permissions.READ_SMS) ||
+//                !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
+//            return null;
+//        }
+
+        Cursor cursor = contentResolver.query(
+                Uri.parse("content://sms"),
+                null,
+                " _id = " + id,
+                null,
+                null);
+
+        SMSMessage message = null;
+        if (validate(cursor)) {
+            SMSMessageCursorWrapper cursorWrapper = new SMSMessageCursorWrapper(cursor);
+            message = cursorWrapper.getSMSMessage(context);
+            cursor.close();
+        }
+
+        return message;
+    }
+
     // Writes SMS messages to the Inbox
     // Needed only since API19 - where only default SMS app can write to content resolver
     @TargetApi(19)
@@ -728,7 +800,7 @@ public class ContactsAccessHelper {
 
         for (SmsMessage message : messages) {
             // get contact by SMS address
-            DatabaseAccessHelper.Contact contact = getContact(context, message.getOriginatingAddress());
+            Contact contact = getContact(context, message.getOriginatingAddress());
 
             // create writing values
             ContentValues values = new ContentValues();
@@ -766,7 +838,7 @@ public class ContactsAccessHelper {
         // check write permission
         if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
         // get contact by SMS address
-        DatabaseAccessHelper.Contact contact = getContact(context, number);
+        Contact contact = getContact(context, number);
         // write SMS
         ContentValues values = new ContentValues();
         values.put("address", number);

@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.SMSMessage;
-import com.kaliturin.blacklist.utils.ContactsAccessHelper.SMSMessageCursorWrapper;
+import com.kaliturin.blacklist.utils.ContactsAccessHelper.SMSMessageCursorWrapper2;
 import com.kaliturin.blacklist.utils.Utils;
 
 import java.text.DateFormat;
@@ -30,10 +30,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
     private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
     private final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
     private Date datetime = new Date();
-    private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;
-    // FIXME
-    private RowOnClickListener rowOnClickListener = new RowOnClickListener();
     private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
     private Padding paddingStart;
     private Padding paddingEnd;
@@ -60,7 +57,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // get cursor wrapper
-        SMSMessageCursorWrapper cursorWrapper = (SMSMessageCursorWrapper) cursor;
+        SMSMessageCursorWrapper2 cursorWrapper = (SMSMessageCursorWrapper2) cursor;
         // get model
         SMSMessage model = cursorWrapper.getSMSMessage(context);
         // get view holder from the row
@@ -81,10 +78,6 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         return (holder == null ? null : holder.model);
     }
 
-    public void setOnClickListener(View.OnClickListener onClickListener) {
-        this.outerOnClickListener = onClickListener;
-    }
-
     public void setOnLongClickListener(View.OnLongClickListener onLongClickListener) {
         this.outerOnLongClickListener = onLongClickListener;
     }
@@ -95,16 +88,6 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         public boolean onLongClick(View view) {
             return (outerOnLongClickListener != null &&
                     outerOnLongClickListener.onLongClick(view));
-        }
-    }
-
-    // Row on click listener
-    private class RowOnClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            if (outerOnClickListener != null) {
-                outerOnClickListener.onClick(view);
-            }
         }
     }
 
