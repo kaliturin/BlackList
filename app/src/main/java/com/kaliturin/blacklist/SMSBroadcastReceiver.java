@@ -8,9 +8,15 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
 
-import java.util.List;
+import com.kaliturin.blacklist.utils.ContactsAccessHelper;
+import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
+import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
+import com.kaliturin.blacklist.utils.DefaultSMSAppHelper;
+import com.kaliturin.blacklist.utils.Notifications;
+import com.kaliturin.blacklist.utils.Permissions;
+import com.kaliturin.blacklist.utils.Settings;
 
-import com.kaliturin.blacklist.DatabaseAccessHelper.Contact;
+import java.util.List;
 
 /**
  * BroadcastReceiver for SMS catching
@@ -26,18 +32,18 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         // check action
         String action = intent.getAction();
-        if(action == null || !action.equals(getAction())) {
+        if (action == null || !action.equals(getAction())) {
             return;
         }
 
         // if not default sms app
-        if(!DefaultSMSAppHelper.isDefault(context)) {
+        if (!DefaultSMSAppHelper.isDefault(context)) {
             return;
         }
 
         // get messages
         SmsMessage[] messages = getSMSMessages(intent);
-        if(messages == null || messages.length == 0) {
+        if (messages == null || messages.length == 0) {
             return;
         }
 
@@ -45,13 +51,13 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         String number = messages[0].getDisplayOriginatingAddress();
 
         // process messages
-        if(!processMessages(context, number, messages)) {
+        if (!processMessages(context, number, messages)) {
             // FIXME Run in service
             // since 19 API only
-            if(DefaultSMSAppHelper.isAvailable()) {
+            if (DefaultSMSAppHelper.isAvailable()) {
                 // messages were not blocked - write them to the inbox
                 ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-                if(db.writeSMSMessageToInbox(context, messages, timeReceived)) {
+                if (db.writeSMSMessageToInbox(context, messages, timeReceived)) {
                     // send broadcast event
                     InternalEventBroadcast.sendSMSWasWritten(context, number);
                     // get contact by number
@@ -70,9 +76,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     private boolean processMessages(Context context, String number, SmsMessage[] messages) {
 
         // private number detected
-        if(isPrivateNumber(number)) {
+        if (isPrivateNumber(number)) {
             // if block private numbers
-            if(Settings.getBooleanValue(context, Settings.BLOCK_HIDDEN_SMS)) {
+            if (Settings.getBooleanValue(context, Settings.BLOCK_HIDDEN_SMS)) {
                 String name = context.getString(R.string.Private);
                 // abort broadcast and notify user
                 abortSMSAndNotify(context, name, name, messages);
@@ -85,7 +91,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         List<Contact> contacts = getContacts(context, number);
 
         // if block all SMS
-        if(Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
+        if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
             String name = getContactName(contacts, number);
             // abort SMS and notify the user
             abortSMSAndNotify(context, name, number, messages);
@@ -94,12 +100,12 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         // if contact is from the white list
         Contact contact = findContactByType(contacts, Contact.TYPE_WHITE_LIST);
-        if(contact != null) {
+        if (contact != null) {
             return false;
         }
 
         // if contact is from the black list
-        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_FROM_BLACK_LIST)) {
+        if (Settings.getBooleanValue(context, Settings.BLOCK_SMS_FROM_BLACK_LIST)) {
             contact = findContactByType(contacts, Contact.TYPE_BLACK_LIST);
             if (contact != null) {
                 // abort SMS and notify the user
@@ -111,26 +117,26 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         boolean abort = false;
 
         // if number is from the contacts
-        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_CONTACTS) &&
+        if (Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_CONTACTS) &&
                 Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.getContact(context, number) != null) {
+            if (db.getContact(context, number) != null) {
                 return false;
             }
             abort = true;
         }
 
         // if number is from the SMS content
-        if(Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_SMS_CONTENT) &&
+        if (Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_SMS_CONTENT) &&
                 Permissions.isGranted(context, Permissions.READ_SMS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if(db.containsNumberInSMSContent(context, number)) {
+            if (db.containsNumberInSMSContent(context, number)) {
                 return false;
             }
             abort = true;
         }
 
-        if(abort) {
+        if (abort) {
             // abort SMS and notify the user
             abortSMSAndNotify(context, number, number, messages);
         }
@@ -143,8 +149,8 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     }
 
     private Contact findContactByType(List<Contact> contacts, int contactType) {
-        for(Contact contact : contacts) {
-            if(contact.type == contactType) {
+        for (Contact contact : contacts) {
+            if (contact.type == contactType) {
                 return contact;
             }
         }
@@ -153,19 +159,20 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     }
 
     // Extracts received SMS message from intent
+    @SuppressWarnings("deprecation")
     private SmsMessage[] getSMSMessages(Intent intent) {
         SmsMessage[] messages = null;
         Bundle bundle = intent.getExtras();
-        if(bundle != null) {
+        if (bundle != null) {
             Object[] pdus = (Object[]) bundle.get("pdus");
             if (pdus != null) {
                 messages = new SmsMessage[pdus.length];
                 for (int i = 0; i < pdus.length; i++) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                        messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                    } else {
                         String format = bundle.getString("format");
                         messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i], format);
-                    } else {
-                        messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
                     }
                 }
             }
@@ -178,12 +185,12 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         StringBuilder smsBody = new StringBuilder();
         for (SmsMessage message : messages) {
             String text = message.getMessageBody();
-            if(text != null) {
+            if (text != null) {
                 smsBody.append(text);
             }
         }
         String body = smsBody.toString();
-        if(body.isEmpty()) {
+        if (body.isEmpty()) {
             body = context.getString(R.string.No_text);
         }
         return body;
@@ -191,7 +198,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     private String getContactName(List<Contact> contacts, String number) {
         String name;
-        if(contacts.size() > 0) {
+        if (contacts.size() > 0) {
             Contact contact = contacts.get(0);
             name = contact.name;
         } else {
@@ -203,7 +210,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     private boolean isPrivateNumber(String number) {
         try {
             // private number detected
-            if(number == null ||
+            if (number == null ||
                     Long.valueOf(number) < 0) {
                 return true;
             }
@@ -220,14 +227,14 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     // Writes record to the journal
     private void writeToJournal(Context context, String name, String number, SmsMessage[] messages) {
-        if(number.equals(name)) {
+        if (number.equals(name)) {
             number = null;
         }
         String text = getSMSMessageBody(context, messages);
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        if(db != null) {
+        if (db != null) {
             // write to the journal
-            if(db.addJournalRecord(System.currentTimeMillis(), name, number, text) >= 0) {
+            if (db.addJournalRecord(System.currentTimeMillis(), name, number, text) >= 0) {
                 // send broadcast message
                 InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WAS_WRITTEN);
             }
@@ -235,7 +242,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void abortSMSAndNotify(Context context, String name, String number, SmsMessage[] messages) {
-        if(name == null || number == null) {
+        if (name == null || number == null) {
             return;
         }
         // prevent to place this SMS to incoming box

@@ -22,7 +22,7 @@
 
         <!-- The main activity and activity that allows the user to send new SMS/MMS messages -->
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Dark">
             <intent-filter>
@@ -43,7 +43,7 @@
 
         <!-- Generic custom activity -->
         <activity
-            android:name=".CustomFragmentActivity"
+            android:name=".activities.CustomFragmentActivity"
             android:theme="@style/AppTheme.Dark">
         </activity>
 

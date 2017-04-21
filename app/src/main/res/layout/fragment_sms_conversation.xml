@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.kaliturin.blacklist.SMSConversationFragment">
+    tools:context="com.kaliturin.blacklist.fragments.SMSConversationFragment">
 
     <android.support.v7.widget.ListViewCompat
         android:id="@+id/rows_list"

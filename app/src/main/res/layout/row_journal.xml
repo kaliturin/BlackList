@@ -36,7 +36,7 @@
 
     </RelativeLayout>
 
-    <com.kaliturin.blacklist.CheckableLinearLayout
+    <com.kaliturin.blacklist.utils.CheckableLinearLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -112,6 +112,6 @@
 
         </LinearLayout>
 
-    </com.kaliturin.blacklist.CheckableLinearLayout>
+    </com.kaliturin.blacklist.utils.CheckableLinearLayout>
 
 </LinearLayout>

@@ -33,7 +33,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
                 break;
             case SMS_WAS_WRITTEN:
                 String number = intent.getStringExtra(CONTACT_NUMBER);
-                if(number != null) {
+                if (number != null) {
                     onSMSWasWritten(number);
                 }
                 break;
@@ -53,25 +53,38 @@ public class InternalEventBroadcast extends BroadcastReceiver {
         context.unregisterReceiver(this);
     }
 
-    /** Method is called if SMS has been written to the Inbox/Outbox **/
-    public void onSMSWasWritten(@NonNull String phoneNumber) {}
+    /**
+     * Method is called if SMS has been written to the Inbox/Outbox
+     **/
+    public void onSMSWasWritten(@NonNull String phoneNumber) {
+    }
 
-    /** Method is called if SMS with thread id have been read from the Inbox/Outbox **/
-    public void onSMSWasRead(int threadId) {}
+    /**
+     * Method is called if SMS with thread id have been read from the Inbox/Outbox
+     **/
+    public void onSMSWasRead(int threadId) {
+    }
 
-    /** Method is called if some record has been written to the Journal **/
-    public void onJournalWasWritten() {}
+    /**
+     * Method is called if some record has been written to the Journal
+     **/
+    public void onJournalWasWritten() {
+    }
 
-    /** Sends internal event which will be received by corresponding
-     * callback of registered receiver **/
+    /**
+     * Sends internal event which will be received by corresponding
+     * callback of registered receiver
+     **/
     public static void send(Context context, String eventType) {
         Intent intent = new Intent(TAG);
         intent.putExtra(EVENT_TYPE, eventType);
         context.sendBroadcast(intent, null);
     }
 
-    /** Sends internal event of writing to the SMS Inbox/Outbox, which causes
-     *  onSMSWasWritten invocation of registered receivers. **/
+    /**
+     * Sends internal event of writing to the SMS Inbox/Outbox, which causes
+     * onSMSWasWritten invocation of registered receivers.
+     **/
     public static void sendSMSWasWritten(Context context, @NonNull String phoneNumber) {
         Intent intent = new Intent(TAG);
         intent.putExtra(EVENT_TYPE, SMS_WAS_WRITTEN);
@@ -79,8 +92,10 @@ public class InternalEventBroadcast extends BroadcastReceiver {
         context.sendBroadcast(intent, null);
     }
 
-    /** Sends internal event of reading the thread from the SMS Inbox, which causes
-     *  onSMSWasRead invocation of registered receivers. **/
+    /**
+     * Sends internal event of reading the thread from the SMS Inbox, which causes
+     * onSMSWasRead invocation of registered receivers.
+     **/
     public static void sendSMSWasRead(Context context, int threadId) {
         Intent intent = new Intent(TAG);
         intent.putExtra(EVENT_TYPE, SMS_WAS_READ);

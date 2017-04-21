@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.kaliturin.blacklist.SMSConversationsListFragment">
+    tools:context="com.kaliturin.blacklist.fragments.SMSConversationsListFragment">
 
     <TextView
         android:id="@+id/text_empty"

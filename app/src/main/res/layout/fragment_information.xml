@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".InformationFragment">
+    tools:context=".fragments.InformationFragment">
 
     <android.support.v7.widget.ListViewCompat
         android:id="@+id/help_list"

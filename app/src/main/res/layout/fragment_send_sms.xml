@@ -5,7 +5,7 @@
     android:focusableInTouchMode="true"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.kaliturin.blacklist.SMSSendFragment">
+    tools:context="com.kaliturin.blacklist.fragments.SMSSendFragment">
 
     <ScrollView
         android:id="@+id/scroll"
