@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="?colorTextSecondary"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:autoLink="web|email"
                 android:visibility="gone" />
         </LinearLayout>

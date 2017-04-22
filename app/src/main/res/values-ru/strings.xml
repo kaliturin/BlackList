@@ -217,7 +217,7 @@
         Приложение Чёрный список распространяется в надежде, что оно может быть
         кому-нибудь полезным, но без каких-либо гарантий или условий.
         Исходный код программы можно найти здесь:
-        http://github.com/kaliturin/blacklist
+        "http://github.com/kaliturin/blacklist"
     </string>
 
     <string name="App_version">Версия программы</string>

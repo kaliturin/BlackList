@@ -88,8 +88,8 @@ public class SMSSendHelper {
         // send multipart message
         smsManager.sendMultipartTextMessage(phoneNumber, null, messageParts, sentIntents, deliveryIntents);
 
-        // write the sent SMS to the Outbox
-        writeSMSToOutbox(context, phoneNumber, message);
+        // write the sent SMS
+        writeSMSMessage(context, phoneNumber, message);
 
         return true;
     }
@@ -163,14 +163,13 @@ public class SMSSendHelper {
         receivers.clear();
     }
 
-    // Writes the sent SMS to the Outbox
-    private void writeSMSToOutbox(Context context, String phoneNumber, String message) {
-        // if above KITKAT and if app isn't default - the SMS will be written by the system
+    // Writes the sent SMS
+    private void writeSMSMessage(Context context, String phoneNumber, String message) {
+        // if newer KITKAT and if app isn't default - the SMS will be written by the system
         if (!DefaultSMSAppHelper.isAvailable() ||
                 DefaultSMSAppHelper.isDefault(context)) {
-            // write the sent SMS to the Outbox
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            db.writeSMSMessageToOutbox(context, phoneNumber, message);
+            db.writeSMSMessageToSentBox(context, phoneNumber, message);
         }
 
         // send internal event message

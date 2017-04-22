@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:padding="2dp"
                 android:textColor="?colorTextSecondary"
-                android:textSize="14sp" />
+                android:textSize="15sp" />
         </LinearLayout>
 
         <LinearLayout

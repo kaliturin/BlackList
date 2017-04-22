@@ -327,7 +327,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             dialog.addItem(R.string.Forward_message, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openSMSSendActivity("", "", sms.body);
+                    openSMSSendActivity(null, null, sms.body);
                 }
             });
 

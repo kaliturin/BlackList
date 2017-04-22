@@ -101,6 +101,7 @@ public class Notifications {
         // pending intent for activating app on click in status bar
         Intent intent = new Intent(context, MainActivity.class);
         intent.setAction(action);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
         // build notification

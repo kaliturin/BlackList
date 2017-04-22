@@ -213,8 +213,8 @@
         The Blacklist application is free software and is distributed under the terms
         of the Apache License Version 2.0. The Blacklist application is distributed
         with the hope that it can be useful for someone, but without any guarantees
-        or conditions. The source code of the application can be found here:\n
-        http://github.com/kaliturin/blacklist
+        or conditions. The source code of the application can be found here:
+        "http://github.com/kaliturin/blacklist"
     </string>
 
     <string name="App_version">Application version</string>

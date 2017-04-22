@@ -108,7 +108,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         internalEventBroadcast = new InternalEventBroadcast() {
             @Override
             public void onSMSWasWritten(@NonNull String phoneNumber) {
-                // SMS thread from the Inbox/Outbox was read -
+                // SMS thread was read -
                 ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
                 int threadId = db.getSMSThreadIdByNumber(getContext(), phoneNumber);
                 if (threadId >= 0 &&

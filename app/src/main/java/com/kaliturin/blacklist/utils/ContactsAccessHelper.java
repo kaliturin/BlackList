@@ -456,7 +456,7 @@ public class ContactsAccessHelper {
         public final int unread;
 
         SMSConversation(int threadId, long date, String person,
-                               String number, String snippet, int unread) {
+                        String number, String snippet, int unread) {
             this.threadId = threadId;
             this.date = date;
             this.person = person;
@@ -528,7 +528,7 @@ public class ContactsAccessHelper {
 
     // Selects SMS messages by thread id
     @Nullable
-    public SMSMessageCursorWrapper getSMSMessagesByThreadId(Context context, int threadId,
+    private SMSMessageCursorWrapper getSMSMessagesByThreadId(Context context, int threadId,
                                                             boolean desc, int limit) {
         if (!Permissions.isGranted(context, Permissions.READ_SMS) ||
                 !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
@@ -708,7 +708,7 @@ public class ContactsAccessHelper {
     }
 
     // SMS message cursor wrapper
-    public class SMSMessageCursorWrapper extends CursorWrapper {
+    private class SMSMessageCursorWrapper extends CursorWrapper {
         private final int ID;
         private final int TYPE;
         private final int DATE;
@@ -727,7 +727,7 @@ public class ContactsAccessHelper {
             BODY = cursor.getColumnIndex("body");
         }
 
-        public SMSMessage getSMSMessage(Context context) {
+        SMSMessage getSMSMessage(Context context) {
             long id = getLong(ID);
             int type = getInt(TYPE);
             long date = getLong(DATE);
@@ -796,7 +796,9 @@ public class ContactsAccessHelper {
     @TargetApi(19)
     public boolean writeSMSMessageToInbox(Context context, SmsMessage[] messages, long timeReceived) {
         // check write permission
-        if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
+        if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
+            return false;
+        }
 
         for (SmsMessage message : messages) {
             // get contact by SMS address
@@ -823,30 +825,35 @@ public class ContactsAccessHelper {
         return true;
     }
 
-    // Writes SMS message to the Outbox
-    boolean writeSMSMessageToOutbox(Context context, String number, String message) {
-        return writeSMSMessage(context, Uri.parse("content://sms/outbox"), number, message);
-    }
-
     // Writes SMS message to the Sent box
-    boolean writeSMSMessageToSentBox(Context context, String number, String message) {
-        return writeSMSMessage(context, Uri.parse("content://sms/sent"), number, message);
-    }
-
-    // Writes SMS message
-    private boolean writeSMSMessage(Context context, Uri uri, String number, String message) {
+    long writeSMSMessageToSentBox(Context context, String number, String message) {
         // check write permission
-        if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) return false;
+        if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
+            return -1;
+        }
+
         // get contact by SMS address
         Contact contact = getContact(context, number);
+
         // write SMS
         ContentValues values = new ContentValues();
         values.put("address", number);
         values.put("body", message);
+        values.put("status", -1);
         values.put("person", (contact == null ? null : contact.id));
-        contentResolver.insert(uri, values);
+        Uri result = contentResolver.insert(Uri.parse("content://sms/sent"), values);
 
-        return true;
+        // get id of the written SMS
+        long id = -1;
+        if(result != null) {
+            try {
+                id = Long.valueOf(result.getLastPathSegment());
+            } catch (NumberFormatException ex) {
+                Log.w(TAG, ex);
+            }
+        }
+
+        return id;
     }
 
 //---------------------------------------------------------------------

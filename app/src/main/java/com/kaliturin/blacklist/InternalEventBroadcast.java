@@ -54,13 +54,13 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     }
 
     /**
-     * Method is called if SMS has been written to the Inbox/Outbox
+     * Method is called if SMS has been written to the Inbox/Outbox/Sent box
      **/
     public void onSMSWasWritten(@NonNull String phoneNumber) {
     }
 
     /**
-     * Method is called if SMS with thread id has been read from the Inbox/Outbox
+     * Method is called if SMS with thread id has been read from the Inbox/Outbox/Sent box
      **/
     public void onSMSWasRead(int threadId) {
     }
@@ -82,7 +82,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     }
 
     /**
-     * Sends internal event of writing to the SMS Inbox/Outbox, which causes
+     * Sends internal event of writing to the SMS Inbox/Outbox/Sent box, which causes
      * onSMSWasWritten invocation of registered receivers.
      **/
     public static void sendSMSWasWritten(Context context, @NonNull String phoneNumber) {
