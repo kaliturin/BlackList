@@ -40,22 +40,22 @@ public class Settings {
     public static final String UI_THEME_DARK = "UI_THEME_DARK";
     public static final String GO_TO_JOURNAL_AT_START = "GO_TO_JOURNAL_AT_START";
     public static final String DEFAULT_SMS_APP_NATIVE_PACKAGE = "DEFAULT_SMS_APP_NATIVE_PACKAGE";
-    public static final String EXIT_ON_BACK_PRESSED = "EXIT_ON_BACK_PRESSED";
+    public static final String DONT_EXIT_ON_BACK_PRESSED = "DONT_EXIT_ON_BACK_PRESSED";
 
     private static final String TRUE = "TRUE";
     private static final String FALSE = "FALSE";
 
-    private static Map<String, String> map = new HashMap<>();
+    private static Map<String, String> settingsMap = new HashMap<>();
 
-    public static void invalidateCache() {
-        map.clear();
+    public static synchronized void invalidateCache() {
+        settingsMap.clear();
     }
 
-    public static boolean setStringValue(Context context, @NonNull String name, @NonNull String value) {
+    public static synchronized boolean setStringValue(Context context, @NonNull String name, @NonNull String value) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
         if (db != null) {
             if (db.setSettingsValue(name, value)) {
-                map.put(name, value);
+                settingsMap.put(name, value);
                 return true;
             }
         }
@@ -63,13 +63,13 @@ public class Settings {
     }
 
     @Nullable
-    public static String getStringValue(Context context, @NonNull String name) {
-        String value = map.get(name);
+    public static synchronized String getStringValue(Context context, @NonNull String name) {
+        String value = settingsMap.get(name);
         if (value == null) {
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
             if (db != null) {
                 value = db.getSettingsValue(name);
-                map.put(name, value);
+                settingsMap.put(name, value);
             }
         }
         return value;
@@ -85,7 +85,7 @@ public class Settings {
         return (value != null && value.equals(TRUE));
     }
 
-    public static void initDefaults(Context context) {
+    public static synchronized void initDefaults(Context context) {
         Map<String, String> map = new HashMap<>();
         map.put(BLOCK_CALLS_FROM_BLACK_LIST, TRUE);
         map.put(BLOCK_ALL_CALLS, FALSE);
@@ -112,13 +112,17 @@ public class Settings {
         map.put(FOLD_SMS_TEXT_IN_JOURNAL, TRUE);
         map.put(UI_THEME_DARK, FALSE);
         map.put(GO_TO_JOURNAL_AT_START, FALSE);
-        map.put(EXIT_ON_BACK_PRESSED, TRUE);
+        map.put(DONT_EXIT_ON_BACK_PRESSED, FALSE);
 
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            String setting = entry.getKey();
-            if (getStringValue(context, setting) == null) {
-                String value = entry.getValue();
-                setStringValue(context, setting, value);
+        if (!Permissions.isGranted(context, Permissions.WRITE_EXTERNAL_STORAGE)) {
+            settingsMap = map;
+        } else {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String setting = entry.getKey();
+                if (getStringValue(context, setting) == null) {
+                    String value = entry.getValue();
+                    setStringValue(context, setting, value);
+                }
             }
         }
     }

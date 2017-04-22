@@ -53,7 +53,7 @@ public class Permissions {
     /**
      * Checks for permission
      **/
-    public static boolean isGranted(@NonNull Context context, @NonNull String permission) {
+    public static synchronized boolean isGranted(@NonNull Context context, @NonNull String permission) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
@@ -69,7 +69,7 @@ public class Permissions {
     /**
      * Checks for permissions and notifies the user if they aren't granted
      **/
-    public static void notifyIfNotGranted(@NonNull Context context) {
+    public static synchronized void notifyIfNotGranted(@NonNull Context context) {
         StringBuilder sb = new StringBuilder();
         int count = 0;
         for (String permission : PERMISSIONS) {
@@ -98,7 +98,7 @@ public class Permissions {
     /**
      * Checks for permission and notifies if it isn't granted
      **/
-    public static boolean notifyIfNotGranted(@NonNull Context context, @NonNull String permission) {
+    public static synchronized boolean notifyIfNotGranted(@NonNull Context context, @NonNull String permission) {
         if (!isGranted(context, permission)) {
             notify(context, permission);
             return true;
@@ -155,14 +155,14 @@ public class Permissions {
     /**
      * Resets permissions results cache
      **/
-    public static void invalidateCache() {
+    public static synchronized void invalidateCache() {
         permissionsResults.clear();
     }
 
     /**
      * Saves the results of permission granting request
      **/
-    public static void onRequestPermissionsResult(int requestCode,
+    public static synchronized  void onRequestPermissionsResult(int requestCode,
                                                   @NonNull String permissions[],
                                                   @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE &&

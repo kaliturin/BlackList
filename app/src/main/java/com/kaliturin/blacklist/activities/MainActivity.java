@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if (!fragmentSwitcher.onBackPressed()) {
-                if (Settings.getBooleanValue(this, Settings.EXIT_ON_BACK_PRESSED)) {
+                if (!Settings.getBooleanValue(this, Settings.DONT_EXIT_ON_BACK_PRESSED)) {
                     super.onBackPressed();
                 }
             }

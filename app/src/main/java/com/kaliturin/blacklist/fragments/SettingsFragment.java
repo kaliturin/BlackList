@@ -200,7 +200,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         adapter.addCheckbox(R.string.Journal, R.string.Go_to_Journal_at_start,
                 Settings.GO_TO_JOURNAL_AT_START);
         adapter.addCheckbox(R.string.Exit, R.string.Exit_on_back_pressed,
-                Settings.EXIT_ON_BACK_PRESSED);
+                Settings.DONT_EXIT_ON_BACK_PRESSED);
         adapter.addCheckbox(R.string.UI_theme_dark, 0, Settings.UI_THEME_DARK, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
