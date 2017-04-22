@@ -122,7 +122,7 @@ public class SMSSendHelper {
         if (messageParts > 1) {
             message += " [" + messagePartId + "/" + messageParts + "]";
         }
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        Utils.showToast(context, message, Toast.LENGTH_SHORT);
     }
 
     /**

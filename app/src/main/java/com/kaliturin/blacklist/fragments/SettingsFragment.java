@@ -225,7 +225,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                         showFilePathDialog(R.string.Export_data, new TextView.OnEditorActionListener() {
                             @Override
                             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-                                // FIXME execute in the thread
                                 // export data file
                                 exportDataFile(textView.getText().toString());
                                 return true;
@@ -246,7 +245,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                         showFilePathDialog(R.string.Import_data, new TextView.OnEditorActionListener() {
                             @Override
                             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-                                // FIXME execute in the thread
                                 // import data file
                                 if (importDataFile(textView.getText().toString())) {
                                     // update settings data

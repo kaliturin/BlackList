@@ -7,6 +7,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.AttrRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StyleRes;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.kaliturin.blacklist.R;
 
@@ -189,5 +192,18 @@ public class Utils {
         }
 
         return true;
+    }
+
+    /**
+     * Makes and shows thread-independent message toast
+     */
+    public static void showToast(final Context context, final String message, final int duration) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context.getApplicationContext(), message, duration).show();
+            }
+        });
     }
 }

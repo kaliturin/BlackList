@@ -226,21 +226,11 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
 //-------------------------------------------------------------------
 
-    // Moves contact to the white list
-    // TODO consider to run it in thread
-    private void moveContactToWhiteList(String caller, String number) {
+    // Moves contact to the the Black/White list
+    private void moveContact(int contactType, String caller, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
         if (db != null) {
-            db.addContact(Contact.TYPE_WHITE_LIST, caller, number);
-        }
-    }
-
-    // Adds contact to the black list
-    // TODO consider to run it in thread
-    private void addContactToBlackList(String caller, String number) {
-        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
-        if (db != null) {
-            db.addContact(Contact.TYPE_BLACK_LIST, caller, number);
+            db.addContact(contactType, caller, number);
         }
     }
 
@@ -420,7 +410,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                 dialog.addItem(R.string.Move_to_black_list, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        addContactToBlackList(record.caller, record.number);
+                        moveContact(Contact.TYPE_BLACK_LIST, record.caller, record.number);
                     }
                 });
             }
@@ -431,7 +421,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                 dialog.addItem(R.string.Move_to_white_list, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        moveContactToWhiteList(record.caller, record.number);
+                        moveContact(Contact.TYPE_WHITE_LIST, record.caller, record.number);
                     }
                 });
             }
@@ -520,7 +510,6 @@ public class JournalFragment extends Fragment implements FragmentArguments {
             progress.dismiss();
         }
 
-        // TODO: check whether cursor is closing
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);

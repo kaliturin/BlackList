@@ -311,8 +311,16 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
     }
 
     private void setNumber(View row, String number) {
-        EditText numberEdit = (EditText) row.findViewById(R.id.edit_number);
+        final EditText numberEdit = (EditText) row.findViewById(R.id.edit_number);
         numberEdit.setText(number);
+        if (number == null || number.isEmpty()) {
+           numberEdit.postDelayed(new Runnable() {
+               @Override
+               public void run() {
+                   numberEdit.requestFocus();
+               }
+           }, 100);
+        }
     }
 
     private int getNumberType(View row) {

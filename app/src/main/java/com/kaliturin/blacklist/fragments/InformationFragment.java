@@ -68,8 +68,8 @@ public class InformationFragment extends Fragment implements FragmentArguments {
         adapter.addTitle(R.string.Attention);
         adapter.addText(R.string.Info_attention);
 
-        adapter.addTitle(R.string.Journal);
-        adapter.addText(R.string.Info_journal);
+        adapter.addTitle(R.string.Messaging);
+        adapter.addText(R.string.Info_messaging);
 
         adapter.addTitle(R.string.Black_list);
         adapter.addText(R.string.Info_black_list);
@@ -77,8 +77,8 @@ public class InformationFragment extends Fragment implements FragmentArguments {
         adapter.addTitle(R.string.White_list);
         adapter.addText(R.string.Info_white_list);
 
-        adapter.addTitle(R.string.Messaging);
-        adapter.addText(R.string.Info_messaging);
+        adapter.addTitle(R.string.Journal);
+        adapter.addText(R.string.Info_journal);
 
         adapter.addTitle(R.string.Settings);
         adapter.addText(R.string.Info_settings);

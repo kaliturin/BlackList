@@ -541,7 +541,7 @@ public class ContactsAccessHelper {
                 Uri.parse("content://sms"),
                 null,
                 " thread_id = ? " +
-                        // FIXME support drafts
+                        // we don't support drafts yet
                         " AND address NOT NULL",
                 new String[]{String.valueOf(threadId)},
                 orderClause + limitClause);
@@ -566,7 +566,7 @@ public class ContactsAccessHelper {
                 Uri.parse("content://sms"),
                 new String[]{" _id "},
                 " thread_id = ? " +
-                        // FIXME support drafts
+                        // we don't support drafts yet
                         " AND address NOT NULL",
                 new String[]{String.valueOf(threadId)},
                 orderClause + limitClause);

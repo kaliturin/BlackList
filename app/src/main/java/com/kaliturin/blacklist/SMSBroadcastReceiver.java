@@ -52,7 +52,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         // process messages
         if (!processMessages(context, number, messages)) {
-            // FIXME Run in service
             // since 19 API only
             if (DefaultSMSAppHelper.isAvailable()) {
                 // messages were not blocked - write them to the inbox

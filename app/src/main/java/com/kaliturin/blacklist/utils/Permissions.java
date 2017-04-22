@@ -91,7 +91,7 @@ public class Permissions {
                 duration = Toast.LENGTH_LONG;
                 message += context.getString(R.string.needs_permissions) + ":\n" + sb.toString();
             }
-            Toast.makeText(context, message, duration).show();
+            Utils.showToast(context, message, duration);
         }
     }
 
@@ -139,7 +139,7 @@ public class Permissions {
         if (info != null) {
             String message = "\"" + context.getString(R.string.app_name) + "\" " +
                     context.getString(R.string.needs_permission) + ": " + info;
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            Utils.showToast(context, message, Toast.LENGTH_SHORT);
         }
     }
 

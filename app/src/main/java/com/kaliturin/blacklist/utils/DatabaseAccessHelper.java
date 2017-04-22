@@ -968,21 +968,4 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
 
         return true;
     }
-
-//----------------------------------------------------------------
-
-/*
-    // TODO temporary
-    static void firstInit(Context context) {
-        DatabaseAccessHelper dao = DatabaseAccessHelper.getInstance(context);
-        InfoStorage storage = InfoStorage.getInstance();
-        // writing from xml to files
-        //storage.firstInit();
-        List<InfoStorage.SmsInfo> itemList =
-                storage.loadSmsInfoList(new ArrayList<InfoStorage.SmsInfo>());
-        for(InfoStorage.SmsInfo info : itemList) {
-            dao.addJournalRecord(info.time, info.sender, info.text);
-        }
-    }
-*/
 }

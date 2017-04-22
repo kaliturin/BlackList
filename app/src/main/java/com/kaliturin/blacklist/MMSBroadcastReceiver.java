@@ -31,7 +31,7 @@ public class MMSBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        // FIXME implement
+        // isn't implemented yet...
     }
 
     public static String getAction() {
