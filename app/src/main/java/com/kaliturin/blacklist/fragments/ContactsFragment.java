@@ -32,7 +32,6 @@ import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
 import com.kaliturin.blacklist.utils.DialogBuilder;
 import com.kaliturin.blacklist.utils.IdentifiersContainer;
 import com.kaliturin.blacklist.utils.Permissions;
-import com.kaliturin.blacklist.utils.ProgressDialogHolder;
 import com.kaliturin.blacklist.utils.Utils;
 
 /**
@@ -40,7 +39,6 @@ import com.kaliturin.blacklist.utils.Utils;
  */
 
 public class ContactsFragment extends Fragment implements FragmentArguments {
-    private static final String LIST_POSITION = "LIST_POSITION";
     private ContactsCursorAdapter cursorAdapter = null;
     private ButtonsBar snackBar = null;
     private int contactType = 0;
@@ -382,7 +380,6 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
 
     // Contact items loader callbacks
     private static class ContactsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
-        ProgressDialogHolder progress = new ProgressDialogHolder();
         private Context context;
         private int contactType;
         private String itemsFilter;
@@ -409,7 +406,6 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            //progress.show(context, R.string.Loading_);
             IdentifiersContainer deletingItems = null;
             if (deleteItems) {
                 deletingItems = cursorAdapter.getCheckedItems().clone();
@@ -430,14 +426,11 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                     }
                 });
             }
-
-            progress.dismiss();
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
-            progress.dismiss();
         }
     }
 

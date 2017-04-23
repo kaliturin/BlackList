@@ -41,7 +41,6 @@ import java.io.File;
  * Settings fragment
  */
 public class SettingsFragment extends Fragment implements FragmentArguments {
-    private static final String LIST_POSITION = "LIST_POSITION";
     private static final int BLOCKED_SMS = 1;
     private static final int RECEIVED_SMS = 2;
     private static final int BLOCKED_CALL = 3;
@@ -69,6 +68,11 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                              Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
+        } else {
+            Bundle arguments = getArguments();
+            if (arguments != null) {
+                listPosition = arguments.getInt(LIST_POSITION, 0);
+            }
         }
 
         // Inflate the layout for this fragment
@@ -518,6 +522,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(MainActivity.ACTION_SETTINGS);
+        intent.putExtra(LIST_POSITION, listView.getFirstVisiblePosition());
         startActivity(intent);
         getActivity().finish();
     }

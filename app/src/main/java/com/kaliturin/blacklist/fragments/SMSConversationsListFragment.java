@@ -42,8 +42,6 @@ import com.kaliturin.blacklist.utils.Utils;
  * Fragment for showing all SMS conversations
  */
 public class SMSConversationsListFragment extends Fragment implements FragmentArguments {
-    private static final String LIST_POSITION = "LIST_POSITION";
-
     private InternalEventBroadcast internalEventBroadcast = null;
     private SMSConversationsListCursorAdapter cursorAdapter = null;
     private ListView listView = null;
@@ -117,7 +115,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                     cursorAdapter.notifyDataSetChanged();
                 } else {
                     // reload all list view items
-                    loadListViewItems();
+                    loadListViewItems(false, false);
                 }
             }
 
@@ -131,7 +129,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         internalEventBroadcast.register(getContext());
 
         // load SMS conversations to the list
-        loadListViewItems(listPosition);
+        loadListViewItems(listPosition, true, true);
     }
 
     @Override
@@ -219,7 +217,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                         ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
                         if (db.deleteSMSMessagesByThreadId(getContext(), sms.threadId)) {
                             // reload list
-                            loadListViewItems();
+                            loadListViewItems(false, true);
                         }
                     } else {
                         Toast.makeText(getContext(), R.string.Need_default_SMS_app,
@@ -261,23 +259,24 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
 //----------------------------------------------------------------------
 
     // Loads SMS conversations to the list view
-    private void loadListViewItems() {
+    private void loadListViewItems(boolean markSeen, boolean showProgress) {
         int listPosition = listView.getFirstVisiblePosition();
-        loadListViewItems(listPosition);
+        loadListViewItems(listPosition, markSeen, showProgress);
     }
 
     // Loads SMS conversations to the list view
-    private void loadListViewItems(int listPosition) {
+    private void loadListViewItems(int listPosition, boolean markSeen, boolean showProgress) {
         if (!isAdded()) {
             return;
         }
         int loaderId = 0;
         ConversationsLoaderCallbacks callbacks =
-                new ConversationsLoaderCallbacks(getContext(),
-                        listView, listPosition, cursorAdapter);
+                new ConversationsLoaderCallbacks(getContext(), listView,
+                        listPosition, cursorAdapter, markSeen, showProgress);
 
         LoaderManager manager = getLoaderManager();
-        if (manager.getLoader(loaderId) == null) {
+        Loader<?> loader = manager.getLoader(loaderId);
+        if (loader == null) {
             // init and run the items loader
             manager.initLoader(loaderId, null, callbacks);
         } else {
@@ -307,18 +306,25 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         private Context context;
         private ListView listView;
         private int listPosition;
+        private boolean markSeen;
+        private boolean showProgress;
 
         ConversationsLoaderCallbacks(Context context, ListView listView, int listPosition,
-                                     SMSConversationsListCursorAdapter cursorAdapter) {
+                                     SMSConversationsListCursorAdapter cursorAdapter,
+                                     boolean markSeen, boolean showProgress) {
             this.context = context;
             this.listView = listView;
             this.listPosition = listPosition;
             this.cursorAdapter = cursorAdapter;
+            this.markSeen = markSeen;
+            this.showProgress = showProgress;
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            progress.show(context, R.string.Loading_);
+            if (showProgress) {
+                progress.show(context, R.string.Loading_);
+            }
             return new ConversationsLoader(context);
         }
 
@@ -339,7 +345,7 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 });
             }
 
-            if (cursor != null) {
+            if (markSeen) {
                 // mark all SMS are seen
                 new SMSSeenMarker(context).execute();
             }

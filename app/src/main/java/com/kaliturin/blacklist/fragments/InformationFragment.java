@@ -23,7 +23,6 @@ import com.kaliturin.blacklist.adapters.InformationArrayAdapter;
  */
 public class InformationFragment extends Fragment implements FragmentArguments {
     private static final String TAG = InformationFragment.class.getName();
-    private static final String LIST_POSITION = "LIST_POSITION";
     private ListView listView = null;
     private int listPosition = 0;
 

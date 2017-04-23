@@ -90,6 +90,15 @@
             </intent-filter>
         </service>
 
+        <!-- BroadcastReceiver that listens for sending/delivering SMS messages -->
+        <receiver
+            android:name=".SMSSendResultBroadcastReceiver">
+            <intent-filter android:priority="100">
+                <action android:name="com.kaliturin.blacklist.SMS_SENT"/>
+                <action android:name="com.kaliturin.blacklist.SMS_DELIVERY" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

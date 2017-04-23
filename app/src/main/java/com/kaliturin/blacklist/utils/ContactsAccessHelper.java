@@ -12,20 +12,19 @@ import android.provider.CallLog.Calls;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
-import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
+import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactNumber;
+import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactSource;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactNumber;
-import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
-import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactSource;
 
 /**
  * Contacts list access helper
@@ -529,7 +528,7 @@ public class ContactsAccessHelper {
     // Selects SMS messages by thread id
     @Nullable
     private SMSMessageCursorWrapper getSMSMessagesByThreadId(Context context, int threadId,
-                                                            boolean desc, int limit) {
+                                                             boolean desc, int limit) {
         if (!Permissions.isGranted(context, Permissions.READ_SMS) ||
                 !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             return null;
@@ -688,19 +687,22 @@ public class ContactsAccessHelper {
 
     // SMS message
     public class SMSMessage {
-        public static final int TYPE_INBOX = 1; // system type of sms from inbox
-
         public final long id;
         public final int type;
+        public final int status;
         public final long date;
+        public final long deliveryDate;
         public final String person;
         public final String number;
         public final String body;
 
-        SMSMessage(long id, int type, long date, String person, String number, String body) {
+        SMSMessage(long id, int type, int status, long date, long deliveryDate,
+                   String person, String number, String body) {
             this.id = id;
             this.type = type;
+            this.status = status;
             this.date = date;
+            this.deliveryDate = deliveryDate;
             this.person = person;
             this.number = number;
             this.body = body;
@@ -711,7 +713,10 @@ public class ContactsAccessHelper {
     private class SMSMessageCursorWrapper extends CursorWrapper {
         private final int ID;
         private final int TYPE;
+        private final int STATUS;
         private final int DATE;
+        private final int DATE_SENT;
+        private final int DELIVERY_DATE;
         private final int PERSON;
         private final int NUMBER;
         private final int BODY;
@@ -721,7 +726,10 @@ public class ContactsAccessHelper {
             cursor.moveToFirst();
             ID = cursor.getColumnIndex("_id");
             TYPE = cursor.getColumnIndex("type");
+            STATUS = cursor.getColumnIndex("status");
             DATE = cursor.getColumnIndex("date");
+            DATE_SENT = cursor.getColumnIndex("date_sent");
+            DELIVERY_DATE = cursor.getColumnIndex("delivery_date");
             NUMBER = cursor.getColumnIndex("address");
             PERSON = cursor.getColumnIndex("person");
             BODY = cursor.getColumnIndex("body");
@@ -730,9 +738,19 @@ public class ContactsAccessHelper {
         SMSMessage getSMSMessage(Context context) {
             long id = getLong(ID);
             int type = getInt(TYPE);
+            int status = getInt(STATUS);
             long date = getLong(DATE);
+            long date_sent = 0;
+            if (DATE_SENT >= 0) {
+                date_sent = getLong(DATE_SENT);
+            } else {
+                if (DELIVERY_DATE >= 0) {
+                    date_sent = getLong(DELIVERY_DATE);
+                }
+            }
             String number = getString(NUMBER);
             String body = getString(BODY);
+
             String person = null;
             Contact contact;
             if (!isNull(PERSON)) {
@@ -746,7 +764,7 @@ public class ContactsAccessHelper {
                 person = contact.name;
             }
 
-            return new SMSMessage(id, type, date, person, number, body);
+            return new SMSMessage(id, type, status, date, date_sent, person, number, body);
         }
     }
 
@@ -775,7 +793,7 @@ public class ContactsAccessHelper {
 //        }
 
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms"),
+                CONTENT_URI_SMS,
                 null,
                 " _id = " + id,
                 null,
@@ -795,7 +813,6 @@ public class ContactsAccessHelper {
     // Needed only since API19 - where only default SMS app can write to content resolver
     @TargetApi(19)
     public boolean writeSMSMessageToInbox(Context context, SmsMessage[] messages, long timeReceived) {
-        // check write permission
         if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return false;
         }
@@ -806,28 +823,65 @@ public class ContactsAccessHelper {
 
             // create writing values
             ContentValues values = new ContentValues();
-            values.put(Telephony.Sms.ADDRESS, message.getDisplayOriginatingAddress());
-            values.put(Telephony.Sms.BODY, message.getMessageBody());
-            values.put(Telephony.Sms.PERSON, (contact == null ? null : contact.id));
-            values.put(Telephony.Sms.DATE, timeReceived);
-            values.put(Telephony.Sms.DATE_SENT, message.getTimestampMillis());
-            values.put(Telephony.Sms.PROTOCOL, message.getProtocolIdentifier());
-            values.put(Telephony.Sms.REPLY_PATH_PRESENT, message.isReplyPathPresent());
-            values.put(Telephony.Sms.SERVICE_CENTER, message.getServiceCenterAddress());
-            values.put(Telephony.Sms.SUBJECT, message.getPseudoSubject());
-            values.put(Telephony.Sms.READ, "0");
-            values.put(Telephony.Sms.SEEN, "0");
+            values.put(ADDRESS, message.getDisplayOriginatingAddress());
+            values.put(BODY, message.getMessageBody());
+            values.put(PERSON, (contact == null ? null : contact.id));
+            values.put(DATE, timeReceived);
+            values.put(DATE_SENT, message.getTimestampMillis());
+            values.put(PROTOCOL, message.getProtocolIdentifier());
+            values.put(REPLY_PATH_PRESENT, message.isReplyPathPresent());
+            values.put(SERVICE_CENTER, message.getServiceCenterAddress());
+            String subject = message.getPseudoSubject();
+            subject = (subject != null && !subject.isEmpty() ? subject : null);
+            values.put(SUBJECT, subject);
+            values.put(READ, "0");
+            values.put(SEEN, "0");
 
             // write SMS to Inbox
-            contentResolver.insert(Telephony.Sms.Inbox.CONTENT_URI, values);
+            contentResolver.insert(CONTENT_URI_SMS_INBOX, values);
         }
 
         return true;
     }
 
-    // Writes SMS message to the Sent box
-    long writeSMSMessageToSentBox(Context context, String number, String message) {
-        // check write permission
+
+    // SMS data uris
+    public static final Uri CONTENT_URI_SMS = Uri.parse("content://sms");
+    public static final Uri CONTENT_URI_SMS_INBOX = Uri.parse("content://sms/inbox");
+    public static final Uri CONTENT_URI_SMS_OUTBOX = Uri.parse("content://sms/outbox");
+
+    // SMS data columns
+    public static final String ID = "_id";
+    public static final String ADDRESS = "address";
+    public static final String BODY = "body";
+    public static final String PERSON = "person";
+    public static final String DATE = "date";
+    public static final String DATE_SENT = "date_sent";
+    public static final String PROTOCOL = "protocol";
+    public static final String REPLY_PATH_PRESENT = "reply_path_present";
+    public static final String SERVICE_CENTER = "service_center";
+    public static final String SUBJECT = "subject";
+    public static final String READ = "read";
+    public static final String SEEN = "seen";
+    public static final String TYPE = "type";
+    public static final String STATUS = "status";
+    public static final String DELIVERY_DATE = "delivery_date";
+
+    // Message statuses
+    public static final int MESSAGE_STATUS_NONE = -1;
+    public static final int MESSAGE_STATUS_COMPLETE = 0;
+    public static final int MESSAGE_STATUS_PENDING = 32;
+    public static final int MESSAGE_STATUS_FAILED = 64;
+
+    // Message types
+    public static final int MESSAGE_TYPE_INBOX = 1;
+    public static final int MESSAGE_TYPE_SENT = 2;
+    public static final int MESSAGE_TYPE_OUTBOX = 4;
+    public static final int MESSAGE_TYPE_FAILED = 5;
+
+
+    // Writes SMS message to the Outbox
+    public long writeSMSMessageToOutbox(Context context, String number, String message) {
         if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return -1;
         }
@@ -837,15 +891,16 @@ public class ContactsAccessHelper {
 
         // write SMS
         ContentValues values = new ContentValues();
-        values.put("address", number);
-        values.put("body", message);
-        values.put("status", -1);
-        values.put("person", (contact == null ? null : contact.id));
-        Uri result = contentResolver.insert(Uri.parse("content://sms/sent"), values);
+        values.put(ADDRESS, number);
+        values.put(BODY, message);
+        values.put(TYPE, MESSAGE_TYPE_OUTBOX);
+        values.put(STATUS, MESSAGE_STATUS_NONE);
+        values.put(PERSON, (contact == null ? null : contact.id));
+        Uri result = contentResolver.insert(CONTENT_URI_SMS, values);
 
         // get id of the written SMS
         long id = -1;
-        if(result != null) {
+        if (result != null) {
             try {
                 id = Long.valueOf(result.getLastPathSegment());
             } catch (NumberFormatException ex) {
@@ -854,6 +909,57 @@ public class ContactsAccessHelper {
         }
 
         return id;
+    }
+
+    // Updates SMS message on sent
+    public boolean updateSMSMessageOnSent(Context context, long messageId, boolean delivery, boolean failed) {
+        int type, status;
+        if (failed) {
+            type = MESSAGE_TYPE_FAILED;
+            status = MESSAGE_STATUS_NONE;
+        } else {
+            type = MESSAGE_TYPE_SENT;
+            if (delivery) {
+                status = MESSAGE_STATUS_PENDING;
+            } else {
+                status = MESSAGE_STATUS_NONE;
+            }
+        }
+        return updateSMSMessage(context, messageId, type, status, 0);
+    }
+
+    // Updates SMS message on delivery
+    public boolean updateSMSMessageOnDelivery(Context context, long messageId, boolean failed) {
+        int type, status;
+        if (failed) {
+            type = MESSAGE_TYPE_FAILED;
+            status = MESSAGE_STATUS_FAILED;
+        } else {
+            type = MESSAGE_TYPE_SENT;
+            status = MESSAGE_STATUS_COMPLETE;
+        }
+        return updateSMSMessage(context, messageId, type, status, System.currentTimeMillis());
+    }
+
+    // Updates SMS message
+    private boolean updateSMSMessage(Context context, long messageId, int type, int status, long deliveryDate) {
+        if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
+            return false;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(TYPE, type);
+        values.put(STATUS, status);
+        if (deliveryDate > 0) {
+            values.put(DELIVERY_DATE, deliveryDate);
+            values.put(DATE_SENT, deliveryDate);
+        }
+
+        return contentResolver.update(
+                CONTENT_URI_SMS,
+                values,
+                ID + " = ? ",
+                new String[]{String.valueOf(messageId)}) > 0;
     }
 
 //---------------------------------------------------------------------

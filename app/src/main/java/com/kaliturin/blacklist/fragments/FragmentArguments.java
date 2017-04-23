@@ -18,4 +18,5 @@ public interface FragmentArguments {
     String UNREAD_COUNT = "UNREAD_COUNT";
     String SINGLE_NUMBER_MODE = "SINGLE_NUMBER_MODE";
     String SMS_MESSAGE_BODY = "SMS_MESSAGE_BODY";
+    String LIST_POSITION = "LIST_POSITION";
 }

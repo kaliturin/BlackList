@@ -195,7 +195,7 @@ public class Utils {
     }
 
     /**
-     * Makes and shows thread-independent message toast
+     * Makes and shows threadsafe toast
      */
     public static void showToast(final Context context, final String message, final int duration) {
         Handler handler = new Handler(Looper.getMainLooper());

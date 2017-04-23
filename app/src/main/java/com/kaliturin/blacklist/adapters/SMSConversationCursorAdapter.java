@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.kaliturin.blacklist.R;
+import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.SMSMessage;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.SMSMessageCursorWrapper2;
 import com.kaliturin.blacklist.utils.Utils;
@@ -58,11 +59,11 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // get cursor wrapper
         SMSMessageCursorWrapper2 cursorWrapper = (SMSMessageCursorWrapper2) cursor;
-        // get model
+        // get message
         SMSMessage model = cursorWrapper.getSMSMessage(context);
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        // update the view holder with new model
+        // update the view holder with new message
         viewHolder.setModel(context, model);
     }
 
@@ -75,7 +76,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         if (view != null) {
             holder = (ViewHolder) view.getTag();
         }
-        return (holder == null ? null : holder.model);
+        return (holder == null ? null : holder.message);
     }
 
     public void setOnLongClickListener(View.OnLongClickListener onLongClickListener) {
@@ -120,7 +121,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
 
     // Holder of the view data
     private class ViewHolder {
-        private SMSMessage model;
+        private SMSMessage message;
         private View rowView;
         private TextView bodyTextView;
         private TextView dateTextView;
@@ -137,7 +138,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
                    View contentView,
                    TextView snippetTextView,
                    TextView dateTextView) {
-            this.model = null;
+            this.message = null;
             this.rowView = rowView;
             this.contentView = contentView;
             this.bodyTextView = snippetTextView;
@@ -150,28 +151,36 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             bodyTextView.setOnLongClickListener(rowOnLongClickListener);
         }
 
-        void setModel(Context context, SMSMessage model) {
-            this.model = model;
-            bodyTextView.setText(model.body);
+        void setModel(Context context, SMSMessage message) {
+            this.message = message;
+            bodyTextView.setText(message.body);
 
-            Date date = toDate(model.date);
-            String text = timeFormat.format(date) + ", " + dateFormat.format(date);
+            String text;
+            switch (message.type) {
+                case ContactsAccessHelper.MESSAGE_TYPE_OUTBOX:
+                    text = context.getString(R.string.Sending_);
+                    break;
+                case ContactsAccessHelper.MESSAGE_TYPE_FAILED:
+                    text = context.getString(R.string.Failed);
+                    break;
+                default:
+                    Date date = toDate(message.date);
+                    text = timeFormat.format(date) + ", " + dateFormat.format(date);
+                    break;
+            }
             dateTextView.setText(text);
 
             // init alignments and color
             Padding padding;
             int gravity;
             int color;
-            //int drawableId;
-            if (model.type == SMSMessage.TYPE_INBOX) {
+            if (message.type == ContactsAccessHelper.MESSAGE_TYPE_INBOX) {
                 padding = paddingStart;
                 gravity = Gravity.START;
-                //drawableId = R.drawable.bubble_in;
                 color = R.attr.colorIncomeSms;
             } else {
                 padding = paddingEnd;
                 gravity = Gravity.END;
-                //drawableId = R.drawable.bubble_out;
                 color = R.attr.colorOutcomeSms;
             }
 
@@ -179,8 +188,6 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
             ((LinearLayout) rowView).setGravity(gravity);
             rowView.setPadding(padding.left, padding.top, padding.right, padding.bottom);
 
-            // set background color
-            //Utils.setDrawable(context, contentView, drawableId);
             Drawable drawable = contentView.getBackground().mutate();
             Utils.setDrawableColor(context, drawable, color);
         }

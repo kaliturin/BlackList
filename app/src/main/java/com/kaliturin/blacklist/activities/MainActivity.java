@@ -242,7 +242,8 @@ public class MainActivity extends AppCompatActivity
 
         // Switches fragment by navigation menu item
         void switchFragment(@IdRes int itemId) {
-            Bundle arguments = new Bundle();
+            Bundle extras = getIntent().getExtras();
+            Bundle arguments = (extras != null ? new Bundle(extras) : new Bundle());
             switch (itemId) {
                 case R.id.nav_journal:
                     arguments.putString(TITLE, getString(R.string.Journal));

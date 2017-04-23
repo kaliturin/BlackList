@@ -40,6 +40,9 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     private static final int SMS_LENGTH_UNICODE = 70;
     private static final int SMS_LENGTH2_UNICODE = 67;
     private Map<String, String> number2NameMap = new HashMap<>();
+    private EditText messageEdit = null;
+    private TextView lengthTextView = null;
+
 
     public SMSSendFragment() {
         // Required empty public constructor
@@ -56,9 +59,26 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // message body edit
-        final EditText messageEdit = (EditText) view.findViewById(R.id.text_message);
+        lengthTextView = (TextView) view.findViewById(R.id.text_message_length);
+        messageEdit = (EditText) view.findViewById(R.id.text_message);
 
+        // message text changed listener
+        messageEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateMessageTextLengthCounter();
+            }
+        });
+
+        // apply arguments
         if (savedInstanceState == null) {
             // get contact from arguments
             Bundle arguments = getArguments();
@@ -75,6 +95,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                 String body = arguments.getString(SMS_MESSAGE_BODY);
                 if (body != null) {
                     messageEdit.setText(body);
+                    updateMessageTextLengthCounter();
                 }
             }
         }
@@ -96,50 +117,6 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                     // open menu dialog
                     showAddContactsMenuDialog();
                 }
-            }
-        });
-
-        // message text changed listener
-        final TextView lengthMessageText = (TextView) view.findViewById(R.id.text_message_length);
-        messageEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                Editable editable = messageEdit.getText();
-                int messageLength = editable.length();
-
-                // is there unicode character in the message?
-                boolean unicode = false;
-                for (int i = 0; i < messageLength; i++) {
-                    char c = editable.charAt(i);
-                    if (Character.UnicodeBlock.of(c) != Character.UnicodeBlock.BASIC_LATIN) {
-                        unicode = true;
-                        break;
-                    }
-                }
-
-                // get max length of sms part depending on encoding and full length
-                int length1 = (unicode ? SMS_LENGTH_UNICODE : SMS_LENGTH);
-                int length2 = (unicode ? SMS_LENGTH2_UNICODE : SMS_LENGTH2);
-                int partMaxLength = (messageLength > length1 ? length2 : length1);
-                // create current length status info
-                int partsNumber = messageLength / partMaxLength + 1;
-                int partLength = partMaxLength - messageLength % partMaxLength;
-                // correct length info for second part
-                if (partsNumber == 2 && partLength == partMaxLength) {
-                    partLength = length1 - (length1 - length2) * 2;
-                }
-
-                // show current length status info
-                String text = "" + partLength + "/" + partsNumber;
-                lengthMessageText.setText(text);
             }
         });
 
@@ -184,6 +161,37 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     private void finishActivity(int result) {
         getActivity().setResult(result);
         getActivity().finish();
+    }
+
+    private void updateMessageTextLengthCounter() {
+        Editable editable = messageEdit.getText();
+        int messageLength = editable.length();
+
+        // is there unicode character in the message?
+        boolean unicode = false;
+        for (int i = 0; i < messageLength; i++) {
+            char c = editable.charAt(i);
+            if (Character.UnicodeBlock.of(c) != Character.UnicodeBlock.BASIC_LATIN) {
+                unicode = true;
+                break;
+            }
+        }
+
+        // get max length of sms part depending on encoding and full length
+        int length1 = (unicode ? SMS_LENGTH_UNICODE : SMS_LENGTH);
+        int length2 = (unicode ? SMS_LENGTH2_UNICODE : SMS_LENGTH2);
+        int partMaxLength = (messageLength > length1 ? length2 : length1);
+        // create current length status info
+        int partsNumber = messageLength / partMaxLength + 1;
+        int partLength = partMaxLength - messageLength % partMaxLength;
+        // correct length info for second part
+        if (partsNumber == 2 && partLength == partMaxLength) {
+            partLength = length1 - (length1 - length2) * 2;
+        }
+
+        // show current length status info
+        String text = "" + partLength + "/" + partsNumber;
+        lengthTextView.setText(text);
     }
 
 //-------------------------------------------------------------

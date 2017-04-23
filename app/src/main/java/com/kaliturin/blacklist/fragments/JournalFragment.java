@@ -34,7 +34,6 @@ import com.kaliturin.blacklist.utils.DatabaseAccessHelper.JournalRecord;
 import com.kaliturin.blacklist.utils.DialogBuilder;
 import com.kaliturin.blacklist.utils.IdentifiersContainer;
 import com.kaliturin.blacklist.utils.Permissions;
-import com.kaliturin.blacklist.utils.ProgressDialogHolder;
 import com.kaliturin.blacklist.utils.Utils;
 
 import java.util.List;
@@ -43,7 +42,6 @@ import java.util.List;
  * Fragment for the journal (blocked calls/sms list) representation
  */
 public class JournalFragment extends Fragment implements FragmentArguments {
-    private static final String LIST_POSITION = "LIST_POSITION";
     private InternalEventBroadcast internalEventBroadcast = null;
     private JournalCursorAdapter cursorAdapter = null;
     private ListView listView = null;
@@ -461,7 +459,6 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
     // Journal items loader callbacks
     private static class JournalItemsLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
-        private ProgressDialogHolder progress = new ProgressDialogHolder();
         private Context context;
         private String itemsFilter;
         private JournalCursorAdapter cursorAdapter;
@@ -485,7 +482,6 @@ public class JournalFragment extends Fragment implements FragmentArguments {
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            //progress.show(context, R.string.Loading_);
             IdentifiersContainer deletingItems = null;
             if (deleteItems) {
                 deletingItems = cursorAdapter.getCheckedItems().clone();
@@ -506,14 +502,11 @@ public class JournalFragment extends Fragment implements FragmentArguments {
                     }
                 });
             }
-
-            progress.dismiss();
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
-            progress.dismiss();
         }
     }
 }

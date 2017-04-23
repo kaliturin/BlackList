@@ -30,7 +30,6 @@ import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
 import com.kaliturin.blacklist.utils.DefaultSMSAppHelper;
 import com.kaliturin.blacklist.utils.DialogBuilder;
 import com.kaliturin.blacklist.utils.Permissions;
-import com.kaliturin.blacklist.utils.ProgressDialogHolder;
 import com.kaliturin.blacklist.utils.Utils;
 
 
@@ -199,7 +198,6 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
     // SMS conversation loader callbacks
     private static class ConversationLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
-        private ProgressDialogHolder progress = new ProgressDialogHolder();
         private SMSConversationCursorAdapter cursorAdapter;
         private Context context;
         private int threadId;
@@ -219,7 +217,6 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            //progress.show(context, R.string.Loading_);
             return new ConversationLoader(context, threadId);
         }
 
@@ -248,14 +245,11 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                 // mark sms ot the thread are read
                 new SMSReadMarker(context).execute(threadId);
             }
-
-            progress.dismiss();
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             cursorAdapter.changeCursor(null);
-            progress.dismiss();
         }
     }
 
