@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Contacts list access helper
+ * Contacts/SMS/Calls list access helper
  */
 public class ContactsAccessHelper {
     private static final String TAG = ContactsAccessHelper.class.getName();
@@ -262,22 +262,43 @@ public class ContactsAccessHelper {
 
 //-------------------------------------------------------------------------------------
 
+    // SMS data URIs
+    private static final Uri URI_CONTENT_SMS = Uri.parse("content://sms");
+    private static final Uri URI_CONTENT_SMS_INBOX = Uri.parse("content://sms/inbox");
+    private static final Uri URI_CONTENT_SMS_CONVERSATIONS = Uri.parse("content://sms/conversations");
+
+    // SMS data columns
+    private static final String ID = "_id";
+    private static final String ADDRESS = "address";
+    private static final String BODY = "body";
+    private static final String PERSON = "person";
+    private static final String DATE = "date";
+    private static final String DATE_SENT = "date_sent";
+    private static final String PROTOCOL = "protocol";
+    private static final String REPLY_PATH_PRESENT = "reply_path_present";
+    private static final String SERVICE_CENTER = "service_center";
+    private static final String SUBJECT = "subject";
+    private static final String READ = "read";
+    private static final String SEEN = "seen";
+    private static final String TYPE = "type";
+    private static final String STATUS = "status";
+    private static final String DELIVERY_DATE = "delivery_date";
+    private static final String THREAD_ID = "thread_id";
+
+//-------------------------------------------------------------------------------------
+
     // Returns true if passed number contains in SMS content list
     public boolean containsNumberInSMSContent(Context context, @NonNull String number) {
         if (!Permissions.isGranted(context, Permissions.READ_SMS)) {
             return false;
         }
 
-        final String ID = "_id";
-        final String ADDRESS = "address";
-        final String PERSON = "person";
-
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms"),
+                URI_CONTENT_SMS,
                 new String[]{"DISTINCT " + ID, ADDRESS, PERSON},
                 ADDRESS + " = ? ) GROUP BY (" + ADDRESS,
                 new String[]{number},
-                "date DESC");
+                DATE + " DESC");
 
         if (validate(cursor)) {
             cursor.close();
@@ -291,20 +312,17 @@ public class ContactsAccessHelper {
     @Nullable
     private ContactFromSMSCursorWrapper getContactsFromSMSList(@Nullable String filter) {
         filter = (filter == null ? "" : filter.toLowerCase());
-        final String ID = "_id";
-        final String ADDRESS = "address"; // number
-        final String PERSON = "person"; // contact id
 
         // filter by address (number) if person (contact id) is null
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms"),
+                URI_CONTENT_SMS,
                 new String[]{"DISTINCT " + ID, ADDRESS, PERSON},
                 ADDRESS + " IS NOT NULL AND (" +
                         PERSON + " IS NOT NULL OR " +
                         ADDRESS + " LIKE ? )" +
                         ") GROUP BY (" + ADDRESS,
                 new String[]{"%" + filter + "%"},
-                "date DESC");
+                DATE + " DESC");
 
         // now we need to filter contacts by names and fill matrix cursor
         if (validate(cursor)) {
@@ -341,23 +359,23 @@ public class ContactsAccessHelper {
 
     // Contact from SMS cursor wrapper
     private class ContactFromSMSCursorWrapper extends CursorWrapper implements ContactSource {
-        private final int ID;
-        private final int ADDRESS;
-        private final int PERSON;
+        private final int _ID;
+        private final int _ADDRESS;
+        private final int _PERSON;
 
         private ContactFromSMSCursorWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
-            ID = getColumnIndex("_id");
-            ADDRESS = getColumnIndex("address");
-            PERSON = getColumnIndex("person");
+            _ID = getColumnIndex(ID);
+            _ADDRESS = getColumnIndex(ADDRESS);
+            _PERSON = getColumnIndex(PERSON);
         }
 
         @Override
         public Contact getContact() {
-            long id = getLong(ID);
-            String name = getString(PERSON);
-            String number = getString(ADDRESS);
+            long id = getLong(_ID);
+            String name = getString(_PERSON);
+            String number = getString(_ADDRESS);
             List<ContactNumber> numbers = new LinkedList<>();
             numbers.add(new ContactNumber(0, number, id));
 
@@ -467,17 +485,17 @@ public class ContactsAccessHelper {
 
     // SMS conversation cursor wrapper
     public class SMSConversationWrapper extends CursorWrapper {
-        private final int THREAD_ID;
+        private final int _THREAD_ID;
 
         private SMSConversationWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
-            THREAD_ID = cursor.getColumnIndex("thread_id");
+            _THREAD_ID = cursor.getColumnIndex(THREAD_ID);
         }
 
         @Nullable
         public SMSConversation getConversation(Context context) {
-            int threadId = getInt(THREAD_ID);
+            int threadId = getInt(_THREAD_ID);
             return getSMSConversationByThreadId(context, threadId);
         }
     }
@@ -492,11 +510,11 @@ public class ContactsAccessHelper {
 
         // select available conversation's data
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms/conversations"),
-                new String[]{"thread_id as _id", "thread_id"},
+                URI_CONTENT_SMS_CONVERSATIONS,
+                new String[]{THREAD_ID + " as " + ID, THREAD_ID},
                 null,
                 null,
-                "date DESC");
+                DATE + " DESC");
 
         return (validate(cursor) ? new SMSConversationWrapper(cursor) : null);
     }
@@ -534,14 +552,14 @@ public class ContactsAccessHelper {
             return null;
         }
 
-        String orderClause = (desc ? " date DESC " : " date ASC ");
+        String orderClause = (desc ? DATE + " DESC " : DATE + " ASC ");
         String limitClause = (limit > 0 ? " LIMIT " + limit : "");
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms"),
+                URI_CONTENT_SMS,
                 null,
-                " thread_id = ? " +
+                THREAD_ID + " = ? " +
                         // we don't support drafts yet
-                        " AND address NOT NULL",
+                        " AND " + ADDRESS + " NOT NULL ",
                 new String[]{String.valueOf(threadId)},
                 orderClause + limitClause);
 
@@ -559,14 +577,14 @@ public class ContactsAccessHelper {
             return null;
         }
 
-        String orderClause = (desc ? " date DESC " : " date ASC ");
+        String orderClause = (desc ? DATE + " DESC " : DATE + " ASC ");
         String limitClause = (limit > 0 ? " LIMIT " + limit : "");
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms"),
-                new String[]{" _id "},
-                " thread_id = ? " +
+                URI_CONTENT_SMS,
+                new String[]{ID},
+                THREAD_ID + " = ? " +
                         // we don't support drafts yet
-                        " AND address NOT NULL",
+                        " AND " + ADDRESS + " NOT NULL ",
                 new String[]{String.valueOf(threadId)},
                 orderClause + limitClause);
 
@@ -580,10 +598,10 @@ public class ContactsAccessHelper {
         }
 
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms/inbox"),
-                new String[]{"COUNT(_id)"},
-                " thread_id = ? AND " +
-                        " read = ? ",
+                URI_CONTENT_SMS_INBOX,
+                new String[]{"COUNT(" + ID + ")"},
+                THREAD_ID + " = ? AND " +
+                        READ + " = ? ",
                 new String[]{
                         String.valueOf(threadId),
                         String.valueOf(0)
@@ -607,12 +625,12 @@ public class ContactsAccessHelper {
         }
 
         ContentValues values = new ContentValues();
-        values.put("read", 1);
+        values.put(READ, 1);
         return contentResolver.update(
-                Uri.parse("content://sms/inbox"),
+                URI_CONTENT_SMS_INBOX,
                 values,
-                " thread_id = ? AND " +
-                        " read = ? ",
+                THREAD_ID + " = ? AND " +
+                        READ + " = ? ",
                 new String[]{
                         String.valueOf(threadId),
                         String.valueOf(0)
@@ -626,8 +644,8 @@ public class ContactsAccessHelper {
         }
 
         int count = contentResolver.delete(
-                Uri.parse("content://sms"),
-                " thread_id = ? ",
+                URI_CONTENT_SMS,
+                THREAD_ID + " = ? ",
                 new String[]{String.valueOf(threadId)});
 
         return (count > 0);
@@ -640,8 +658,8 @@ public class ContactsAccessHelper {
         }
 
         int count = contentResolver.delete(
-                Uri.parse("content://sms"),
-                " _id = ? ",
+                URI_CONTENT_SMS,
+                ID + " = ? ",
                 new String[]{String.valueOf(id)});
 
         return (count > 0);
@@ -654,11 +672,11 @@ public class ContactsAccessHelper {
         }
 
         ContentValues values = new ContentValues();
-        values.put("seen", 1);
+        values.put(SEEN, 1);
         return contentResolver.update(
-                Uri.parse("content://sms/inbox"),
+                URI_CONTENT_SMS_INBOX,
                 values,
-                " seen = ? ",
+                SEEN + " = ? ",
                 new String[]{String.valueOf(0)}) > 0;
     }
 
@@ -669,11 +687,11 @@ public class ContactsAccessHelper {
         }
 
         Cursor cursor = contentResolver.query(
-                Uri.parse("content://sms"),
-                new String[]{"thread_id"},
-                " address = ? ",
+                URI_CONTENT_SMS,
+                new String[]{THREAD_ID},
+                ADDRESS + " = ? ",
                 new String[]{number},
-                "date DESC LIMIT 1 ");
+                DATE + " DESC LIMIT 1 ");
 
         int threadId = -1;
         if (validate(cursor)) {
@@ -684,6 +702,8 @@ public class ContactsAccessHelper {
 
         return threadId;
     }
+
+//--------------------------------------------------------------------------------
 
     // SMS message
     public class SMSMessage {
@@ -711,51 +731,51 @@ public class ContactsAccessHelper {
 
     // SMS message cursor wrapper
     private class SMSMessageCursorWrapper extends CursorWrapper {
-        private final int ID;
-        private final int TYPE;
-        private final int STATUS;
-        private final int DATE;
-        private final int DATE_SENT;
-        private final int DELIVERY_DATE;
-        private final int PERSON;
-        private final int NUMBER;
-        private final int BODY;
+        private final int _ID;
+        private final int _TYPE;
+        private final int _STATUS;
+        private final int _DATE;
+        private final int _DATE_SENT;
+        private final int _DELIVERY_DATE;
+        private final int _PERSON;
+        private final int _NUMBER;
+        private final int _BODY;
 
         private SMSMessageCursorWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
-            ID = cursor.getColumnIndex("_id");
-            TYPE = cursor.getColumnIndex("type");
-            STATUS = cursor.getColumnIndex("status");
-            DATE = cursor.getColumnIndex("date");
-            DATE_SENT = cursor.getColumnIndex("date_sent");
-            DELIVERY_DATE = cursor.getColumnIndex("delivery_date");
-            NUMBER = cursor.getColumnIndex("address");
-            PERSON = cursor.getColumnIndex("person");
-            BODY = cursor.getColumnIndex("body");
+            _ID = cursor.getColumnIndex(ID);
+            _TYPE = cursor.getColumnIndex(TYPE);
+            _STATUS = cursor.getColumnIndex(STATUS);
+            _DATE = cursor.getColumnIndex(DATE);
+            _DATE_SENT = cursor.getColumnIndex(DATE_SENT);
+            _DELIVERY_DATE = cursor.getColumnIndex(DELIVERY_DATE);
+            _NUMBER = cursor.getColumnIndex(ADDRESS);
+            _PERSON = cursor.getColumnIndex(PERSON);
+            _BODY = cursor.getColumnIndex(BODY);
         }
 
         SMSMessage getSMSMessage(Context context) {
-            long id = getLong(ID);
-            int type = getInt(TYPE);
-            int status = getInt(STATUS);
-            long date = getLong(DATE);
+            long id = getLong(_ID);
+            int type = getInt(_TYPE);
+            int status = getInt(_STATUS);
+            long date = getLong(_DATE);
             long date_sent = 0;
-            if (DATE_SENT >= 0) {
-                date_sent = getLong(DATE_SENT);
+            if (_DATE_SENT >= 0) {
+                date_sent = getLong(_DATE_SENT);
             } else {
-                if (DELIVERY_DATE >= 0) {
-                    date_sent = getLong(DELIVERY_DATE);
+                if (_DELIVERY_DATE >= 0) {
+                    date_sent = getLong(_DELIVERY_DATE);
                 }
             }
-            String number = getString(NUMBER);
-            String body = getString(BODY);
+            String number = getString(_NUMBER);
+            String body = getString(_BODY);
 
             String person = null;
             Contact contact;
-            if (!isNull(PERSON)) {
+            if (!isNull(_PERSON)) {
                 // if person is defined - get contact name
-                long contactId = getLong(PERSON);
+                long contactId = getLong(_PERSON);
                 contact = getContact(contactId);
             } else {
                 contact = getContact(context, number);
@@ -770,17 +790,17 @@ public class ContactsAccessHelper {
 
     // SMS message cursor wrapper
     public class SMSMessageCursorWrapper2 extends CursorWrapper {
-        private final int ID;
+        private final int _ID;
 
         private SMSMessageCursorWrapper2(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
-            ID = cursor.getColumnIndex("_id");
+            _ID = cursor.getColumnIndex(ID);
         }
 
         @Nullable
         public SMSMessage getSMSMessage(Context context) {
-            long id = getLong(ID);
+            long id = getLong(_ID);
             return getSMSMessagesById(context, id);
         }
     }
@@ -793,15 +813,18 @@ public class ContactsAccessHelper {
 //        }
 
         Cursor cursor = contentResolver.query(
-                CONTENT_URI_SMS,
+                URI_CONTENT_SMS,
                 null,
-                " _id = " + id,
+                ID + " = " + id,
                 null,
                 null);
 
         SMSMessage message = null;
         if (validate(cursor)) {
             SMSMessageCursorWrapper cursorWrapper = new SMSMessageCursorWrapper(cursor);
+
+            debug(cursor);
+
             message = cursorWrapper.getSMSMessage(context);
             cursor.close();
         }
@@ -838,34 +861,13 @@ public class ContactsAccessHelper {
             values.put(SEEN, "0");
 
             // write SMS to Inbox
-            contentResolver.insert(CONTENT_URI_SMS_INBOX, values);
+            contentResolver.insert(URI_CONTENT_SMS_INBOX, values);
         }
 
         return true;
     }
 
-
-    // SMS data uris
-    public static final Uri CONTENT_URI_SMS = Uri.parse("content://sms");
-    public static final Uri CONTENT_URI_SMS_INBOX = Uri.parse("content://sms/inbox");
-    public static final Uri CONTENT_URI_SMS_OUTBOX = Uri.parse("content://sms/outbox");
-
-    // SMS data columns
-    public static final String ID = "_id";
-    public static final String ADDRESS = "address";
-    public static final String BODY = "body";
-    public static final String PERSON = "person";
-    public static final String DATE = "date";
-    public static final String DATE_SENT = "date_sent";
-    public static final String PROTOCOL = "protocol";
-    public static final String REPLY_PATH_PRESENT = "reply_path_present";
-    public static final String SERVICE_CENTER = "service_center";
-    public static final String SUBJECT = "subject";
-    public static final String READ = "read";
-    public static final String SEEN = "seen";
-    public static final String TYPE = "type";
-    public static final String STATUS = "status";
-    public static final String DELIVERY_DATE = "delivery_date";
+//--------------------------------------------------------------------------------
 
     // Message statuses
     public static final int MESSAGE_STATUS_NONE = -1;
@@ -879,6 +881,7 @@ public class ContactsAccessHelper {
     public static final int MESSAGE_TYPE_OUTBOX = 4;
     public static final int MESSAGE_TYPE_FAILED = 5;
 
+//--------------------------------------------------------------------------------
 
     // Writes SMS message to the Outbox
     public long writeSMSMessageToOutbox(Context context, String number, String message) {
@@ -896,7 +899,7 @@ public class ContactsAccessHelper {
         values.put(TYPE, MESSAGE_TYPE_OUTBOX);
         values.put(STATUS, MESSAGE_STATUS_NONE);
         values.put(PERSON, (contact == null ? null : contact.id));
-        Uri result = contentResolver.insert(CONTENT_URI_SMS, values);
+        Uri result = contentResolver.insert(URI_CONTENT_SMS, values);
 
         // get id of the written SMS
         long id = -1;
@@ -956,7 +959,7 @@ public class ContactsAccessHelper {
         }
 
         return contentResolver.update(
-                CONTENT_URI_SMS,
+                URI_CONTENT_SMS,
                 values,
                 ID + " = ? ",
                 new String[]{String.valueOf(messageId)}) > 0;
