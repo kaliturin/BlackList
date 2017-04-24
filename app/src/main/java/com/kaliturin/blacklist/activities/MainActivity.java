@@ -300,13 +300,14 @@ public class MainActivity extends AppCompatActivity
         if (uri == null) {
             return;
         }
+        ContactsAccessHelper db = ContactsAccessHelper.getInstance(this);
+
         // get phone number where to send the SMS
         String ssp = uri.getSchemeSpecificPart();
-        String number = ContactsAccessHelper.normalizeContactNumber(ssp);
+        String number = db.normalizePhoneNumber(ssp);
 
         // find person by phone number in contacts
         String person = null;
-        ContactsAccessHelper db = ContactsAccessHelper.getInstance(this);
         Contact contact = db.getContact(this, number);
         if (contact != null) {
             person = contact.name;

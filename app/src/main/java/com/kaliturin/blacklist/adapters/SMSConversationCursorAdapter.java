@@ -60,7 +60,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
         // get cursor wrapper
         SMSMessageCursorWrapper2 cursorWrapper = (SMSMessageCursorWrapper2) cursor;
         // get message
-        SMSMessage model = cursorWrapper.getSMSMessage(context);
+        SMSMessage model = cursorWrapper.getSMSMessage(false);
         // get view holder from the row
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         // update the view holder with new message

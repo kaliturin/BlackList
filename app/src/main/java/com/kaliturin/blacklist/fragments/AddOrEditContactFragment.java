@@ -19,6 +19,7 @@ import android.widget.Spinner;
 
 import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.utils.ButtonsBar;
+import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
@@ -204,6 +205,9 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
 
     // Saves contact data from the View to DB
     private boolean saveContact() {
+        ContactsAccessHelper contactsAccessHelper =
+                ContactsAccessHelper.getInstance(getContext());
+
         // get contact name
         String name = getName();
 
@@ -211,7 +215,9 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         List<ContactNumber> numbers = new LinkedList<>();
         Set<Pair<String, Integer>> numbers2TypeSet = getNumber2TypePairs();
         for (Pair<String, Integer> pair : numbers2TypeSet) {
-            numbers.add(new ContactNumber(0, pair.first, pair.second, 0));
+            String number = contactsAccessHelper.normalizePhoneNumber(pair.first);
+            int type = pair.second;
+            numbers.add(new ContactNumber(0, number, type, 0));
         }
 
         // if there is not any number - take a name as a number

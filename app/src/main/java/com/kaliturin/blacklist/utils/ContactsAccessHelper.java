@@ -21,10 +21,11 @@ import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactNumber;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactSource;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 /**
  * Contacts/SMS/Calls list access helper
@@ -172,11 +173,7 @@ public class ContactsAccessHelper {
     }
 
     @Nullable
-    public Contact getContact(Context context, String number) {
-        if (!Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
-            return null;
-        }
-
+    private Contact getContact(String number) {
         Contact contact = null;
         ContactCursorWrapper cursor = getContactCursor(number);
         if (cursor != null) {
@@ -185,6 +182,15 @@ public class ContactsAccessHelper {
         }
 
         return contact;
+    }
+
+    @Nullable
+    public Contact getContact(Context context, String number) {
+        if (!Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
+            return null;
+        }
+
+        return getContact(number);
     }
 
     // Contact's cursor wrapper
@@ -213,7 +219,7 @@ public class ContactsAccessHelper {
                 if (cursor != null) {
                     do {
                         // normalize the phone number (remove spaces and brackets)
-                        String number = normalizeContactNumber(cursor.getNumber());
+                        String number = normalizePhoneNumber(cursor.getNumber());
                         // create and add contact number instance
                         ContactNumber contactNumber =
                                 new ContactNumber(cursor.getPosition(), number, id);
@@ -227,8 +233,20 @@ public class ContactsAccessHelper {
         }
     }
 
-    public static String normalizeContactNumber(String number) {
-        return number.replaceAll("[-() ]", "");
+    // For the sake of performance we don't use comprehensive phone number pattern.
+    // We just want to detect whether a phone number is digital but not symbolic.
+    private Pattern digitalPhoneNumberPattern = Pattern.compile("[+]?[0-9-() ]+");
+    // Is used for normalizing a phone number, removing from it brackets, dashes and spaces.
+    private Pattern normalizePhoneNumberPattern = Pattern.compile("[-() ]");
+
+    // If passed phone number is digital and not symbolic then normalizes
+    // it, removing brackets, dashes and spaces.
+    public String normalizePhoneNumber(String number) {
+        if (digitalPhoneNumberPattern.matcher(number).matches()) {
+            String result = normalizePhoneNumberPattern.matcher(number).replaceAll("");
+            number = (result.isEmpty() ? number : result);
+        }
+        return number;
     }
 
     // Contact's number cursor wrapper
@@ -287,22 +305,34 @@ public class ContactsAccessHelper {
 
 //-------------------------------------------------------------------------------------
 
-    // Returns true if passed number contains in SMS content list
+    // Returns true if passed phone number contains in SMS content list
     public boolean containsNumberInSMSContent(Context context, @NonNull String number) {
         if (!Permissions.isGranted(context, Permissions.READ_SMS)) {
             return false;
         }
 
+        // We cannot select passed phone number simply by using query because some stored numbers
+        // may be not normalized. So we select all the unique numbers first, normalize them,
+        // and then search for our number.
         Cursor cursor = contentResolver.query(
                 URI_CONTENT_SMS,
-                new String[]{"DISTINCT " + ID, ADDRESS, PERSON},
-                ADDRESS + " = ? ) GROUP BY (" + ADDRESS,
-                new String[]{number},
+                new String[]{"DISTINCT " + ADDRESS},
+                ADDRESS + " IS NOT NULL) GROUP BY (" + ADDRESS,
+                null,
                 DATE + " DESC");
 
         if (validate(cursor)) {
+            cursor.moveToFirst();
+            final int _ADDRESS = cursor.getColumnIndex(ADDRESS);
+            do {
+                String address = cursor.getString(_ADDRESS);
+                address = normalizePhoneNumber(address);
+                if (address.equals(number)) {
+                    cursor.close();
+                    return true;
+                }
+            } while (cursor.moveToNext());
             cursor.close();
-            return true;
         }
 
         return false;
@@ -317,11 +347,9 @@ public class ContactsAccessHelper {
         Cursor cursor = contentResolver.query(
                 URI_CONTENT_SMS,
                 new String[]{"DISTINCT " + ID, ADDRESS, PERSON},
-                ADDRESS + " IS NOT NULL AND (" +
-                        PERSON + " IS NOT NULL OR " +
-                        ADDRESS + " LIKE ? )" +
+                ADDRESS + " IS NOT NULL " +
                         ") GROUP BY (" + ADDRESS,
-                new String[]{"%" + filter + "%"},
+                null,
                 DATE + " DESC");
 
         // now we need to filter contacts by names and fill matrix cursor
@@ -331,23 +359,34 @@ public class ContactsAccessHelper {
             final int _ID = cursor.getColumnIndex(ID);
             final int _ADDRESS = cursor.getColumnIndex(ADDRESS);
             final int _PERSON = cursor.getColumnIndex(PERSON);
+            // set is used to filter repeated data
+            Set<String> set = new HashSet<>();
             do {
                 String id = cursor.getString(_ID);
                 String address = cursor.getString(_ADDRESS);
+                address = normalizePhoneNumber(address);
+                if (!set.add(address)) {
+                    continue;
+                }
                 String person = address;
-                if (cursor.isNull(_PERSON)) {
-                    matrixCursor.addRow(new String[]{id, address, person});
-                } else {
-                    // get person name from contacts
+                Contact contact = null;
+                if (!cursor.isNull(_PERSON)) {
+                    // get contact by id
                     long contactId = cursor.getLong(_PERSON);
-                    Contact contact = getContact(contactId);
-                    if (contact != null) {
-                        person = contact.name;
-                    }
-                    // filter contact
-                    if (person.toLowerCase().contains(filter)) {
-                        matrixCursor.addRow(new String[]{id, address, person});
-                    }
+                    contact = getContact(contactId);
+                }
+                // commented for the sake of performance
+                //if (contact == null) {
+                // find contact by address
+                //contact = getContact(address);
+                //}
+                // get person name from contact
+                if (contact != null) {
+                    person = contact.name;
+                }
+                // filter contact
+                if (person.toLowerCase().contains(filter)) {
+                    matrixCursor.addRow(new String[]{id, address, person});
                 }
             } while (cursor.moveToNext());
             cursor.close();
@@ -409,18 +448,21 @@ public class ContactsAccessHelper {
         if (validate(cursor)) {
             cursor.moveToFirst();
             // Because we cannot query distinct calls - we have queried all.
-            // And now we must get rid of repeated calls with help of tree set and matrix cursor.
+            // Then we getting rid of repeated data.
             MatrixCursor matrixCursor = new MatrixCursor(
                     new String[]{Calls._ID, Calls.NUMBER, Calls.CACHED_NAME});
             final int ID = cursor.getColumnIndex(Calls._ID);
             final int NUMBER = cursor.getColumnIndex(Calls.NUMBER);
             final int NAME = cursor.getColumnIndex(Calls.CACHED_NAME);
-            Set<String> set = new TreeSet<>();
+            Set<String> set = new HashSet<>();
             do {
                 String number = cursor.getString(NUMBER);
+                number = normalizePhoneNumber(number);
                 String name = cursor.getString(NAME);
-                String key = number + (name == null ? "" : name);
-                if (set.add(key)) {
+                if (name == null) {
+                    name = number;
+                }
+                if (set.add(number + name)) {
                     String id = cursor.getString(ID);
                     matrixCursor.addRow(new String[]{id, number, name});
                 }
@@ -453,9 +495,6 @@ public class ContactsAccessHelper {
             String name = getString(NAME);
             List<ContactNumber> numbers = new LinkedList<>();
             numbers.add(new ContactNumber(0, number, id));
-            if (name == null) {
-                name = number;
-            }
 
             return new Contact(id, name, 0, numbers);
         }
@@ -534,7 +573,7 @@ public class ContactsAccessHelper {
         // get date and address from the last SMS of the thread
         SMSMessageCursorWrapper cursor = getSMSMessagesByThreadId(context, threadId, true, 1);
         if (cursor != null) {
-            SMSMessage sms = cursor.getSMSMessage(context);
+            SMSMessage sms = cursor.getSMSMessage(true);
             smsConversation = new SMSConversation(threadId, sms.date,
                     sms.person, sms.number, sms.body, unread);
             cursor.close();
@@ -755,7 +794,7 @@ public class ContactsAccessHelper {
             _BODY = cursor.getColumnIndex(BODY);
         }
 
-        SMSMessage getSMSMessage(Context context) {
+        SMSMessage getSMSMessage(boolean withContact) {
             long id = getLong(_ID);
             int type = getInt(_TYPE);
             int status = getInt(_STATUS);
@@ -769,19 +808,24 @@ public class ContactsAccessHelper {
                 }
             }
             String number = getString(_NUMBER);
+            number = normalizePhoneNumber(number);
             String body = getString(_BODY);
-
             String person = null;
-            Contact contact;
-            if (!isNull(_PERSON)) {
-                // if person is defined - get contact name
-                long contactId = getLong(_PERSON);
-                contact = getContact(contactId);
-            } else {
-                contact = getContact(context, number);
-            }
-            if (contact != null) {
-                person = contact.name;
+            if (withContact) {
+                Contact contact = null;
+                // if person is defined
+                if (!isNull(_PERSON)) {
+                    // get contact
+                    long contactId = getLong(_PERSON);
+                    contact = getContact(contactId);
+                }
+                if (contact == null) {
+                    // find contact by number
+                    contact = getContact(number);
+                }
+                if (contact != null) {
+                    person = contact.name;
+                }
             }
 
             return new SMSMessage(id, type, status, date, date_sent, person, number, body);
@@ -799,14 +843,14 @@ public class ContactsAccessHelper {
         }
 
         @Nullable
-        public SMSMessage getSMSMessage(Context context) {
+        public SMSMessage getSMSMessage(boolean withContact) {
             long id = getLong(_ID);
-            return getSMSMessagesById(context, id);
+            return getSMSMessagesById(id, withContact);
         }
     }
 
     @Nullable
-    private SMSMessage getSMSMessagesById(Context context, long id) {
+    private SMSMessage getSMSMessagesById(long id, boolean withContact) {
 //        if (!Permissions.isGranted(context, Permissions.READ_SMS) ||
 //                !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
 //            return null;
@@ -822,10 +866,7 @@ public class ContactsAccessHelper {
         SMSMessage message = null;
         if (validate(cursor)) {
             SMSMessageCursorWrapper cursorWrapper = new SMSMessageCursorWrapper(cursor);
-
-            debug(cursor);
-
-            message = cursorWrapper.getSMSMessage(context);
+            message = cursorWrapper.getSMSMessage(withContact);
             cursor.close();
         }
 

@@ -41,6 +41,8 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
     private InternalEventBroadcast internalEventBroadcast = null;
     private SMSConversationCursorAdapter cursorAdapter = null;
     private ListView listView = null;
+    private String contactName = null;
+    private String contactNumber = null;
 
     public SMSConversationFragment() {
         // Required empty public constructor
@@ -93,6 +95,8 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         // load sms messages of the conversation to the list view
         Bundle arguments = getArguments();
         if (arguments != null) {
+            contactName = arguments.getString(CONTACT_NAME);
+            contactNumber = arguments.getString(CONTACT_NUMBER);
             int threadId = arguments.getInt(THREAD_ID);
             int unreadCount = arguments.getInt(UNREAD_COUNT);
             // load sms messages of the conversation to the list view
@@ -118,13 +122,8 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         writeMessageItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // get the first showed sms
-                View row = listView.getChildAt(0);
-                ContactsAccessHelper.SMSMessage sms = cursorAdapter.getSMSMessage(row);
-                if (sms != null) {
-                    // open activity with fragment of sending SMS
-                    openSMSSendActivity(sms.person, sms.number, "");
-                }
+                // open activity with fragment of sending SMS
+                openSMSSendActivity(contactName, contactNumber, "");
                 return true;
             }
         });
@@ -284,8 +283,6 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                 return true;
             }
 
-            final String person = (sms.person != null ? sms.person : sms.number);
-
             // create menu dialog
             DialogBuilder dialog = new DialogBuilder(getContext());
             // add dialog title as message snippet
@@ -328,12 +325,12 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             final DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(getContext());
             if (db != null) {
                 // 'move contact to black list'
-                DatabaseAccessHelper.Contact contact = db.getContact(person, sms.number);
+                DatabaseAccessHelper.Contact contact = db.getContact(contactName, contactNumber);
                 if (contact == null || contact.type != Contact.TYPE_BLACK_LIST) {
                     dialog.addItem(R.string.Move_to_black_list, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            db.addContact(Contact.TYPE_BLACK_LIST, person, sms.number);
+                            db.addContact(Contact.TYPE_BLACK_LIST, contactName, contactNumber);
                         }
                     });
                 }
@@ -343,7 +340,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                     dialog.addItem(R.string.Move_to_white_list, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            db.addContact(Contact.TYPE_WHITE_LIST, person, sms.number);
+                            db.addContact(Contact.TYPE_WHITE_LIST, contactName, contactNumber);
                         }
                     });
                 }

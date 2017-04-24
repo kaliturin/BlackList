@@ -182,13 +182,14 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
             // get the clicked conversation
             final SMSConversation sms = cursorAdapter.getSMSConversation(row);
             if (sms != null) {
+                String person = (sms.person != null ? sms.person : sms.number);
                 // open activity with all the SMS of the conversation
                 Bundle arguments = new Bundle();
+                arguments.putString(CONTACT_NAME, person);
+                arguments.putString(CONTACT_NUMBER, sms.number);
                 arguments.putInt(THREAD_ID, sms.threadId);
                 arguments.putInt(UNREAD_COUNT, sms.unread);
-                arguments.putString(CONTACT_NUMBER, sms.number);
-                String title = (sms.person != null ? sms.person : sms.number);
-                CustomFragmentActivity.show(getContext(), title,
+                CustomFragmentActivity.show(getContext(), person,
                         SMSConversationFragment.class, arguments);
             }
         }
