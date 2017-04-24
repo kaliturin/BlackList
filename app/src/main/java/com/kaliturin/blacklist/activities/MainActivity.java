@@ -305,6 +305,9 @@ public class MainActivity extends AppCompatActivity
         // get phone number where to send the SMS
         String ssp = uri.getSchemeSpecificPart();
         String number = db.normalizePhoneNumber(ssp);
+        if(number.isEmpty()) {
+            return;
+        }
 
         // find person by phone number in contacts
         String person = null;

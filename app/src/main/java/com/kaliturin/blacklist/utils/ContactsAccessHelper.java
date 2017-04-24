@@ -243,8 +243,7 @@ public class ContactsAccessHelper {
     // it, removing brackets, dashes and spaces.
     public String normalizePhoneNumber(String number) {
         if (digitalPhoneNumberPattern.matcher(number).matches()) {
-            String result = normalizePhoneNumberPattern.matcher(number).replaceAll("");
-            number = (result.isEmpty() ? number : result);
+            number = normalizePhoneNumberPattern.matcher(number).replaceAll("");
         }
         return number;
     }

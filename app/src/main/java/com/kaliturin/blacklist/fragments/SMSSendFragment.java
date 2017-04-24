@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kaliturin.blacklist.R;
+import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.utils.DialogBuilder;
 import com.kaliturin.blacklist.utils.Permissions;
@@ -108,15 +109,15 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
         addContactView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String number = numberEdit.getText().toString().trim();
+                String number = getNumberFromEdit(numberEdit);
                 if (!number.isEmpty()) {
                     // add number to contacts list
                     addRowToContactsList(number, "");
-                    numberEdit.setText("");
                 } else {
                     // open menu dialog
                     showAddContactsMenuDialog();
                 }
+                numberEdit.setText("");
             }
         });
 
@@ -209,8 +210,11 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
 
         // add phone number from EditText to the container
         EditText numberEdit = (EditText) view.findViewById(R.id.edit_number);
-        String number_ = numberEdit.getText().toString().trim();
-        number2NameMap.put(number_, "");
+        String number_ = getNumberFromEdit(numberEdit);
+        if(!number_.isEmpty()) {
+            number2NameMap.put(number_, "");
+        }
+
         if (number2NameMap.size() == 0) {
             Toast.makeText(getContext(), R.string.Address_is_not_defined, Toast.LENGTH_SHORT).show();
             return false;
@@ -346,5 +350,13 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
 
     private void showGetContactsFragment(ContactSourceType sourceType) {
         GetContactsFragment.show(this, sourceType, true);
+    }
+
+    private String getNumberFromEdit(EditText numberEdit) {
+        String number = numberEdit.getText().toString().trim();
+        // normalize number
+        ContactsAccessHelper contactsAccessHelper =
+                ContactsAccessHelper.getInstance(getContext());
+        return contactsAccessHelper.normalizePhoneNumber(number);
     }
 }

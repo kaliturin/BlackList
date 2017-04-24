@@ -216,6 +216,9 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         Set<Pair<String, Integer>> numbers2TypeSet = getNumber2TypePairs();
         for (Pair<String, Integer> pair : numbers2TypeSet) {
             String number = contactsAccessHelper.normalizePhoneNumber(pair.first);
+            if(number.isEmpty()) {
+                continue;
+            }
             int type = pair.second;
             numbers.add(new ContactNumber(0, number, type, 0));
         }
