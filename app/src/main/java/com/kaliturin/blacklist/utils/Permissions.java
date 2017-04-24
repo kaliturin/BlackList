@@ -162,9 +162,9 @@ public class Permissions {
     /**
      * Saves the results of permission granting request
      **/
-    public static synchronized  void onRequestPermissionsResult(int requestCode,
-                                                  @NonNull String permissions[],
-                                                  @NonNull int[] grantResults) {
+    public static synchronized void onRequestPermissionsResult(int requestCode,
+                                                               @NonNull String permissions[],
+                                                               @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE &&
                 permissions.length == grantResults.length) {
             for (int i = 0; i < permissions.length; i++) {

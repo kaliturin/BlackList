@@ -15,6 +15,6 @@
         android:dividerHeight="1dp"
         android:visibility="invisible"
         android:fastScrollEnabled="true"
-        android:theme="?AppTheme.ListView"/>
+        android:theme="?AppTheme.ListView" />
 
 </LinearLayout>

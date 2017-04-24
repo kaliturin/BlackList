@@ -17,7 +17,7 @@
             android:theme="?AppTheme.Toolbar"
             app:popupTheme="?AppTheme.PopupOverlay"
             app:titleTextAppearance="?AppTheme.ToolbarTitle"
-            app:titleTextColor="?colorText"/>
+            app:titleTextColor="?colorText" />
 
         <View
             android:id="@+id/toolbar_shadow"

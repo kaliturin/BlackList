@@ -211,7 +211,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
         // add phone number from EditText to the container
         EditText numberEdit = (EditText) view.findViewById(R.id.edit_number);
         String number_ = getNumberFromEdit(numberEdit);
-        if(!number_.isEmpty()) {
+        if (!number_.isEmpty()) {
             number2NameMap.put(number_, "");
         }
 

@@ -216,7 +216,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         Set<Pair<String, Integer>> numbers2TypeSet = getNumber2TypePairs();
         for (Pair<String, Integer> pair : numbers2TypeSet) {
             String number = contactsAccessHelper.normalizePhoneNumber(pair.first);
-            if(number.isEmpty()) {
+            if (number.isEmpty()) {
                 continue;
             }
             int type = pair.second;
@@ -323,12 +323,12 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         final EditText numberEdit = (EditText) row.findViewById(R.id.edit_number);
         numberEdit.setText(number);
         if (number == null || number.isEmpty()) {
-           numberEdit.postDelayed(new Runnable() {
-               @Override
-               public void run() {
-                   numberEdit.requestFocus();
-               }
-           }, 100);
+            numberEdit.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    numberEdit.requestFocus();
+                }
+            }, 100);
         }
     }
 

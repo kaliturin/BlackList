@@ -131,7 +131,7 @@ public class DialogBuilder {
             }
         }
 
-        if(listener == null) {
+        if (listener == null) {
             ImageView imageView = (ImageView) itemView.findViewById(R.id.item_image);
             imageView.setVisibility(View.GONE);
         }

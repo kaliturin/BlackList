@@ -222,7 +222,7 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
         public final String text;
 
         JournalRecord(long id, long time, @NonNull String caller,
-                             String number, String text) {
+                      String number, String text) {
             this.id = id;
             this.time = time;
             this.caller = caller;

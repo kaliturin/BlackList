@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity
         // get phone number where to send the SMS
         String ssp = uri.getSchemeSpecificPart();
         String number = db.normalizePhoneNumber(ssp);
-        if(number.isEmpty()) {
+        if (number.isEmpty()) {
             return;
         }
 

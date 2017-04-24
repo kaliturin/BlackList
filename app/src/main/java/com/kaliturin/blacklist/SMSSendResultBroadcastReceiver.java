@@ -11,11 +11,11 @@ import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.Notifications;
 import com.kaliturin.blacklist.utils.Utils;
 
+import static com.kaliturin.blacklist.utils.SMSSendHelper.DELIVERY;
 import static com.kaliturin.blacklist.utils.SMSSendHelper.MESSAGE_ID;
 import static com.kaliturin.blacklist.utils.SMSSendHelper.MESSAGE_PARTS;
 import static com.kaliturin.blacklist.utils.SMSSendHelper.MESSAGE_PART_ID;
 import static com.kaliturin.blacklist.utils.SMSSendHelper.PHONE_NUMBER;
-import static com.kaliturin.blacklist.utils.SMSSendHelper.DELIVERY;
 
 /**
  * Receives the results of SMS sending/delivery
@@ -66,7 +66,7 @@ public class SMSSendResultBroadcastReceiver extends BroadcastReceiver {
 
         // get SMS parameters
         String phoneNumber = intent.getStringExtra(PHONE_NUMBER);
-        if(phoneNumber != null) {
+        if (phoneNumber != null) {
             int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
             int messageParts = intent.getIntExtra(MESSAGE_PARTS, 0);
             long messageId = intent.getLongExtra(MESSAGE_ID, 0);
@@ -106,7 +106,7 @@ public class SMSSendResultBroadcastReceiver extends BroadcastReceiver {
 
         // get SMS parameters
         String phoneNumber = intent.getStringExtra(PHONE_NUMBER);
-        if(phoneNumber != null) {
+        if (phoneNumber != null) {
             int messagePartId = intent.getIntExtra(MESSAGE_PART_ID, 0);
             int messageParts = intent.getIntExtra(MESSAGE_PARTS, 0);
             long messageId = intent.getLongExtra(MESSAGE_ID, 0);
