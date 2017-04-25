@@ -245,6 +245,7 @@ public class JournalFragment extends Fragment implements FragmentArguments {
         if (itemSearch != null && searchView != null) {
             MenuItemCompat.expandActionView(itemSearch);
             searchView.setQuery(query, true);
+            searchView.clearFocus();
         }
     }
 

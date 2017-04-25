@@ -161,7 +161,7 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
                     text = context.getString(R.string.Sending_);
                     break;
                 case ContactsAccessHelper.MESSAGE_TYPE_FAILED:
-                    text = context.getString(R.string.Failed);
+                    text = context.getString(R.string.Not_sent);
                     break;
                 default:
                     Date date = toDate(message.date);

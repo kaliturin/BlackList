@@ -145,7 +145,7 @@
     <string name="Go_to_Journal_at_start">Go to the Event log at the application start</string>
     <string name="Exit_on_back_pressed">Do not exit the application on the phone\'s \"Back\" button pressed</string>
     <string name="Sending_">Sending...</string>
-    <string name="Failed">Failed</string>
+    <string name="Not_sent">Not sent</string>
 
     <string name="About">About</string>
     <string name="Info_about">
