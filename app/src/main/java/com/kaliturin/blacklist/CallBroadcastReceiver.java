@@ -38,6 +38,13 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
 
         // get incoming call number
         String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+        if (number == null) {
+            return;
+        }
+        number = number.trim();
+        if (number.isEmpty()) {
+            return;
+        }
 
         // private number detected
         if (isPrivateNumber(number)) {

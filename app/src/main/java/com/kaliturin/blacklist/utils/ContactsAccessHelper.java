@@ -242,6 +242,7 @@ public class ContactsAccessHelper {
     // If passed phone number is digital and not symbolic then normalizes
     // it, removing brackets, dashes and spaces.
     public String normalizePhoneNumber(String number) {
+        number = number.trim();
         if (digitalPhoneNumberPattern.matcher(number).matches()) {
             number = normalizePhoneNumberPattern.matcher(number).replaceAll("");
         }
@@ -807,10 +808,8 @@ public class ContactsAccessHelper {
             long date_sent = 0;
             if (_DATE_SENT >= 0) {
                 date_sent = getLong(_DATE_SENT);
-            } else {
-                if (_DELIVERY_DATE >= 0) {
-                    date_sent = getLong(_DELIVERY_DATE);
-                }
+            } else if (_DELIVERY_DATE >= 0) {
+                date_sent = getLong(_DELIVERY_DATE);
             }
             String number = getString(_NUMBER);
             number = normalizePhoneNumber(number);
@@ -995,8 +994,12 @@ public class ContactsAccessHelper {
         values.put(TYPE, type);
         values.put(STATUS, status);
         if (deliveryDate > 0) {
-            values.put(DELIVERY_DATE, deliveryDate);
-            values.put(DATE_SENT, deliveryDate);
+            Set<String> columns = getColumns(URI_CONTENT_SMS);
+            if (columns.contains(DATE_SENT)) {
+                values.put(DATE_SENT, deliveryDate);
+            } else if (columns.contains(DELIVERY_DATE)) {
+                values.put(DELIVERY_DATE, deliveryDate);
+            }
         }
 
         return contentResolver.update(
@@ -1004,6 +1007,20 @@ public class ContactsAccessHelper {
                 values,
                 ID + " = ? ",
                 new String[]{String.valueOf(messageId)}) > 0;
+    }
+
+    // Returns the set of columns names
+    private Set<String> getColumns(Uri uri) {
+        Set<String> set = new HashSet<>();
+        Cursor cursor = contentResolver.query(uri, null, null, null, null);
+        if (cursor != null) {
+            for (int i = 0; i < cursor.getColumnCount(); i++) {
+                set.add(cursor.getColumnName(i));
+            }
+            cursor.close();
+        }
+
+        return set;
     }
 
 //---------------------------------------------------------------------

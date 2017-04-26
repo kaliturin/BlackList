@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.telephony.SmsManager;
 
+import com.kaliturin.blacklist.InternalEventBroadcast;
 import com.kaliturin.blacklist.SMSSendResultBroadcastReceiver;
 
 import java.util.ArrayList;
@@ -46,10 +47,10 @@ public class SMSSendHelper {
         // divide message into parts
         SmsManager smsManager = SmsManager.getDefault();
         ArrayList<String> messageParts = smsManager.divideMessage(message);
-        ArrayList<PendingIntent> sentIntents = new ArrayList<>(messageParts.size());
-        ArrayList<PendingIntent> deliveryIntents = new ArrayList<>(messageParts.size());
 
         // create pending intents for each part of message
+        ArrayList<PendingIntent> sentIntents = new ArrayList<>(messageParts.size());
+        ArrayList<PendingIntent> deliveryIntents = new ArrayList<>(messageParts.size());
         for (int i = 0; i < messageParts.size(); i++) {
             String messagePart = messageParts.get(i);
             int messagePartId = i + 1;
@@ -71,21 +72,23 @@ public class SMSSendHelper {
         smsManager.sendMultipartTextMessage(phoneNumber, null, messageParts, sentIntents, deliveryIntents);
 
         // send internal event message
-        //InternalEventBroadcast.sendSMSWasWritten(context, phoneNumber);
+        InternalEventBroadcast.sendSMSWasWritten(context, phoneNumber);
 
         return true;
     }
 
-    // Writes the sending SMS to to the Outbox
+    // Writes the sending SMS to the Outbox
     private long writeSMSMessageToOutbox(Context context, String phoneNumber, String message) {
         long id = -1;
 
-        // if newer than KITKAT and if app isn't default - the SMS will be written by the system
+        // if older than KITKAT or if app is default
         if (!DefaultSMSAppHelper.isAvailable() ||
                 DefaultSMSAppHelper.isDefault(context)) {
+            // write SMS to the outbox
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
             id = db.writeSMSMessageToOutbox(context, phoneNumber, message);
         }
+        // else SMS will be written by the system
 
         return id;
     }

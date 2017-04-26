@@ -52,6 +52,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         // get message data
         Map<String, String> data = extractMessageData(context, messages, timeReceive);
+        if (data == null) {
+            return;
+        }
         String address = data.get(ContactsAccessHelper.ADDRESS);
         String body = data.get(ContactsAccessHelper.BODY);
 
@@ -63,15 +66,24 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     }
 
     // Extracts message data
+    @Nullable
     private Map<String, String> extractMessageData(Context context,
                                                    SmsMessage[] messages, long timeReceive) {
-        Map<String, String> data = new HashMap<>();
-        // save concatenated messages bodies
-        data.put(ContactsAccessHelper.BODY, getSMSMessageBody(context, messages));
         // Assume that all messages in array received at ones have the same data except of bodies.
         // So get just the first message to get the rest data.
         SmsMessage message = messages[0];
-        data.put(ContactsAccessHelper.ADDRESS, message.getOriginatingAddress());
+        String address = message.getOriginatingAddress();
+        if (address == null) {
+            return null;
+        }
+        address = address.trim();
+        if (address.isEmpty()) {
+            return null;
+        }
+        Map<String, String> data = new HashMap<>();
+        // save concatenated bodies of messages
+        data.put(ContactsAccessHelper.BODY, getSMSMessageBody(context, messages));
+        data.put(ContactsAccessHelper.ADDRESS, address);
         data.put(ContactsAccessHelper.DATE, String.valueOf(timeReceive));
         data.put(ContactsAccessHelper.DATE_SENT, String.valueOf(message.getTimestampMillis()));
         data.put(ContactsAccessHelper.PROTOCOL, String.valueOf(message.getProtocolIdentifier()));
