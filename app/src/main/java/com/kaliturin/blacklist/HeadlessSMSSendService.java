@@ -6,11 +6,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 /**
- * HeadlessSmsSendService stub
+ * HeadlessSMSSendService stub
  */
 
-public class HeadlessSmsSendService extends Service {
-    public HeadlessSmsSendService() {
+public class HeadlessSMSSendService extends Service {
+    public HeadlessSMSSendService() {
     }
 
     @Nullable

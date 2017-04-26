@@ -14,7 +14,6 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
@@ -24,6 +23,7 @@ import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactSource;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -285,22 +285,22 @@ public class ContactsAccessHelper {
     private static final Uri URI_CONTENT_SMS_CONVERSATIONS = Uri.parse("content://sms/conversations");
 
     // SMS data columns
-    private static final String ID = "_id";
-    private static final String ADDRESS = "address";
-    private static final String BODY = "body";
-    private static final String PERSON = "person";
-    private static final String DATE = "date";
-    private static final String DATE_SENT = "date_sent";
-    private static final String PROTOCOL = "protocol";
-    private static final String REPLY_PATH_PRESENT = "reply_path_present";
-    private static final String SERVICE_CENTER = "service_center";
-    private static final String SUBJECT = "subject";
-    private static final String READ = "read";
-    private static final String SEEN = "seen";
-    private static final String TYPE = "type";
-    private static final String STATUS = "status";
-    private static final String DELIVERY_DATE = "delivery_date";
-    private static final String THREAD_ID = "thread_id";
+    public static final String ID = "_id";
+    public static final String ADDRESS = "address";
+    public static final String BODY = "body";
+    public static final String PERSON = "person";
+    public static final String DATE = "date";
+    public static final String DATE_SENT = "date_sent";
+    public static final String PROTOCOL = "protocol";
+    public static final String REPLY_PATH_PRESENT = "reply_path_present";
+    public static final String SERVICE_CENTER = "service_center";
+    public static final String SUBJECT = "subject";
+    public static final String READ = "read";
+    public static final String SEEN = "seen";
+    public static final String TYPE = "type";
+    public static final String STATUS = "status";
+    public static final String DELIVERY_DATE = "delivery_date";
+    public static final String THREAD_ID = "thread_id";
 
 //-------------------------------------------------------------------------------------
 
@@ -872,37 +872,32 @@ public class ContactsAccessHelper {
         return message;
     }
 
-    // Writes SMS messages to the Inbox
-    // Needed only since API19 - where only default SMS app can write to content resolver
+    // Writes SMS message to the Inbox. This method is needed only since API19 -
+    // where only default SMS app can write to the content resolver.
     @TargetApi(19)
-    public boolean writeSMSMessageToInbox(Context context, SmsMessage[] messages, long timeReceived) {
+    public boolean writeSMSMessageToInbox(Context context, Contact contact, Map<String, String> data) {
         if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return false;
         }
 
-        for (SmsMessage message : messages) {
-            // get contact by SMS address
-            Contact contact = getContact(context, message.getOriginatingAddress());
+        // create writing values
+        ContentValues values = new ContentValues();
+        values.put(ADDRESS, data.get(ADDRESS));
+        values.put(BODY, data.get(BODY));
+        values.put(PERSON, (contact == null ? null : contact.id));
+        values.put(DATE, data.get(DATE));
+        values.put(DATE_SENT, data.get(DATE_SENT));
+        values.put(PROTOCOL, data.get(PROTOCOL));
+        values.put(REPLY_PATH_PRESENT, data.get(REPLY_PATH_PRESENT));
+        values.put(SERVICE_CENTER, data.get(SERVICE_CENTER));
+        String subject = data.get(SUBJECT);
+        subject = (subject != null && !subject.isEmpty() ? subject : null);
+        values.put(SUBJECT, subject);
+        values.put(READ, "0");
+        values.put(SEEN, "0");
 
-            // create writing values
-            ContentValues values = new ContentValues();
-            values.put(ADDRESS, message.getDisplayOriginatingAddress());
-            values.put(BODY, message.getMessageBody());
-            values.put(PERSON, (contact == null ? null : contact.id));
-            values.put(DATE, timeReceived);
-            values.put(DATE_SENT, message.getTimestampMillis());
-            values.put(PROTOCOL, message.getProtocolIdentifier());
-            values.put(REPLY_PATH_PRESENT, message.isReplyPathPresent());
-            values.put(SERVICE_CENTER, message.getServiceCenterAddress());
-            String subject = message.getPseudoSubject();
-            subject = (subject != null && !subject.isEmpty() ? subject : null);
-            values.put(SUBJECT, subject);
-            values.put(READ, "0");
-            values.put(SEEN, "0");
-
-            // write SMS to Inbox
-            contentResolver.insert(URI_CONTENT_SMS_INBOX, values);
-        }
+        // write message to the Inbox
+        contentResolver.insert(URI_CONTENT_SMS_INBOX, values);
 
         return true;
     }

@@ -1,5 +1,6 @@
 package com.kaliturin.blacklist;
 
+import android.app.IntentService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +17,9 @@ import com.kaliturin.blacklist.utils.Notifications;
 import com.kaliturin.blacklist.utils.Permissions;
 import com.kaliturin.blacklist.utils.Settings;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * BroadcastReceiver for SMS catching
@@ -28,7 +31,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        long timeReceived = System.currentTimeMillis();
+        long timeReceive = System.currentTimeMillis();
 
         // check action
         String action = intent.getAction();
@@ -47,32 +50,42 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        // get address number
-        String number = messages[0].getDisplayOriginatingAddress();
+        // get message data
+        Map<String, String> data = extractMessageData(context, messages, timeReceive);
+        String address = data.get(ContactsAccessHelper.ADDRESS);
+        String body = data.get(ContactsAccessHelper.BODY);
 
-        // process messages
-        if (!processMessages(context, number, messages)) {
-            // since 19 API only
-            if (DefaultSMSAppHelper.isAvailable()) {
-                // messages were not blocked - write them to the inbox
-                ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-                if (db.writeSMSMessageToInbox(context, messages, timeReceived)) {
-                    // send broadcast event
-                    InternalEventBroadcast.sendSMSWasWritten(context, number);
-                    // get contact by number
-                    Contact contact = db.getContact(context, number);
-                    // get name for notification
-                    String name = (contact == null ? number : contact.name);
-                    // notify user
-                    String body = getSMSMessageBody(context, messages);
-                    Notifications.onSmsReceived(context, name, body);
-                }
-            }
+        // process message
+        if (!processMessage(context, address, body)) {
+            // message wasn't blocked - write it to the inbox
+            writeSMSMessageToInbox(context, data);
         }
     }
 
-    // Processes messages; returns true if messages were blocked, false else
-    private boolean processMessages(Context context, String number, SmsMessage[] messages) {
+    // Extracts message data
+    private Map<String, String> extractMessageData(Context context,
+                                                   SmsMessage[] messages, long timeReceive) {
+        Map<String, String> data = new HashMap<>();
+        // save concatenated messages bodies
+        data.put(ContactsAccessHelper.BODY, getSMSMessageBody(context, messages));
+        // Assume that all messages in array received at ones have the same data except of bodies.
+        // So get just the first message to get the rest data.
+        SmsMessage message = messages[0];
+        data.put(ContactsAccessHelper.ADDRESS, message.getOriginatingAddress());
+        data.put(ContactsAccessHelper.DATE, String.valueOf(timeReceive));
+        data.put(ContactsAccessHelper.DATE_SENT, String.valueOf(message.getTimestampMillis()));
+        data.put(ContactsAccessHelper.PROTOCOL, String.valueOf(message.getProtocolIdentifier()));
+        data.put(ContactsAccessHelper.REPLY_PATH_PRESENT, String.valueOf(message.isReplyPathPresent()));
+        data.put(ContactsAccessHelper.SERVICE_CENTER, message.getServiceCenterAddress());
+        String subject = message.getPseudoSubject();
+        subject = (subject != null && !subject.isEmpty() ? subject : null);
+        data.put(ContactsAccessHelper.SUBJECT, subject);
+
+        return data;
+    }
+
+    // Processes message; returns true if message was blocked, false else
+    private boolean processMessage(Context context, String number, String body) {
 
         // private number detected
         if (isPrivateNumber(number)) {
@@ -80,7 +93,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             if (Settings.getBooleanValue(context, Settings.BLOCK_HIDDEN_SMS)) {
                 String name = context.getString(R.string.Private);
                 // abort broadcast and notify user
-                abortSMSAndNotify(context, name, name, messages);
+                abortSMSAndNotify(context, name, name, body);
                 return true;
             }
             return false;
@@ -93,7 +106,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
             String name = getContactName(contacts, number);
             // abort SMS and notify the user
-            abortSMSAndNotify(context, name, number, messages);
+            abortSMSAndNotify(context, name, number, body);
             return true;
         }
 
@@ -108,7 +121,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             contact = findContactByType(contacts, Contact.TYPE_BLACK_LIST);
             if (contact != null) {
                 // abort SMS and notify the user
-                abortSMSAndNotify(context, contact.name, number, messages);
+                abortSMSAndNotify(context, contact.name, number, body);
                 return true;
             }
         }
@@ -137,7 +150,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         if (abort) {
             // abort SMS and notify the user
-            abortSMSAndNotify(context, number, number, messages);
+            abortSMSAndNotify(context, number, number, body);
         }
 
         return abort;
@@ -225,30 +238,93 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     }
 
     // Writes record to the journal
-    private void writeToJournal(Context context, String name, String number, SmsMessage[] messages) {
+    private void writeToJournal(Context context, String name, String number, String body) {
         if (number.equals(name)) {
             number = null;
         }
-        String text = getSMSMessageBody(context, messages);
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
         if (db != null) {
             // write to the journal
-            if (db.addJournalRecord(System.currentTimeMillis(), name, number, text) >= 0) {
+            if (db.addJournalRecord(System.currentTimeMillis(), name, number, body) >= 0) {
                 // send broadcast message
                 InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WAS_WRITTEN);
             }
         }
     }
 
-    private void abortSMSAndNotify(Context context, String name, String number, SmsMessage[] messages) {
+    private void abortSMSAndNotify(Context context, String name, String number, String body) {
         if (name == null || number == null) {
             return;
         }
         // prevent to place this SMS to incoming box
         abortBroadcast();
         // write record to the journal
-        writeToJournal(context, name, number, messages);
+        writeToJournal(context, name, number, body);
         // notify user
         Notifications.onSmsBlocked(context, name);
+    }
+
+    // Writes message's data to the inbox
+    private void writeSMSMessageToInbox(Context context, Map<String, String> data) {
+        // since API 19 only
+        if (DefaultSMSAppHelper.isAvailable()) {
+            SMSWriterService.run(context, data);
+        }
+    }
+
+    // SMS message writer service
+    public static class SMSWriterService extends IntentService {
+        private static final String KEYS = "KEYS";
+        private static final String VALUES = "VALUES";
+
+        public SMSWriterService() {
+            super(SMSWriterService.class.getName());
+        }
+
+        @Override
+        protected void onHandleIntent(@Nullable Intent intent) {
+            Map<String, String> data = extractData(intent);
+            if (!data.isEmpty()) {
+                process(this, data);
+            }
+        }
+
+        private void process(Context context, Map<String, String> data) {
+            String address = data.get(ContactsAccessHelper.ADDRESS);
+            ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
+            // get contact by number
+            Contact contact = db.getContact(context, address);
+            // write message to the inbox
+            if (db.writeSMSMessageToInbox(context, contact, data)) {
+                // send broadcast event
+                InternalEventBroadcast.sendSMSWasWritten(context, address);
+                // get name for notification
+                String name = (contact == null ? address : contact.name);
+                // notify user
+                String body = data.get(ContactsAccessHelper.BODY);
+                Notifications.onSmsReceived(context, name, body);
+            }
+        }
+
+        private Map<String, String> extractData(@Nullable Intent intent) {
+            Map<String, String> data = new HashMap<>();
+            if (intent != null) {
+                String[] keys = intent.getStringArrayExtra(KEYS);
+                String[] values = intent.getStringArrayExtra(VALUES);
+                if (keys != null && values != null && keys.length == values.length) {
+                    for (int i = 0; i < keys.length; i++) {
+                        data.put(keys[i], values[i]);
+                    }
+                }
+            }
+            return data;
+        }
+
+        public static void run(Context context, Map<String, String> data) {
+            Intent intent = new Intent(context, SMSWriterService.class);
+            intent.putExtra(KEYS, data.keySet().toArray(new String[data.size()]));
+            intent.putExtra(VALUES, data.values().toArray(new String[data.size()]));
+            context.startService(intent);
+        }
     }
 }
