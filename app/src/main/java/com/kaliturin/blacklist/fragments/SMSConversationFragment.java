@@ -267,7 +267,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
             if (db.setSMSMessagesReadByThreadId(context, threadId)) {
                 // send broadcast event that SMS thread was read
-                InternalEventBroadcast.sendSMSWasRead(context, threadId);
+                InternalEventBroadcast.sendSMSThreadWasRead(context, threadId);
             }
             return null;
         }
@@ -277,7 +277,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
     private class RowOnLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View view) {
-            // view here may be as row itself as some of child view of row
+            // view here may be itself as a row as a some child view of a row
             final ContactsAccessHelper.SMSMessage sms = cursorAdapter.getSMSMessage(view);
             if (sms == null) {
                 return true;
@@ -307,6 +307,8 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
                     } else {
                         ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
                         if (db.deleteSMSMessageById(getContext(), sms.id)) {
+                            // send broadcast event that SMS was deleted
+                            InternalEventBroadcast.sendSMSWasDeleted(getContext(), contactNumber);
                             // reload sms messages in the list
                             int listPosition = listView.getFirstVisiblePosition();
                             loadListViewItems(listPosition, 0);

@@ -301,6 +301,7 @@ public class ContactsAccessHelper {
     public static final String STATUS = "status";
     public static final String DELIVERY_DATE = "delivery_date";
     public static final String THREAD_ID = "thread_id";
+    public static final String MSG_COUNT = "msg_count";
 
 //-------------------------------------------------------------------------------------
 
@@ -504,15 +505,17 @@ public class ContactsAccessHelper {
     // SMS conversation
     public class SMSConversation {
         public final int threadId;
+        public final int msgCount;
         public final long date;
         public final String person;
         public final String number;
         public final String snippet;
         public final int unread;
 
-        SMSConversation(int threadId, long date, String person,
+        SMSConversation(int threadId, int msgCount, long date, String person,
                         String number, String snippet, int unread) {
             this.threadId = threadId;
+            this.msgCount = msgCount;
             this.date = date;
             this.person = person;
             this.number = number;
@@ -524,17 +527,20 @@ public class ContactsAccessHelper {
     // SMS conversation cursor wrapper
     public class SMSConversationWrapper extends CursorWrapper {
         private final int _THREAD_ID;
+        private final int _MSG_COUNT;
 
         private SMSConversationWrapper(Cursor cursor) {
             super(cursor);
             cursor.moveToFirst();
             _THREAD_ID = cursor.getColumnIndex(THREAD_ID);
+            _MSG_COUNT = cursor.getColumnIndex(MSG_COUNT);
         }
 
         @Nullable
         public SMSConversation getConversation(Context context) {
             int threadId = getInt(_THREAD_ID);
-            return getSMSConversationByThreadId(context, threadId);
+            int msgCount = getInt(_MSG_COUNT);
+            return getSMSConversationByThreadId(context, threadId, msgCount);
         }
     }
 
@@ -549,7 +555,7 @@ public class ContactsAccessHelper {
         // select available conversation's data
         Cursor cursor = contentResolver.query(
                 URI_CONTENT_SMS_CONVERSATIONS,
-                new String[]{THREAD_ID + " as " + ID, THREAD_ID},
+                new String[]{THREAD_ID + " as " + ID, THREAD_ID, MSG_COUNT},
                 null,
                 null,
                 DATE + " DESC");
@@ -559,7 +565,7 @@ public class ContactsAccessHelper {
 
     // Returns SMS conversation by thread id
     @Nullable
-    private SMSConversation getSMSConversationByThreadId(Context context, int threadId) {
+    private SMSConversation getSMSConversationByThreadId(Context context, int threadId, int msgCount) {
         if (!Permissions.isGranted(context, Permissions.READ_SMS) ||
                 !Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             return null;
@@ -573,7 +579,7 @@ public class ContactsAccessHelper {
         SMSMessageCursorWrapper cursor = getSMSMessagesByThreadId(context, threadId, true, 1);
         if (cursor != null) {
             SMSMessage sms = cursor.getSMSMessage(true);
-            smsConversation = new SMSConversation(threadId, sms.date,
+            smsConversation = new SMSConversation(threadId, msgCount, sms.date,
                     sms.person, sms.number, sms.body, unread);
             cursor.close();
         }

@@ -13,6 +13,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     public static final String TAG = InternalEventBroadcast.class.getName();
     public static final String JOURNAL_WAS_WRITTEN = "JOURNAL_WAS_WRITTEN";
     public static final String SMS_WAS_WRITTEN = "SMS_WAS_WRITTEN";
+    public static final String SMS_WAS_DELETED = "SMS_WAS_DELETED";
     public static final String SMS_WAS_READ = "SMS_WAS_READ";
 
     private static final String EVENT_TYPE = "EVENT_TYPE";
@@ -30,17 +31,25 @@ public class InternalEventBroadcast extends BroadcastReceiver {
         switch (actionType) {
             case JOURNAL_WAS_WRITTEN:
                 onJournalWasWritten();
-                break;
-            case SMS_WAS_WRITTEN:
+            break;
+            case SMS_WAS_WRITTEN: {
                 String number = intent.getStringExtra(CONTACT_NUMBER);
                 if (number != null) {
                     onSMSWasWritten(number);
                 }
-                break;
+            }
+            break;
+            case SMS_WAS_DELETED: {
+                String number = intent.getStringExtra(CONTACT_NUMBER);
+                if (number != null) {
+                    onSMSWasDeleted(number);
+                }
+            }
+            break;
             case SMS_WAS_READ:
                 int threadId = intent.getIntExtra(THREAD_ID, 0);
-                onSMSWasRead(threadId);
-                break;
+                onSMSThreadWasRead(threadId);
+            break;
         }
     }
 
@@ -56,17 +65,23 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     /**
      * Method is called if SMS has been written to the Inbox/Outbox/Sent box
      **/
-    public void onSMSWasWritten(@NonNull String phoneNumber) {
+    public void onSMSWasWritten(String phoneNumber) {
+    }
+
+    /**
+     * Method is called if SMS has been deleted from the Inbox/Outbox/Sent box
+     **/
+    public void onSMSWasDeleted(String phoneNumber) {
     }
 
     /**
      * Method is called if SMS with thread id has been read from the Inbox/Outbox/Sent box
      **/
-    public void onSMSWasRead(int threadId) {
+    public void onSMSThreadWasRead(int threadId) {
     }
 
     /**
-     * Method is called if some record has been written to the Journal
+     * Method is called if some record has been written to the Journal (Event log)
      **/
     public void onJournalWasWritten() {
     }
@@ -82,7 +97,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     }
 
     /**
-     * Sends internal event of writing to the SMS Inbox/Outbox/Sent box, which causes
+     * Sends internal event of writing SMS to the Inbox/Outbox/Sent box, which causes
      * onSMSWasWritten invocation of registered receivers.
      **/
     public static void sendSMSWasWritten(Context context, @NonNull String phoneNumber) {
@@ -93,10 +108,21 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     }
 
     /**
-     * Sends internal event of reading the thread from the SMS Inbox, which causes
-     * onSMSWasRead invocation of registered receivers.
+     * Sends internal event of deleting the SMS from Inbox/Outbox/Sent box, which causes
+     * onSMSWasDeleted invocation of registered receivers.
      **/
-    public static void sendSMSWasRead(Context context, int threadId) {
+    public static void sendSMSWasDeleted(Context context, @NonNull String phoneNumber) {
+        Intent intent = new Intent(TAG);
+        intent.putExtra(EVENT_TYPE, SMS_WAS_DELETED);
+        intent.putExtra(CONTACT_NUMBER, phoneNumber);
+        context.sendBroadcast(intent, null);
+    }
+
+    /**
+     * Sends internal event of reading the thread from the SMS Inbox, which causes
+     * onSMSThreadWasRead invocation of registered receivers.
+     **/
+    public static void sendSMSThreadWasRead(Context context, int threadId) {
         Intent intent = new Intent(TAG);
         intent.putExtra(EVENT_TYPE, SMS_WAS_READ);
         intent.putExtra(THREAD_ID, threadId);

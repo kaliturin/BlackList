@@ -104,9 +104,9 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
 
         // init internal broadcast event receiver
         internalEventBroadcast = new InternalEventBroadcast() {
+            // SMS was written
             @Override
-            public void onSMSWasWritten(@NonNull String phoneNumber) {
-                // SMS thread was read -
+            public void onSMSWasWritten(String phoneNumber) {
                 ContactsAccessHelper db = ContactsAccessHelper.getInstance(getContext());
                 int threadId = db.getSMSThreadIdByNumber(getContext(), phoneNumber);
                 if (threadId >= 0 &&
@@ -119,9 +119,17 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
                 }
             }
 
+            // SMS was deleted
             @Override
-            public void onSMSWasRead(int threadId) {
-                // SMS thread from the Inbox was read - refresh cached list view items
+            public void onSMSWasDeleted(String phoneNumber) {
+                // reload all list view items
+                loadListViewItems(false, false);
+            }
+
+            // SMS thread was read
+            @Override
+            public void onSMSThreadWasRead(int threadId) {
+                // refresh cached list view items
                 cursorAdapter.invalidateCache(threadId);
                 cursorAdapter.notifyDataSetChanged();
             }
