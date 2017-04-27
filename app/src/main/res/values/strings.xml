@@ -137,7 +137,7 @@
     <string name="Error_file_is_not_valid">Error: file isn\'t valid</string>
     <string name="Error_on_old_data_deletion">Error on old data deletion</string>
     <string name="Import_complete">Import complete</string>
-    <string name="UI_theme_dark">Dark UI theme</string>
+    <string name="UI_theme_light">Light UI theme</string>
     <string name="List_is_empty">List is empty</string>
     <string name="Logo_motto">Protection from unwanted \n calls and SMS</string>
     <string name="Attention_all_SMS_blocked">Attention! All incoming SMS will be blocked!</string>
@@ -158,14 +158,14 @@
     <string name="Info_attention">
         Because of the security policy in Android 6.0 and later versions,
         the application requires rights:
-        \n1. Titled: \"Access photos, media and files\".
+        \n1. Named: \"Access photos, media and files\".
         Allows reading and writing the files in the internal memory of the
         device - for storing the block lists.
-        \n2. Titled: \"Send and view SMS messages\".
+        \n2. Named: \"Send and view SMS messages\".
         Allows to display and block incoming SMS messages.
-        \n3. Titled: \"Make and manage phone calls\". Allows to block
+        \n3. Named: \"Make and manage phone calls\". Allows to block
         incoming calls.
-        \n4. Titled: \"Access contacts\". Allows to display
+        \n4. Named: \"Access contacts\". Allows to display
         a list of contacts.
 
         \nBecause of the security policy in Android 4.4 and later versions

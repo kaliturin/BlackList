@@ -217,10 +217,10 @@ public class MainActivity extends AppCompatActivity
 
     // Applies the current UI theme depending on settings
     private void applyCurrentTheme() {
-        if (Settings.getBooleanValue(this, Settings.UI_THEME_DARK)) {
-            setTheme(R.style.AppTheme_Dark);
-        } else {
+        if (Settings.getBooleanValue(this, Settings.UI_THEME_LIGHT)) {
             setTheme(R.style.AppTheme_Light);
+        } else {
+            setTheme(R.style.AppTheme_Dark);
         }
     }
 

@@ -37,7 +37,7 @@ public class Settings {
     public static final String BLOCKED_CALL_RINGTONE = "BLOCKED_CALL_RINGTONE";
     public static final String DELIVERY_SMS_NOTIFICATION = "DELIVERY_SMS_NOTIFICATION";
     public static final String FOLD_SMS_TEXT_IN_JOURNAL = "FOLD_SMS_TEXT_IN_JOURNAL";
-    public static final String UI_THEME_DARK = "UI_THEME_DARK";
+    public static final String UI_THEME_LIGHT = "UI_THEME_LIGHT";
     public static final String GO_TO_JOURNAL_AT_START = "GO_TO_JOURNAL_AT_START";
     public static final String DEFAULT_SMS_APP_NATIVE_PACKAGE = "DEFAULT_SMS_APP_NATIVE_PACKAGE";
     public static final String DONT_EXIT_ON_BACK_PRESSED = "DONT_EXIT_ON_BACK_PRESSED";
@@ -110,7 +110,7 @@ public class Settings {
         map.put(BLOCKED_SMS_VIBRATION_NOTIFICATION, FALSE);
         map.put(DELIVERY_SMS_NOTIFICATION, TRUE);
         map.put(FOLD_SMS_TEXT_IN_JOURNAL, TRUE);
-        map.put(UI_THEME_DARK, FALSE);
+        map.put(UI_THEME_LIGHT, FALSE);
         map.put(GO_TO_JOURNAL_AT_START, FALSE);
         map.put(DONT_EXIT_ON_BACK_PRESSED, FALSE);
 

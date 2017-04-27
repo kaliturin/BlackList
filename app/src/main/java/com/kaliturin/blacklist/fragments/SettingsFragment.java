@@ -205,7 +205,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 Settings.GO_TO_JOURNAL_AT_START);
         adapter.addCheckbox(R.string.Exit, R.string.Exit_on_back_pressed,
                 Settings.DONT_EXIT_ON_BACK_PRESSED);
-        adapter.addCheckbox(R.string.UI_theme_dark, 0, Settings.UI_THEME_DARK, new View.OnClickListener() {
+        adapter.addCheckbox(R.string.UI_theme_light, 0, Settings.UI_THEME_LIGHT, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // trigger checked row
