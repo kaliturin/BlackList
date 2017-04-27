@@ -86,18 +86,6 @@ public class CustomFragmentActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        // check for result code from the child activity
-//        // (which could be started from a child fragment of the current activity)
-//        if (resultCode == RESULT_OK) {
-//            // a child activity has done an action - close the current activity
-//            setResult(resultCode);
-//            finish();
-//        }
-//    }
-
     // Applies the current UI theme depending on settings
     private void applyCurrentTheme() {
         if (Settings.getBooleanValue(this, Settings.UI_THEME_LIGHT)) {
