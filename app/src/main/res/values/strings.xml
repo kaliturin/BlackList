@@ -18,7 +18,7 @@
     <string name="Block_calls_from_black_list">Block incoming calls from contacts which are in the Blacklist</string>
     <string name="All_calls">All calls</string>
     <string name="Block_all_calls">Block all incoming calls</string>
-    <string name="Block_calls_not_from_contacts">Block incoming calls from numbers which are not from the Contacts list</string>
+    <string name="Block_calls_not_from_contacts">Block incoming calls from numbers which are not from the Contact list</string>
     <string name="Block_calls_not_from_SMS_list">Block incoming calls from numbers which are not from the SMS list</string>
     <string name="Block_calls_from_private">Block incoming calls from private numbers</string>
     <string name="Write_calls_to_journal">Write blocked calls to the Event log</string>
@@ -28,8 +28,8 @@
     <string name="Block_SMS_from_black_list">Block incoming SMS from contacts which are in the Blacklist</string>
     <string name="All_SMS">All SMS</string>
     <string name="Block_all_SMS">Block all incoming SMS</string>
-    <string name="Contacts_list">Contacts list</string>
-    <string name="Block_SMS_not_from_contacts">Block incoming SMS from numbers which are not from the Contacts list</string>
+    <string name="Contacts_list">Contact list</string>
+    <string name="Block_SMS_not_from_contacts">Block incoming SMS from numbers which are not from the Contact list</string>
     <string name="SMS_list">SMS list</string>
     <string name="Block_SMS_not_from_SMS_list">Block incoming SMS from numbers which are not from the SMS list</string>
     <string name="Private_numbers">Private numbers</string>
@@ -49,14 +49,14 @@
     <string name="SMS_blocking_notification">SMS blocking notification</string>
     <string name="SMS_sending">SMS sending</string>
     <string name="SMS_receiving_notification">SMS receiving notification</string>
-    <string name="From_contacts_list">From the Contacts list</string>
-    <string name="From_calls_list">From the Calls list</string>
+    <string name="From_contacts_list">From the Contact list</string>
+    <string name="From_calls_list">From the Call list</string>
     <string name="From_SMS_list">From the SMS list</string>
     <string name="From_Black_list">From the Blacklist</string>
     <string name="From_White_list">From the Whitelist</string>
     <string name="Manually">Manually</string>
-    <string name="List_of_contacts">Contacts list</string>
-    <string name="List_of_calls">Calls list</string>
+    <string name="List_of_contacts">Contact list</string>
+    <string name="List_of_calls">Call list</string>
     <string name="List_of_SMS">SMS list</string>
     <string name="Black_list">Blacklist</string>
     <string name="White_list">Whitelist</string>
@@ -201,7 +201,7 @@
         conflicts between them.
         Attention! If in the Settings is set the blocking of all incoming calls
         or SMS, then even those calls/SMS, whose numbers are included in the
-        Whitelist, will be blocked. Management of contacts in the Whitelist
+        Whitelist, will be blocked. Management the contacts in the Whitelist
         is similar to the Blacklist.
     </string>
 
@@ -213,7 +213,7 @@
     <string name="Info_settings">
         In the Settings you can set the blocking of all calls and SMS from numbers
         that are not in the list of contacts of your phone and (or) not included
-        in the list of numbers with which you exchanged SMS. These options can be
+        in the list of phone numbers with which you exchanged SMS. These options can be
         used in conjunction with the Black and White lists, or separately. You can
         adjust the level of visual and audio information about the event of blocking.
         You can set the light or dark theme of the application interface.
