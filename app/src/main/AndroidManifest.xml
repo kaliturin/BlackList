@@ -100,7 +100,7 @@
         </receiver>
 
         <!-- Writes SMS messages -->
-        <service android:name=".SMSBroadcastReceiver$SMSWriterService" />
+        <service android:name=".SMSBroadcastReceiver$SMSProcessingService" />
 
     </application>
 

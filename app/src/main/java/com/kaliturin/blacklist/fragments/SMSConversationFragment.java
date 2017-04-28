@@ -68,17 +68,26 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         // notify user if permission isn't granted
         Permissions.notifyIfNotGranted(getContext(), Permissions.READ_SMS);
 
+        // get fragment's arguments
+        Bundle arguments = getArguments();
+        int threadId = 0, unreadCount = 0;
+        if (arguments != null) {
+            contactName = arguments.getString(CONTACT_NAME);
+            contactNumber = arguments.getString(CONTACT_NUMBER);
+            threadId = arguments.getInt(THREAD_ID);
+            unreadCount = arguments.getInt(UNREAD_COUNT);
+        }
+        if (contactName == null || contactNumber == null) {
+            getActivity().finish();
+        }
+
         // init internal broadcast event receiver
         internalEventBroadcast = new InternalEventBroadcast() {
             @Override
             public void onSMSWasWritten(@NonNull String phoneNumber) {
-                Bundle arguments = getArguments();
-                if (arguments != null) {
-                    String number = arguments.getString(CONTACT_NUMBER);
-                    if (number != null && number.equals(phoneNumber)) {
-                        // reload sms messages in the list
-                        loadListViewItems(END_OF_LIST, 1);
-                    }
+                if (contactNumber.equals(phoneNumber)) {
+                    // reload sms messages in the list
+                    loadListViewItems(END_OF_LIST, 1);
                 }
             }
         };
@@ -92,16 +101,8 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         listView = (ListView) view.findViewById(R.id.rows_list);
         listView.setAdapter(cursorAdapter);
 
-        // load sms messages of the conversation to the list view
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            contactName = arguments.getString(CONTACT_NAME);
-            contactNumber = arguments.getString(CONTACT_NUMBER);
-            int threadId = arguments.getInt(THREAD_ID);
-            int unreadCount = arguments.getInt(UNREAD_COUNT);
-            // load sms messages of the conversation to the list view
-            loadListViewItems(threadId, unreadCount, END_OF_LIST);
-        }
+        // load sms messages of the conversation to the list
+        loadListViewItems(threadId, unreadCount, END_OF_LIST);
     }
 
     @Override
@@ -151,7 +152,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         Bundle arguments = getArguments();
         if (arguments != null) {
             int threadId = arguments.getInt(THREAD_ID);
-            // load sms messages of the conversation to the list view
+            // load sms messages of the conversation to the list
             loadListViewItems(threadId, unreadCount, listPosition);
         }
     }
@@ -225,7 +226,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             cursorAdapter.changeCursor(cursor);
 
             if (!cursorAdapter.isEmpty()) {
-                // scroll list to bottom
+                // scroll list to the bottom
                 listView.post(new Runnable() {
                     @Override
                     public void run() {
@@ -241,7 +242,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
             // is there unread sms in the thread
             if (unreadCount > 0) {
-                // mark sms ot the thread are read
+                // mark such sms as are read
                 new SMSReadMarker(context).execute(threadId);
             }
         }

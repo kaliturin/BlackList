@@ -35,12 +35,18 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         // check action
         String action = intent.getAction();
-        if (action == null || !action.equals(getAction())) {
+        if (action == null ||
+                !action.equals(SMS_DELIVER) &&
+                        !action.equals(SMS_RECEIVED)) {
             return;
         }
 
-        // if not default sms app
-        if (!DefaultSMSAppHelper.isDefault(context)) {
+        // is default SMS app
+        boolean isDefaultSMSApp = DefaultSMSAppHelper.isDefault(context);
+
+        // if is default
+        if (isDefaultSMSApp && action.equals(SMS_RECEIVED)) {
+            // ignore SMS_RECEIVED action
             return;
         }
 
@@ -58,10 +64,17 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         String address = data.get(ContactsAccessHelper.ADDRESS);
         String body = data.get(ContactsAccessHelper.BODY);
 
-        // process message
-        if (!processMessage(context, address, body)) {
-            // message wasn't blocked - write it to the inbox
-            writeSMSMessageToInbox(context, data);
+        // if default sms app
+        if (isDefaultSMSApp) {
+            // process message
+            if (!processMessage(context, address, body)) {
+                // message wasn't blocked - write it to the inbox
+                SMSProcessingService.run(context, data);
+            }
+        } else {
+            // message will be written by default app
+            // inform internal receivers
+            SMSProcessingService.run(context, data);
         }
     }
 
@@ -168,10 +181,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         return abort;
     }
 
-    public static String getAction() {
-        return (DefaultSMSAppHelper.isAvailable() ? SMS_DELIVER : SMS_RECEIVED);
-    }
-
     private Contact findContactByType(List<Contact> contacts, int contactType) {
         for (Contact contact : contacts) {
             if (contact.type == contactType) {
@@ -276,21 +285,13 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         Notifications.onSmsBlocked(context, name);
     }
 
-    // Writes message's data to the inbox
-    private void writeSMSMessageToInbox(Context context, Map<String, String> data) {
-        // since API 19 only
-        if (DefaultSMSAppHelper.isAvailable()) {
-            SMSWriterService.run(context, data);
-        }
-    }
-
-    // SMS message writer service
-    public static class SMSWriterService extends IntentService {
+    // SMS message processing service
+    public static class SMSProcessingService extends IntentService {
         private static final String KEYS = "KEYS";
         private static final String VALUES = "VALUES";
 
-        public SMSWriterService() {
-            super(SMSWriterService.class.getName());
+        public SMSProcessingService() {
+            super(SMSProcessingService.class.getName());
         }
 
         @Override
@@ -303,6 +304,22 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         private void process(Context context, Map<String, String> data) {
             String address = data.get(ContactsAccessHelper.ADDRESS);
+
+            // if before API 19
+            if (!DefaultSMSAppHelper.isAvailable() ||
+                    // or if not default sms app
+                    !DefaultSMSAppHelper.isDefault(context)) {
+                // SMS will be written by default app
+                try {
+                    // wait for writing to complete
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
+                // inform internal receivers
+                InternalEventBroadcast.sendSMSWasWritten(context, address);
+                return;
+            }
+
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
             // get contact by number
             Contact contact = db.getContact(context, address);
@@ -333,7 +350,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         }
 
         public static void run(Context context, Map<String, String> data) {
-            Intent intent = new Intent(context, SMSWriterService.class);
+            Intent intent = new Intent(context, SMSProcessingService.class);
             intent.putExtra(KEYS, data.keySet().toArray(new String[data.size()]));
             intent.putExtra(VALUES, data.values().toArray(new String[data.size()]));
             context.startService(intent);

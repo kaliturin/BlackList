@@ -15,6 +15,8 @@ import android.widget.Toast;
 import com.kaliturin.blacklist.R;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,16 +76,19 @@ public class Permissions {
         int count = 0;
         for (String permission : PERMISSIONS) {
             if (!isGranted(context, permission)) {
+                if (count > 0) {
+                    sb.append("\n");
+                }
                 String info = getPermissionInfo(context, permission);
                 sb.append(info);
-                sb.append(";\n");
+                sb.append(";");
                 count++;
             }
         }
 
         if (count > 0) {
             int duration;
-            String message = "\"" + context.getString(R.string.app_name) + "\" ";
+            String message = context.getString(R.string.app_name) + " ";
             if (count == 1) {
                 duration = Toast.LENGTH_SHORT;
                 message += context.getString(R.string.needs_permission) + ":\n" + sb.toString();
@@ -137,8 +142,8 @@ public class Permissions {
     private static void notify(@NonNull Context context, @NonNull String permission) {
         String info = getPermissionInfo(context, permission);
         if (info != null) {
-            String message = "\"" + context.getString(R.string.app_name) + "\" " +
-                    context.getString(R.string.needs_permission) + ": " + info;
+            String message = context.getString(R.string.app_name) + " " +
+                    context.getString(R.string.needs_permission) + ":\n" + info + ";";
             Utils.showToast(context, message, Toast.LENGTH_SHORT);
         }
     }
@@ -148,7 +153,16 @@ public class Permissions {
      **/
     public static void checkAndRequest(@NonNull Activity context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            ActivityCompat.requestPermissions(context, PERMISSIONS, REQUEST_CODE);
+            List<String> permissions = new LinkedList<>();
+            for (String permission : PERMISSIONS) {
+                if (!isGranted(context, permission)) {
+                    permissions.add(permission);
+                }
+            }
+            if (permissions.size() > 0) {
+                String[] array = permissions.toArray(new String[permissions.size()]);
+                ActivityCompat.requestPermissions(context, array, REQUEST_CODE);
+            }
         }
     }
 

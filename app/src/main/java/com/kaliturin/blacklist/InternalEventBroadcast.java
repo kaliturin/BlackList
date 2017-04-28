@@ -31,7 +31,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
         switch (actionType) {
             case JOURNAL_WAS_WRITTEN:
                 onJournalWasWritten();
-            break;
+                break;
             case SMS_WAS_WRITTEN: {
                 String number = intent.getStringExtra(CONTACT_NUMBER);
                 if (number != null) {
@@ -49,7 +49,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
             case SMS_WAS_READ:
                 int threadId = intent.getIntExtra(THREAD_ID, 0);
                 onSMSThreadWasRead(threadId);
-            break;
+                break;
         }
     }
 
@@ -63,27 +63,27 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     }
 
     /**
-     * Method is called if SMS has been written to the Inbox/Outbox/Sent box
+     * Method is called if some record was written to the Journal (Event log)
+     **/
+    public void onJournalWasWritten() {
+    }
+
+    /**
+     * Method is called if SMS was written to the content provider
      **/
     public void onSMSWasWritten(String phoneNumber) {
     }
 
     /**
-     * Method is called if SMS has been deleted from the Inbox/Outbox/Sent box
+     * Method is called if SMS was deleted from the content provider
      **/
     public void onSMSWasDeleted(String phoneNumber) {
     }
 
     /**
-     * Method is called if SMS with thread id has been read from the Inbox/Outbox/Sent box
+     * Method is called if SMS with thread id was read from the content provider
      **/
     public void onSMSThreadWasRead(int threadId) {
-    }
-
-    /**
-     * Method is called if some record has been written to the Journal (Event log)
-     **/
-    public void onJournalWasWritten() {
     }
 
     /**
@@ -97,7 +97,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     }
 
     /**
-     * Sends internal event of writing SMS to the Inbox/Outbox/Sent box, which causes
+     * Sends internal event of writing SMS to the content provider, which causes
      * onSMSWasWritten invocation of registered receivers.
      **/
     public static void sendSMSWasWritten(Context context, @NonNull String phoneNumber) {
@@ -108,7 +108,7 @@ public class InternalEventBroadcast extends BroadcastReceiver {
     }
 
     /**
-     * Sends internal event of deleting the SMS from Inbox/Outbox/Sent box, which causes
+     * Sends internal event of deleting the SMS from content provider, which causes
      * onSMSWasDeleted invocation of registered receivers.
      **/
     public static void sendSMSWasDeleted(Context context, @NonNull String phoneNumber) {
