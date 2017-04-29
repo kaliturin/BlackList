@@ -26,7 +26,7 @@
             android:paddingRight="8dp"
             android:paddingTop="10dp"
             android:textColor="?colorAccent"
-            android:textSize="18sp" />
+            android:textSize="@dimen/textSize18" />
 
         <View
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="?colorTextSecondary"
-                android:textSize="13sp" />
+                android:textSize="@dimen/textSize13" />
 
         </LinearLayout>
 
@@ -82,7 +82,7 @@
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
                 android:textColor="?colorText"
-                android:textSize="22sp" />
+                android:textSize="@dimen/textSize22" />
 
             <TextView
                 android:id="@+id/text"
@@ -90,27 +90,19 @@
                 android:layout_height="wrap_content"
                 android:padding="2dp"
                 android:textColor="?colorTextSecondary"
-                android:textSize="15sp" />
+                android:textSize="@dimen/textSize15" />
         </LinearLayout>
 
-        <LinearLayout
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/cb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <android.support.v7.widget.AppCompatCheckBox
-                android:id="@+id/cb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@android:color/transparent"
-                android:button="?selector_checkbox"
-                android:clickable="false"
-                app:buttonTint="?selector_checkbox_tint" />
-
-        </LinearLayout>
+            android:layout_margin="8dp"
+            android:background="@android:color/transparent"
+            android:button="?selector_checkbox"
+            android:clickable="false"
+            app:buttonTint="?selector_checkbox_tint" />
 
     </com.kaliturin.blacklist.utils.CheckableLinearLayout>
 

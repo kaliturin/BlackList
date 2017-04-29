@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="textSize13">16sp</dimen>
+    <dimen name="textSize14">18sp</dimen>
+    <dimen name="textSize15">20sp</dimen>
+    <dimen name="textSize16">22sp</dimen>
+    <dimen name="textSize18">25sp</dimen>
+    <dimen name="textSize20">28sp</dimen>
+    <dimen name="textSize22">31sp</dimen>
+    <dimen name="toolbarHeight">56dp</dimen>
+
+    <bool name="isTablet">true</bool>
+    <item name="iconScale" format="float" type="dimen">1.3</item>
+</resources>

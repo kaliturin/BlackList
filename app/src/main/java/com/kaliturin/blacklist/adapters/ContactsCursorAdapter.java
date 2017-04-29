@@ -16,6 +16,7 @@ import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactNumber;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactSource;
 import com.kaliturin.blacklist.utils.IdentifiersContainer;
+import com.kaliturin.blacklist.utils.Utils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class ContactsCursorAdapter extends CursorAdapter {
         View view = inflater.inflate(R.layout.row_contacts, parent, false);
 
         // view holder for the new row
-        ViewHolder viewHolder = new ViewHolder(view);
+        ViewHolder viewHolder = new ViewHolder(context, view);
         // add view holder to the row
         view.setTag(viewHolder);
 
@@ -168,20 +169,22 @@ public class ContactsCursorAdapter extends CursorAdapter {
         private TextView numbersTextView;
         private CheckBox checkBox;
 
-        ViewHolder(View row) {
-            this((CheckableLinearLayout) row,
+        ViewHolder(Context context, View row) {
+            this(context, (CheckableLinearLayout) row,
                     (TextView) row.findViewById(R.id.contact_name),
                     (TextView) row.findViewById(R.id.contact_numbers),
                     (CheckBox) row.findViewById(R.id.contact_cb));
         }
 
-        ViewHolder(CheckableLinearLayout rowView, TextView nameTextView, TextView numbersTextView, CheckBox checkBox) {
+        ViewHolder(Context context, CheckableLinearLayout rowView, TextView nameTextView,
+                   TextView numbersTextView, CheckBox checkBox) {
             this.contact = null;
             this.itemId = 0;
             this.rowView = rowView;
             this.nameTextView = nameTextView;
             this.numbersTextView = numbersTextView;
             this.checkBox = checkBox;
+            Utils.scaleViewOnTablet(context, checkBox, R.dimen.iconScale);
         }
 
         private void setModel(Context context, Contact contact) {

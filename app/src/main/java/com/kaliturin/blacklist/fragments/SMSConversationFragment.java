@@ -116,11 +116,10 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
 
-        MenuItem writeMessageItem = menu.findItem(R.id.write_message);
-        Utils.setMenuIconTint(getContext(), writeMessageItem, R.attr.colorAccent);
-        writeMessageItem.setVisible(true);
-
-        writeMessageItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        MenuItem menuItem = menu.findItem(R.id.write_message);
+        Utils.setMenuIconTint(getContext(), menuItem, R.attr.colorAccent);
+        menuItem.setVisible(true);
+        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 // open activity with fragment of sending SMS

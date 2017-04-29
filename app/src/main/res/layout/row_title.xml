@@ -24,7 +24,7 @@
         android:paddingRight="8dp"
         android:paddingTop="20dp"
         android:textColor="?colorAccent"
-        android:textSize="18sp" />
+        android:textSize="@dimen/textSize18" />
 
     <View
         android:layout_width="match_parent"

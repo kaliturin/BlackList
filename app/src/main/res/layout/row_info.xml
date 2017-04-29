@@ -28,14 +28,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="?colorText"
-                android:textSize="18sp" />
+                android:textSize="@dimen/textSize18" />
 
             <TextView
                 android:id="@+id/text_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="?colorTextSecondary"
-                android:textSize="15sp"
+                android:textSize="@dimen/textSize15"
                 android:autoLink="web|email"
                 android:visibility="gone" />
         </LinearLayout>

@@ -131,9 +131,10 @@ public class DialogBuilder {
             }
         }
 
-        if (listener == null) {
+        if (listener != null) {
             ImageView imageView = (ImageView) itemView.findViewById(R.id.item_image);
-            imageView.setVisibility(View.GONE);
+            Utils.scaleViewOnTablet(context, imageView, R.dimen.iconScale);
+            imageView.setVisibility(View.VISIBLE);
         }
 
         // wrap on click listener

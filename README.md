@@ -14,15 +14,15 @@ are not in the lists.
 - Supporting light and dark UI themes.
 - Usual SMS-application features - reading/writing/sending messages.
 
-Rights granting:
-Because of the security policy in Android 6.0 and later versions, the application requires rights:
+Permissions granting:
+Because of the security policy in Android 6.0 and later versions, the application requires permissions:
 1) Named: "Access photos, media and files". Allows reading and writing the files in the internal
 memory of the device - for storing the block lists.
 2) Named: "Send and view SMS messages". Allows to display and block incoming SMS messages.
 3) Named: "Make and manage phone calls". Allows to block incoming calls.
 4) Named: "Access contacts". Allows to display a list of contacts.
 Because of the security policy in Android 4.4 and later versions to block the incoming SMS messages
-it is required to give to the application the rights of "Default SMS-application" in the Settings.
+it is required to give to the application the permissions of "Default SMS-application" in the Settings.
 If necessary, you can always disable this option and return to the previous "Default
 SMS-application". In this case, the SMS blocking will be disabled. At the moment the application
 supports the functions of blocking and exchanging SMS messages only. Support for MMS messages has

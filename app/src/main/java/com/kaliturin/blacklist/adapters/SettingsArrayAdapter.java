@@ -184,6 +184,7 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
         };
 
         ViewHolder(View rowView, Model model, int position) {
+            Context context = getContext();
             this.rowView = rowView;
             this.model = model;
 
@@ -208,6 +209,7 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
             if (model.type == Model.CHECKBOX) {
                 checkBox = (CheckBox) rowView.findViewById(R.id.cb);
                 if (checkBox != null) {
+                    Utils.scaleViewOnTablet(context, checkBox, R.dimen.iconScale);
                     checkBox.setVisibility(View.VISIBLE);
                     checkBox.setChecked(model.isChecked());
                     checkBox.setOnClickListener(listener);
@@ -220,11 +222,12 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
             if (model.type == Model.BUTTON) {
                 rowView.setOnClickListener(listener);
                 // set row's background drawable
-                int drawableRes = Utils.getResourceId(getContext(), R.attr.selector_control);
-                Utils.setDrawable(getContext(), rowView, drawableRes);
+                int drawableRes = Utils.getResourceId(context, R.attr.selector_control);
+                Utils.setDrawable(context, rowView, drawableRes);
                 // set row's image
                 ImageView imageView = (ImageView) rowView.findViewById(R.id.image);
                 if (imageView != null) {
+                    Utils.scaleViewOnTablet(context, imageView, R.dimen.iconScale);
                     imageView.setVisibility(View.VISIBLE);
                 }
             }

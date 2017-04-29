@@ -27,7 +27,7 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:textColor="?colorTextSms"
-            android:textSize="18sp" />
+            android:textSize="@dimen/textSize18" />
 
         <TextView
             android:id="@+id/date"
@@ -37,7 +37,7 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:textColor="?colorTextSms"
-            android:textSize="14sp" />
+            android:textSize="@dimen/textSize14" />
     </LinearLayout>
 
     <View

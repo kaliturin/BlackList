@@ -19,6 +19,7 @@ import com.kaliturin.blacklist.utils.DatabaseAccessHelper.JournalRecord;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.JournalRecordCursorWrapper;
 import com.kaliturin.blacklist.utils.IdentifiersContainer;
 import com.kaliturin.blacklist.utils.Settings;
+import com.kaliturin.blacklist.utils.Utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -64,7 +65,7 @@ public class JournalCursorAdapter extends CursorAdapter {
         View view = inflater.inflate(R.layout.row_journal, parent, false);
 
         // link view to holder
-        view.setTag(new ViewHolder(view));
+        view.setTag(new ViewHolder(context, view));
 
         return view;
     }
@@ -180,8 +181,8 @@ public class JournalCursorAdapter extends CursorAdapter {
         private View dateLayout;
         private CheckableLinearLayout contentLayout;
 
-        ViewHolder(View rowView) {
-            this((ImageView) rowView.findViewById(R.id.icon),
+        ViewHolder(Context context, View rowView) {
+            this(context, (ImageView) rowView.findViewById(R.id.icon),
                     (TextView) rowView.findViewById(R.id.sender),
                     (TextView) rowView.findViewById(R.id.text),
                     (TextView) rowView.findViewById(R.id.date),
@@ -191,7 +192,7 @@ public class JournalCursorAdapter extends CursorAdapter {
                     (CheckableLinearLayout) rowView.findViewById(R.id.content_layout));
         }
 
-        ViewHolder(ImageView iconImageView, TextView senderTextView,
+        ViewHolder(Context context, ImageView iconImageView, TextView senderTextView,
                    TextView textTextView, TextView dateTextView,
                    TextView timeTextView, CheckBox checkBox, View dateLayout,
                    CheckableLinearLayout contentLayout) {
@@ -205,6 +206,9 @@ public class JournalCursorAdapter extends CursorAdapter {
             this.checkBox = checkBox;
             this.dateLayout = dateLayout;
             this.contentLayout = contentLayout;
+
+            Utils.scaleViewOnTablet(context, checkBox, R.dimen.iconScale);
+            Utils.scaleViewOnTablet(context, iconImageView, R.dimen.iconScale);
 
             contentLayout.setTag(this);
             textTextView.setTag(this);

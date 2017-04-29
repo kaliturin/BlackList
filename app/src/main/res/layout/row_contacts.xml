@@ -24,14 +24,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?colorText"
-                android:textSize="22sp" />
+                android:textSize="@dimen/textSize22" />
 
             <TextView
                 android:id="@+id/contact_numbers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?colorTextSecondary"
-                android:textSize="18sp" />
+                android:textSize="@dimen/textSize18" />
 
         </LinearLayout>
 

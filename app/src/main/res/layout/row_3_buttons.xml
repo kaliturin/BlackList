@@ -27,7 +27,7 @@
             android:paddingBottom="15dp"
             android:paddingTop="15dp"
             android:textColor="?colorAccent"
-            android:textSize="14sp"
+            android:textSize="@dimen/textSize14"
             android:textStyle="bold"
             android:visibility="invisible" />
 
@@ -41,7 +41,7 @@
             android:paddingBottom="15dp"
             android:paddingTop="15dp"
             android:textColor="?colorAccent"
-            android:textSize="14sp"
+            android:textSize="@dimen/textSize14"
             android:textStyle="bold"
             android:visibility="invisible" />
 
@@ -55,7 +55,7 @@
             android:paddingBottom="15dp"
             android:paddingTop="15dp"
             android:textColor="?colorAccent"
-            android:textSize="14sp"
+            android:textSize="@dimen/textSize14"
             android:textStyle="bold"
             android:visibility="invisible" />
 

@@ -22,7 +22,7 @@
             android:paddingBottom="2dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:textSize="18sp"
+            android:textSize="@dimen/textSize18"
             android:textColor="?colorText"
             android:text="@string/Phone_number" />
 

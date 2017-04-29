@@ -20,7 +20,7 @@
         <!-- Android resources -->
         <item name="android:textColorSecondary">?colorTextSecondary</item>
         <item name="android:textColorLink">@color/link</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/textSize16</item>
 
         <!-- Drawables -->
         <item name="selector_control">@drawable/selector_control_light</item>
@@ -58,7 +58,7 @@
 
     <!-- Toolbar title theme -->
     <style name="AppTheme.ToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">@dimen/textSize20</item>
     </style>
 
     <!-- Dark theme -->
@@ -81,7 +81,7 @@
         <!-- Android resources -->
         <item name="android:textColorSecondary">?colorTextSecondary</item>
         <item name="android:textColorLink">@color/link_d</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/textSize16</item>
 
         <!-- Drawables -->
         <item name="selector_control">@drawable/selector_control_dark</item>

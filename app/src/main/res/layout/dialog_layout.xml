@@ -12,7 +12,7 @@
         android:background="?colorTitleBackground"
         android:padding="12dp"
         android:textColor="?colorAccent"
-        android:textSize="18sp"
+        android:textSize="@dimen/textSize18"
         android:visibility="gone" />
 
     <View

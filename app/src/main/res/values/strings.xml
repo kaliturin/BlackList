@@ -157,7 +157,7 @@
     <string name="Attention">Attention</string>
     <string name="Info_attention">
         Because of the security policy in Android 6.0 and later versions,
-        the application requires rights:
+        the application requires permissions:
         \n1. Named: \"Access photos, media and files\".
         Allows reading and writing the files in the internal memory of the
         device - for storing the block lists.
@@ -170,7 +170,7 @@
 
         \nBecause of the security policy in Android 4.4 and later versions
         to block the incoming SMS messages it is required to give to the
-        application the rights of \"Default SMS-application\" in the Settings.
+        application the permissions of \"Default SMS-application\" in the Settings.
         If necessary, you can always disable this option and return to the previous
         \"Default SMS-application\". In this case, the SMS blocking will be
         disabled. At the moment the application supports blocking and exchanging

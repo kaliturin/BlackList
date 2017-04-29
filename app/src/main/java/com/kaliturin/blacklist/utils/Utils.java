@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.AttrRes;
+import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StyleRes;
 import android.support.v4.content.ContextCompat;
@@ -205,5 +206,21 @@ public class Utils {
                 Toast.makeText(context.getApplicationContext(), message, duration).show();
             }
         });
+    }
+
+    /**
+     * Scales passed view with passed dimension on Tablets only
+     */
+    public static void scaleViewOnTablet(Context context, View view, @DimenRes int dimenRes) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            boolean isTablet = context.getResources().getBoolean(R.bool.isTablet);
+            if(isTablet) {
+                TypedValue outValue = new TypedValue();
+                context.getResources().getValue(dimenRes, outValue, true);
+                float scale = outValue.getFloat();
+                view.setScaleX(scale);
+                view.setScaleY(scale);
+            }
+        }
     }
 }
