@@ -1,34 +1,36 @@
-Blacklist blocker is a free Android application that allows you to conveniently configure the
-blocking of unwanted calls and SMS, has light and dark UI themes and supports Android devices
-since version 2.3.
+This is a free application that allows you to configure the blocking of unwanted calls and SMS
+in convenient way. It does not contain ads, supports light and dark interface themes and is
+supported by devices with Android 2.3 and up.
 
 Features:
-- Managing the blacklist - for blocking incoming calls/messages.
-- Managing the whitelist - for excluding from blocking incoming calls/messages.
-- Reading the contacts and SMS lists of your phone - for blocking all incoming calls/messages which
-are not in the lists.
-- Blocking private/anonymous numbers.
-- Different ways to compare blocked phone numbers (equals, contains, starts with, ends with).
-- Writing the event log - the history of blocked calls and messages (with saving blocked SMS texts).
-- Managing visual and audio notifications about events of blocking.
-- Supporting light and dark UI themes.
-- Usual SMS-application features - reading/writing/sending messages.
+
+- Managing the Blacklist - to block numbers from this list.
+- Managing the Whitelist - to exclude blocking of numbers from this list.
+- Reading the Contacts and SMS lists of your phone - to block numbers not included in these lists.
+- Blocking of private/anonymous numbers.
+- Different ways of comparing blocked numbers (equality, by fragment, etc.).
+- Recording of the event log - the history of blocked calls and SMS (with saving the texts).
+- Manage notifications about block events.
+- Support for light and dark themes of the interface.
+- Common functions of SMS-application - reading/writing/exchanging SMS messages.
 
 Permissions granting:
+
 Because of the security policy in Android 6.0 and later versions, the application requires permissions:
-1) Named: "Access photos, media and files". Allows reading and writing the files in the internal
-memory of the device - for storing the block lists.
-2) Named: "Send and view SMS messages". Allows to display and block incoming SMS messages.
-3) Named: "Make and manage phone calls". Allows to block incoming calls.
-4) Named: "Access contacts". Allows to display a list of contacts.
+1) "Access photos, media and files". Allows reading and writing files in the internal memory of
+the device - for storing the block lists.
+2) "Send and view SMS messages". Allows to display and block incoming SMS messages.
+3) "Make and manage phone calls". Allows to block incoming calls.
+4) "Access contacts". Allows to display a list of contacts.
+
 Because of the security policy in Android 4.4 and later versions to block the incoming SMS messages
 it is required to give to the application the permissions of "Default SMS-application" in the Settings.
-If necessary, you can always disable this option and return to the previous "Default
-SMS-application". In this case, the SMS blocking will be disabled. At the moment the application
-supports the functions of blocking and exchanging SMS messages only. Support for MMS messages has
-not yet been implemented.
+If necessary, you can always opt-out and return to the previous "Default SMS-application".
+In this case, the SMS blocking will be disabled. At the moment the application supports blocking
+and exchanging SMS messages only. Support for MMS messages has not yet been implemented.
 
-Details:
+Functionality details:
+
 1) Messaging.
 This list displays SMS-chats, sorted by the time of the last message in them. From here you can
 go to sending SMS messages.

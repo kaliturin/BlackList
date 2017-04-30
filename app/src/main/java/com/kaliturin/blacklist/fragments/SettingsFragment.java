@@ -251,12 +251,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                                 // import data file
                                 if (importDataFile(textView.getText().toString())) {
-                                    // update settings data
-                                    Settings.invalidateCache();
-                                    Settings.initDefaults(getContext());
-                                    // refresh fragment
-                                    onPause();
-                                    onResume();
+                                    restartApp();
                                 }
                                 return true;
                             }

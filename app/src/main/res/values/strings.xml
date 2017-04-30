@@ -156,25 +156,22 @@
 
     <string name="Attention">Attention</string>
     <string name="Info_attention">
-        Because of the security policy in Android 6.0 and later versions,
-        the application requires permissions:
-        \n1. Named: \"Access photos, media and files\".
-        Allows reading and writing the files in the internal memory of the
-        device - for storing the block lists.
-        \n2. Named: \"Send and view SMS messages\".
-        Allows to display and block incoming SMS messages.
-        \n3. Named: \"Make and manage phone calls\". Allows to block
-        incoming calls.
-        \n4. Named: \"Access contacts\". Allows to display
-        a list of contacts.
+        Because of the security policy in Android 6.0 and later versions, the
+        application requires permissions:
+        \n1. \"Access photos, media and files\". Allows reading and writing
+        files in the internal memory of the device - for storing the block lists.
+        \n2. \"Send and view SMS messages\". Allows to display and block
+        incoming SMS messages.
+        \n3. \"Make and manage phone calls\". Allows to block incoming calls.
+        \n4. \"Access contacts\". Allows to display a list of contacts.
 
         \nBecause of the security policy in Android 4.4 and later versions
         to block the incoming SMS messages it is required to give to the
         application the permissions of \"Default SMS-application\" in the Settings.
-        If necessary, you can always disable this option and return to the previous
+        If necessary, you can always opt-out and return to the previous
         \"Default SMS-application\". In this case, the SMS blocking will be
         disabled. At the moment the application supports blocking and exchanging
-        SMS messages only. Support for MMS messages has not yet been implemented.
+        SMS messages only. Support the MMS messages has not yet been implemented.
     </string>
 
     <string name="Info_messaging">
