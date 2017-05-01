@@ -16,14 +16,14 @@ Features:
 
 Permissions granting:
 
-Because of the security policy in Android 6.0 and later versions, the application requires permissions:
+Because of the security policy in Android 6.0 and up, the application requires permissions:
 1) "Access photos, media and files". Allows reading and writing files in the internal memory of
 the device - for storing the block lists.
 2) "Send and view SMS messages". Allows to display and block incoming SMS messages.
 3) "Make and manage phone calls". Allows to block incoming calls.
 4) "Access contacts". Allows to display a list of contacts.
 
-Because of the security policy in Android 4.4 and later versions to block the incoming SMS messages
+Because of the security policy in Android 4.4 and up to block the incoming SMS messages
 it is required to give to the application the permissions of "Default SMS-application" in the Settings.
 If necessary, you can always opt-out and return to the previous "Default SMS-application".
 In this case, the SMS blocking will be disabled. At the moment the application supports blocking

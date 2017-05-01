@@ -144,6 +144,7 @@
     <string name="Attention_all_calls_blocked">Внимание! Все входящие звонки будут блокированы!</string>
     <string name="Go_to_Journal_at_start">Переходить в Журнал событий при старте приложения</string>
     <string name="Exit_on_back_pressed">Не закрывать приложение при нажатии кнопки телефона \"Назад\"</string>
+    <string name="Back_button">Кнопка \"Назад\"</string>
     <string name="Sending_">Отправка...</string>
     <string name="Not_sent">Не отправлено</string>
 

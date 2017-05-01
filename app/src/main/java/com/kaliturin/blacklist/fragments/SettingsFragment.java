@@ -44,9 +44,9 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     private static final int BLOCKED_SMS = 1;
     private static final int RECEIVED_SMS = 2;
     private static final int BLOCKED_CALL = 3;
+    private static final int DEFAULT_SMS_APP = 4;
     private SettingsArrayAdapter adapter = null;
     private ListView listView = null;
-    private int listPosition = 0;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -66,15 +66,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
-        } else {
-            Bundle arguments = getArguments();
-            if (arguments != null) {
-                listPosition = arguments.getInt(LIST_POSITION, 0);
-            }
-        }
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
@@ -84,15 +75,57 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         super.onViewCreated(view, savedInstanceState);
         Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE);
 
+        int listPosition = 0;
+        if (savedInstanceState != null) {
+            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
+        } else {
+            Bundle arguments = getArguments();
+            if (arguments != null) {
+                listPosition = arguments.getInt(LIST_POSITION, 0);
+            }
+        }
+
         listView = (ListView) view.findViewById(R.id.settings_list);
+        loadListView(listPosition);
     }
 
-    // Array adapter is rebuilt here because we need to update rows after
-    // we've got a result of the default SMS app changing dialog.
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // save first showed row position
+        outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
+    }
 
+    // Is used for getting result of ringtone picker dialog & default sms app dialog
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            // default sms app dialog result
+            case DEFAULT_SMS_APP:
+                if (resultCode == Activity.RESULT_OK) {
+                    Permissions.invalidateCache();
+                }
+                // reload settings list
+                int listPosition = listView.getFirstVisiblePosition();
+                loadListView(listPosition);
+                break;
+            // ringtone picker dialog results
+            default:
+                // get ringtone url
+                Uri uri = null;
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                }
+                // save url as settings property value
+                setRingtoneUri(requestCode, uri);
+                break;
+        }
+    }
+
+    // Loads settings list view
+    private void loadListView(int listPosition) {
         // Create list adapter and fill it with data
         adapter = new SettingsArrayAdapter(getContext());
 
@@ -108,9 +141,8 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                     isDefaultSmsApp, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Activity activity = SettingsFragment.this.getActivity();
-                            DefaultSMSAppHelper.askForDefaultAppChange(activity, 0);
-                            Permissions.invalidateCache();
+                            DefaultSMSAppHelper.askForDefaultAppChange(
+                                    SettingsFragment.this, DEFAULT_SMS_APP);
                         }
                     });
         }
@@ -203,7 +235,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 Settings.FOLD_SMS_TEXT_IN_JOURNAL);
         adapter.addCheckbox(R.string.Journal, R.string.Go_to_Journal_at_start,
                 Settings.GO_TO_JOURNAL_AT_START);
-        adapter.addCheckbox(R.string.Exit, R.string.Exit_on_back_pressed,
+        adapter.addCheckbox(R.string.Back_button, R.string.Exit_on_back_pressed,
                 Settings.DONT_EXIT_ON_BACK_PRESSED);
         adapter.addCheckbox(R.string.UI_theme_light, 0, Settings.UI_THEME_LIGHT, new View.OnClickListener() {
             @Override
@@ -265,39 +297,10 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         listView.setSelection(listPosition);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        listPosition = listView.getFirstVisiblePosition();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // save first showed row position
-        outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
-    }
-
-    // Is used for getting result of ringtone picker dialog
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == Activity.RESULT_OK) {
-            // get ringtone url
-            Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-            // save url as settings property value
-            setRingtoneUri(requestCode, uri);
-        }
-    }
-
     // Saves ringtone url as settings property value
-    private void setRingtoneUri(int type, Uri uri) {
-        String ringtoneProperty = null;
-        String soundProperty = null;
-        String statusProperty = null;
-
-        switch (type) {
+    private void setRingtoneUri(int requestCode, @Nullable Uri uri) {
+        String ringtoneProperty, soundProperty, statusProperty = null;
+        switch (requestCode) {
             case BLOCKED_CALL:
                 ringtoneProperty = Settings.BLOCKED_CALL_RINGTONE;
                 soundProperty = Settings.BLOCKED_CALL_SOUND_NOTIFICATION;
@@ -312,27 +315,27 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 ringtoneProperty = Settings.RECEIVED_SMS_RINGTONE;
                 soundProperty = Settings.RECEIVED_SMS_SOUND_NOTIFICATION;
                 break;
+            default:
+                return;
         }
 
-        if (ringtoneProperty != null && soundProperty != null) {
-            if (uri != null) {
-                String uriString = uri.toString();
-                Settings.setStringValue(getContext(), ringtoneProperty, uriString);
-                Settings.setBooleanValue(getContext(), soundProperty, true);
-                if (statusProperty != null) {
-                    Settings.setBooleanValue(getContext(), statusProperty, true);
-                }
-            } else {
-                Settings.setBooleanValue(getContext(), soundProperty, false);
+        if (uri != null) {
+            Settings.setStringValue(getContext(), ringtoneProperty, uri.toString());
+            adapter.setRowChecked(soundProperty, true);
+            if (statusProperty != null) {
+                // if we enable ringtone we must enable status bar notification
+                adapter.setRowChecked(statusProperty, true);
             }
+        } else {
+            adapter.setRowChecked(soundProperty, false);
         }
     }
 
     // Returns ringtone url from settings property
     @Nullable
-    private Uri getRingtoneUri(int type) {
+    private Uri getRingtoneUri(int requestCode) {
         String uriString = null;
-        switch (type) {
+        switch (requestCode) {
             case BLOCKED_CALL:
                 uriString = Settings.getStringValue(getContext(), Settings.BLOCKED_CALL_RINGTONE);
                 break;

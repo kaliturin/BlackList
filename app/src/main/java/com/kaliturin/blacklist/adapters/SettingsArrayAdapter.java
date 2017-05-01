@@ -87,6 +87,7 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
             if (viewHolder.model.property != null &&
                     viewHolder.model.property.equals(property)) {
                 viewHolder.setChecked(checked);
+                break;
             }
         }
     }
@@ -98,24 +99,30 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
         return (viewHolder != null ? viewHolder.model.property : null);
     }
 
-    private void addModel(int type, @StringRes int titleId, @StringRes int commentId,
-                          String property, View.OnClickListener listener) {
+    private void addModel(int type, String title, String comment, String property, boolean isChecked,
+                          View.OnClickListener listener) {
+        Model model = new Model(type, title, comment, property, isChecked, listener);
+        add(model);
+    }
+
+    private void addModel(int type, String title, String comment, String property,
+                          View.OnClickListener listener) {
         boolean isChecked = (property != null && Settings.getBooleanValue(getContext(), property));
-        add(new Model(type, getString(titleId), getString(commentId), property, isChecked, listener));
+        addModel(type, title, comment, property, isChecked, listener);
     }
 
     public void addTitle(@StringRes int titleId) {
-        addModel(Model.TITLE, titleId, 0, null, null);
+        addModel(Model.TITLE, getString(titleId), null, null, null);
     }
 
     public void addCheckbox(@StringRes int titleId, @StringRes int commentId, boolean isChecked,
                             View.OnClickListener listener) {
-        add(new Model(Model.CHECKBOX, getString(titleId), getString(commentId), null, isChecked, listener));
+        addModel(Model.CHECKBOX, getString(titleId), getString(commentId), null, isChecked, listener);
     }
 
     public void addCheckbox(@StringRes int titleId, @StringRes int commentId, String property,
                             View.OnClickListener listener) {
-        addModel(Model.CHECKBOX, titleId, commentId, property, listener);
+        addModel(Model.CHECKBOX, getString(titleId), getString(commentId), property, listener);
     }
 
     public void addCheckbox(@StringRes int titleId, @StringRes int commentId, String property) {
@@ -123,7 +130,7 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
     }
 
     public void addButton(@StringRes int titleId, @StringRes int commentId, View.OnClickListener listener) {
-        add(new Model(Model.BUTTON, getString(titleId), getString(commentId), null, false, listener));
+        addModel(Model.BUTTON, getString(titleId), getString(commentId), null, false, listener);
     }
 
     @Nullable

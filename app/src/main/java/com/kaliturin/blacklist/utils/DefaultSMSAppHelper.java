@@ -1,13 +1,13 @@
 package com.kaliturin.blacklist.utils;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Telephony;
+import android.support.v4.app.Fragment;
 
 import com.kaliturin.blacklist.SMSBroadcastReceiver;
 
@@ -47,25 +47,26 @@ public class DefaultSMSAppHelper {
     }
 
     @TargetApi(19)
-    public static void askForDefaultAppChange(Activity activity, int requestCode) {
+    public static void askForDefaultAppChange(Fragment fragment, int requestCode) {
         if (!isAvailable()) return;
+        Context context = fragment.getContext().getApplicationContext();
         String packageName;
         // current app package is already set as default
-        if (isDefault(activity)) {
+        if (isDefault(context)) {
             // get native app package as default
-            packageName = Settings.getStringValue(activity, Settings.DEFAULT_SMS_APP_NATIVE_PACKAGE);
+            packageName = Settings.getStringValue(context, Settings.DEFAULT_SMS_APP_NATIVE_PACKAGE);
         } else {
             // save native app package to the settings
-            String nativePackage = Telephony.Sms.getDefaultSmsPackage(activity);
-            Settings.setStringValue(activity, Settings.DEFAULT_SMS_APP_NATIVE_PACKAGE, nativePackage);
+            String nativePackage = Telephony.Sms.getDefaultSmsPackage(context);
+            Settings.setStringValue(context, Settings.DEFAULT_SMS_APP_NATIVE_PACKAGE, nativePackage);
             // get current app package as default
-            packageName = activity.getPackageName();
+            packageName = context.getPackageName();
         }
-        askForDefaultAppChange(activity, packageName, requestCode);
+        askForDefaultAppChange(fragment, packageName, requestCode);
     }
 
     @TargetApi(19)
-    private static void askForDefaultAppChange(Activity activity, String packageName, int requestCode) {
+    private static void askForDefaultAppChange(Fragment fragment, String packageName, int requestCode) {
         if (!isAvailable()) return;
         Intent intent;
         if (packageName == null) {
@@ -80,6 +81,6 @@ public class DefaultSMSAppHelper {
             intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
             intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName);
         }
-        activity.startActivityForResult(intent, requestCode);
+        fragment.startActivityForResult(intent, requestCode);
     }
 }

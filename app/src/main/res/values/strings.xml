@@ -102,7 +102,7 @@
     <string name="Move_to_white_list">Move contact to the Whitelist</string>
     <string name="Move_to_black_list">Move contact to the Blacklist</string>
     <string name="Default_SMS_app">Default SMS app</string>
-    <string name="Set_as_default_SMS_app">Set as default SMS app is needed for SMS blocking since Android 4.4 and newer</string>
+    <string name="Set_as_default_SMS_app">Set as default SMS app is needed for SMS blocking since Android 4.4 and up</string>
     <string name="SMS_default_app">SMS application</string>
     <string name="New_message">New message</string>
     <string name="needs_permission">needs permission</string>
@@ -144,6 +144,7 @@
     <string name="Attention_all_calls_blocked">Attention! All incoming calls will be blocked!</string>
     <string name="Go_to_Journal_at_start">Go to the Event log at the application start</string>
     <string name="Exit_on_back_pressed">Do not exit the application on the phone\'s \"Back\" button pressed</string>
+    <string name="Back_button">\"Back\" button</string>
     <string name="Sending_">Sending...</string>
     <string name="Not_sent">Not sent</string>
 
@@ -156,7 +157,7 @@
 
     <string name="Attention">Attention</string>
     <string name="Info_attention">
-        Because of the security policy in Android 6.0 and later versions, the
+        Because of the security policy in Android 6.0 and up, the
         application requires permissions:
         \n1. \"Access photos, media and files\". Allows reading and writing
         files in the internal memory of the device - for storing the block lists.
@@ -165,7 +166,7 @@
         \n3. \"Make and manage phone calls\". Allows to block incoming calls.
         \n4. \"Access contacts\". Allows to display a list of contacts.
 
-        \nBecause of the security policy in Android 4.4 and later versions
+        \nBecause of the security policy in Android 4.4 and up
         to block the incoming SMS messages it is required to give to the
         application the permissions of \"Default SMS-application\" in the Settings.
         If necessary, you can always opt-out and return to the previous

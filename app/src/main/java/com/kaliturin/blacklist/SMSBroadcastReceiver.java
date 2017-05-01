@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
@@ -26,6 +27,7 @@ import java.util.Map;
  */
 
 public class SMSBroadcastReceiver extends BroadcastReceiver {
+    private static final String TAG = SMSBroadcastReceiver.class.getName();
     private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
     private static final String SMS_DELIVER = "android.provider.Telephony.SMS_DELIVER";
 
@@ -41,39 +43,25 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        // is default SMS app
-        boolean isDefaultSMSApp = DefaultSMSAppHelper.isDefault(context);
+        // is current app the "default SMS app"
+        boolean isDefaultSmsApp = DefaultSMSAppHelper.isDefault(context);
 
-        // if is default
-        if (isDefaultSMSApp && action.equals(SMS_RECEIVED)) {
-            // ignore SMS_RECEIVED action
-            return;
-        }
-
-        // get messages
-        SmsMessage[] messages = getSMSMessages(intent);
-        if (messages == null || messages.length == 0) {
+        // if "default SMS app" feature is available and app is default
+        if (DefaultSMSAppHelper.isAvailable() &&
+                isDefaultSmsApp && action.equals(SMS_RECEIVED)) {
+            // ignore SMS_RECEIVED action - wait only for SMS_DELIVER
             return;
         }
 
         // get message data
-        Map<String, String> data = extractMessageData(context, messages, timeReceive);
+        Map<String, String> data = extractMessageData(context, intent, timeReceive);
         if (data == null) {
             return;
         }
-        String address = data.get(ContactsAccessHelper.ADDRESS);
-        String body = data.get(ContactsAccessHelper.BODY);
 
-        // if default sms app
-        if (isDefaultSMSApp) {
-            // process message
-            if (!processMessage(context, address, body)) {
-                // message wasn't blocked - write it to the inbox
-                SMSProcessingService.run(context, data);
-            }
-        } else {
-            // message will be written by default app
-            // inform internal receivers
+        // if isn't "default SMS app" or if message isn't blocked
+        if (!isDefaultSmsApp || !processMessageData(context, data)) {
+            // process message in service
             SMSProcessingService.run(context, data);
         }
     }
@@ -81,18 +69,28 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     // Extracts message data
     @Nullable
     private Map<String, String> extractMessageData(Context context,
-                                                   SmsMessage[] messages, long timeReceive) {
+                                                   Intent intent, long timeReceive) {
+        // get messages
+        SmsMessage[] messages = getSMSMessages(intent);
+        if (messages == null || messages.length == 0) {
+            Log.w(TAG, "Received message is null or empty");
+            return null;
+        }
+
         // Assume that all messages in array received at ones have the same data except of bodies.
         // So get just the first message to get the rest data.
         SmsMessage message = messages[0];
         String address = message.getOriginatingAddress();
         if (address == null) {
+            Log.w(TAG, "Received message address is null");
             return null;
         }
         address = address.trim();
         if (address.isEmpty()) {
+            Log.w(TAG, "Received message address is empty");
             return null;
         }
+
         Map<String, String> data = new HashMap<>();
         // save concatenated bodies of messages
         data.put(ContactsAccessHelper.BODY, getSMSMessageBody(context, messages));
@@ -110,10 +108,12 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     }
 
     // Processes message; returns true if message was blocked, false else
-    private boolean processMessage(Context context, String number, String body) {
+    private boolean processMessageData(Context context, Map<String, String> data) {
+        String address = data.get(ContactsAccessHelper.ADDRESS);
+        String body = data.get(ContactsAccessHelper.BODY);
 
         // private number detected
-        if (isPrivateNumber(number)) {
+        if (isPrivateNumber(address)) {
             // if block private numbers
             if (Settings.getBooleanValue(context, Settings.BLOCK_HIDDEN_SMS)) {
                 String name = context.getString(R.string.Private);
@@ -125,13 +125,13 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         }
 
         // get contacts linked to the number
-        List<Contact> contacts = getContacts(context, number);
+        List<Contact> contacts = getContacts(context, address);
 
         // if block all SMS
         if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
-            String name = getContactName(contacts, number);
+            String name = getContactName(contacts, address);
             // abort SMS and notify the user
-            abortSMSAndNotify(context, name, number, body);
+            abortSMSAndNotify(context, name, address, body);
             return true;
         }
 
@@ -146,7 +146,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             contact = findContactByType(contacts, Contact.TYPE_BLACK_LIST);
             if (contact != null) {
                 // abort SMS and notify the user
-                abortSMSAndNotify(context, contact.name, number, body);
+                abortSMSAndNotify(context, contact.name, address, body);
                 return true;
             }
         }
@@ -157,7 +157,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         if (Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_CONTACTS) &&
                 Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if (db.getContact(context, number) != null) {
+            if (db.getContact(context, address) != null) {
                 return false;
             }
             abort = true;
@@ -167,7 +167,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         if (Settings.getBooleanValue(context, Settings.BLOCK_SMS_NOT_FROM_SMS_CONTENT) &&
                 Permissions.isGranted(context, Permissions.READ_SMS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            if (db.containsNumberInSMSContent(context, number)) {
+            if (db.containsNumberInSMSContent(context, address)) {
                 return false;
             }
             abort = true;
@@ -175,7 +175,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         if (abort) {
             // abort SMS and notify the user
-            abortSMSAndNotify(context, number, number, body);
+            abortSMSAndNotify(context, address, address, body);
         }
 
         return abort;
@@ -273,6 +273,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
+    // Aborts broadcast (if available) and notifies user
     private void abortSMSAndNotify(Context context, String name, String number, String body) {
         if (name == null || number == null) {
             return;
@@ -287,6 +288,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
     // SMS message processing service
     public static class SMSProcessingService extends IntentService {
+        private static final String TAG = SMSProcessingService.class.getName();
         private static final String KEYS = "KEYS";
         private static final String VALUES = "VALUES";
 
@@ -296,18 +298,23 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         protected void onHandleIntent(@Nullable Intent intent) {
-            Map<String, String> data = extractData(intent);
-            if (!data.isEmpty()) {
-                process(this, data);
+            try {
+                Map<String, String> data = extractMessageData(intent);
+                processMessageData(this, data);
+            } catch (IllegalArgumentException e) {
+                Log.w(TAG, e);
             }
         }
 
-        private void process(Context context, Map<String, String> data) {
+        private void processMessageData(Context context, Map<String, String> data) throws IllegalArgumentException {
             String address = data.get(ContactsAccessHelper.ADDRESS);
+            if (address == null || address.isEmpty()) {
+                throw new IllegalArgumentException("Message address is null or empty");
+            }
 
             // if before API 19
             if (!DefaultSMSAppHelper.isAvailable() ||
-                    // or if not default sms app
+                    // or if not "default SMS app"
                     !DefaultSMSAppHelper.isDefault(context)) {
                 // SMS will be written by default app
                 try {
@@ -335,7 +342,9 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             }
         }
 
-        private Map<String, String> extractData(@Nullable Intent intent) {
+        // Extracts message's data from intent.
+        // Throws exception on data intent is illegal.
+        private Map<String, String> extractMessageData(@Nullable Intent intent) throws IllegalArgumentException {
             Map<String, String> data = new HashMap<>();
             if (intent != null) {
                 String[] keys = intent.getStringArrayExtra(KEYS);
@@ -346,6 +355,12 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                     }
                 }
             }
+
+            if (data.isEmpty()) {
+                String intentString = (intent == null ? "null" : intent.toString());
+                throw new IllegalArgumentException("Message intent data is illegal: " + intentString);
+            }
+
             return data;
         }
 
