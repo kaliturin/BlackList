@@ -150,19 +150,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         if (isDefaultSmsApp) {
             // sms blocking settings
             adapter.addTitle(R.string.SMS_blocking);
-            adapter.addCheckbox(R.string.All_SMS, R.string.Block_all_SMS, Settings.BLOCK_ALL_SMS,
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // trigger checked row
-                            adapter.triggerRowChecked(view);
-                            if (adapter.isRowChecked(view)) {
-                                // show attention message
-                                Toast.makeText(getContext(), R.string.Attention_all_SMS_blocked,
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
+            adapter.addCheckbox(R.string.All_SMS, R.string.Block_all_SMS, Settings.BLOCK_ALL_SMS);
             adapter.addCheckbox(R.string.Black_list, R.string.Block_SMS_from_black_list,
                     Settings.BLOCK_SMS_FROM_BLACK_LIST);
             adapter.addCheckbox(R.string.Contacts_list, R.string.Block_SMS_not_from_contacts,
@@ -195,19 +183,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         // calls blocking settings
         adapter.addTitle(R.string.Calls_blocking);
-        adapter.addCheckbox(R.string.All_calls, R.string.Block_all_calls, Settings.BLOCK_ALL_CALLS,
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // trigger checked row
-                        adapter.triggerRowChecked(view);
-                        if (adapter.isRowChecked(view)) {
-                            // show attention message
-                            Toast.makeText(getContext(), R.string.Attention_all_calls_blocked,
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
+        adapter.addCheckbox(R.string.All_calls, R.string.Block_all_calls, Settings.BLOCK_ALL_CALLS);
 
         adapter.addCheckbox(R.string.Black_list, R.string.Block_calls_from_black_list,
                 Settings.BLOCK_CALLS_FROM_BLACK_LIST);
@@ -240,8 +216,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         adapter.addCheckbox(R.string.UI_theme_light, 0, Settings.UI_THEME_LIGHT, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // trigger checked row
-                adapter.triggerRowChecked(view);
                 restartApp();
             }
         });
@@ -360,13 +334,15 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         @Override
         public void onClick(View view) {
-            if (isAdded() && !adapter.isRowChecked(view)) {
-                // open ringtone picker dialog
-                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.Ringtone_picker));
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getRingtoneUri(requestCode));
-                startActivityForResult(intent, requestCode);
+            if (isAdded()) {
+                if (adapter.isRowChecked(view)) {
+                    // open ringtone picker dialog
+                    Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.Ringtone_picker));
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getRingtoneUri(requestCode));
+                    startActivityForResult(intent, requestCode);
+                }
             } else {
                 adapter.setRowChecked(view, false);
             }
@@ -377,8 +353,6 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     private class DependentRowOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            // trigger checked row
-            adapter.triggerRowChecked(view);
             String property = adapter.getRowProperty(view);
             if (property == null) {
                 return;

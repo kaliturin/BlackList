@@ -127,18 +127,18 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // get contacts linked to the number
         List<Contact> contacts = getContacts(context, address);
 
-        // if block all SMS
+        // if contact is from the white list
+        Contact contact = findContactByType(contacts, Contact.TYPE_WHITE_LIST);
+        if (contact != null) {
+            return false;
+        }
+
+        // if block all SMS (excluding the white list)
         if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
             String name = getContactName(contacts, address);
             // abort SMS and notify the user
             abortSMSAndNotify(context, name, address, body);
             return true;
-        }
-
-        // if contact is from the white list
-        Contact contact = findContactByType(contacts, Contact.TYPE_WHITE_LIST);
-        if (contact != null) {
-            return false;
         }
 
         // if contact is from the black list

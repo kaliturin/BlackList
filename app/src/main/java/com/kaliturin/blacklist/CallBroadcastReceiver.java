@@ -63,18 +63,18 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        // if block all calls
-        if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_CALLS)) {
-            String name = getContactName(contacts, number);
-            // break call and notify
-            breakCallAndNotify(context, name, name);
-            return;
-        }
-
         // is contact is int the white list
         Contact contact = findContactByType(contacts, Contact.TYPE_WHITE_LIST);
         if (contact != null) {
             // do not break a call
+            return;
+        }
+
+        // if block all calls (excluding the white list)
+        if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_CALLS)) {
+            String name = getContactName(contacts, number);
+            // break call and notify
+            breakCallAndNotify(context, name, name);
             return;
         }
 

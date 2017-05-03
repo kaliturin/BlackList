@@ -58,14 +58,6 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
         return rowView;
     }
 
-    // Triggers row checked status
-    public void triggerRowChecked(View view) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-        if (viewHolder != null) {
-            viewHolder.trigger();
-        }
-    }
-
     // Returns true if row is checked
     public boolean isRowChecked(View view) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
@@ -165,11 +157,15 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
             return checked;
         }
 
-        void setChecked(boolean checked) {
-            this.checked = checked;
-            if (property != null) {
-                Settings.setBooleanValue(getContext(), property, checked);
+        boolean setChecked(boolean checked) {
+            if (this.checked != checked) {
+                if (property != null &&
+                        !Settings.setBooleanValue(getContext(), property, checked)) {
+                    return false;
+                }
+                this.checked = checked;
             }
+            return true;
         }
     }
 
@@ -182,10 +178,9 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                applyChecked();
                 if (model.listener != null) {
                     model.listener.onClick(rowView);
-                } else {
-                    trigger();
                 }
             }
         };
@@ -252,8 +247,9 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
 
         void setChecked(boolean checked) {
             if (checkBox != null) {
-                checkBox.setChecked(checked);
-                model.setChecked(checked);
+                if (model.setChecked(checked)) {
+                    checkBox.setChecked(checked);
+                }
             }
         }
 
@@ -261,8 +257,12 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
             return model.isChecked();
         }
 
-        void trigger() {
-            setChecked(!isChecked());
+        void applyChecked() {
+            if (checkBox != null) {
+                if (!model.setChecked(checkBox.isChecked())) {
+                    checkBox.setChecked(model.isChecked());
+                }
+            }
         }
     }
 }
