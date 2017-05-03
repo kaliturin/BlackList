@@ -15,27 +15,27 @@
     <string name="Import_data">Импорт данных</string>
     <string name="Load_data_from_external">Загрузить данные приложения из внешнего файла</string>
     <string name="File_path">Путь к файлу</string>
-    <string name="Block_calls_from_black_list">Блокировать звонки от контактов из Чёрного списка</string>
+    <string name="Block_calls_from_black_list">Блокировать звонки с номеров из Чёрного списка</string>
     <string name="All_calls">Все звонки</string>
-    <string name="Block_all_calls">Блокировать все входящие звонки</string>
+    <string name="Block_all_calls">Блокировать все звонки (за исключением звонков с номеров из Белого списка)</string>
     <string name="Block_calls_not_from_contacts">Блокировать звонки с номеров не из списка Контактов</string>
     <string name="Block_calls_not_from_SMS_list">Блокировать звонки с номеров не из списка СМС</string>
     <string name="Block_calls_from_private">Блокировать звонки со скрытых номеров</string>
     <string name="Write_calls_to_journal">Вести Журнал заблокированных звонков</string>
-    <string name="Notify_in_status_bar_blocked_call">Уведомлять в статус баре о заблокированном звонке</string>
+    <string name="Notify_in_status_bar_blocked_call">Уведомлять в строке состояния о заблокированном звонке</string>
     <string name="Notify_with_sound_blocked_call">Уведомлять звуком о заблокированном звонке</string>
     <string name="Notify_with_vibration_blocked_call">Уведомлять вибрацией о заблокированном звонке</string>
-    <string name="Block_SMS_from_black_list">Блокировать СМС от контактов из Чёрного списка</string>
+    <string name="Block_SMS_from_black_list">Блокировать СМС с номеров из Чёрного списка</string>
     <string name="All_SMS">Все СМС</string>
-    <string name="Block_all_SMS">Блокировать все входящие СМС</string>
+    <string name="Block_all_SMS">Блокировать все СМС (за исключением СМС с номеров из Белого списка)</string>
     <string name="Contacts_list">Список Контактов</string>
     <string name="Block_SMS_not_from_contacts">Блокировать СМС с номеров не из списка Контактов</string>
     <string name="SMS_list">Список СМС</string>
     <string name="Block_SMS_not_from_SMS_list">Блокировать СМС с номеров не из списка СМС</string>
     <string name="Private_numbers">Скрытые номера</string>
     <string name="Block_SMS_from_private">Блокировать СМС со скрытых номеров</string>
-    <string name="Status_bar">Статус бар</string>
-    <string name="Notify_in_status_bar_blocked_SMS">Уведомлять в статус баре о заблокированном СМС</string>
+    <string name="Status_bar">Строка состояния</string>
+    <string name="Notify_in_status_bar_blocked_SMS">Уведомлять в строке состояния о заблокированном СМС</string>
     <string name="Notify_with_sound_received_SMS">Уведомлять звуком о полученном СМС</string>
     <string name="Sound">"Звук"</string>
     <string name="Notify_with_sound_blocked_SMS">Уведомлять звуком о заблокированном СМС"</string>
@@ -102,7 +102,8 @@
     <string name="Move_to_white_list">Поместить контакт в Белый список</string>
     <string name="Move_to_black_list">Поместить контакт в Чёрный список</string>
     <string name="Default_SMS_app">По умолчанию</string>
-    <string name="Set_as_default_SMS_app">Уcтановить как приложение для работы с СМС по умолчанию (необходимо для блокировки СМС в версиях Android 4.4 и последующих)</string>
+    <string name="Set_as_default_SMS_app">Уcтановить как приложение для работы с СМС по умолчанию
+        (необходимо для блокировки СМС в версиях Android 4.4 и последующих)</string>
     <string name="SMS_default_app">СМС - приложение</string>
     <string name="New_message">Новое сообщение</string>
     <string name="needs_permission">требует разрешение</string>
@@ -140,8 +141,6 @@
     <string name="UI_theme_light">Светлая тема интерфейса</string>
     <string name="List_is_empty">Список пуст</string>
     <string name="Logo_motto">Защита от нежелательных звонков и СМС</string>
-    <string name="Attention_all_SMS_blocked">Внимание! Все входящие СМС будут блокированы!</string>
-    <string name="Attention_all_calls_blocked">Внимание! Все входящие звонки будут блокированы!</string>
     <string name="Go_to_Journal_at_start">Переходить в Журнал событий при старте приложения</string>
     <string name="Exit_on_back_pressed">Не закрывать приложение при нажатии кнопки телефона \"Назад\"</string>
     <string name="Back_button">Кнопка \"Назад\"</string>
@@ -177,7 +176,7 @@
 
     <string name="Info_messaging">
         В данном списке отображаются СМС-чаты, отсортированные по времени последнего
-        сообщения в них. Отсюда же можно перейти к отправке СМС-сообщений.
+        сообщения в них. Отсюда можно перейти к чтению, написанию и отправке СМС-сообщений.
     </string>
 
     <string name="Info_black_list">
@@ -195,14 +194,10 @@
     </string>
 
     <string name="Info_white_list">
-        Это список контактов с номерами, звонки и СМС с которых вы не планируете
-        блокировать. Этот список полезен для дополнительной настройки исключений
-        из блокировки. Он имеет более высокий приоритет, чем другие списки при
-        разрешении конфликтов между ними.
-        Внимание! Если в Настройках установить блокировку всех входящих
-        звонков или СМС, то блокироваться будут даже те звонки/СМС, номера
-        которых внесены в Белый список.
-        Управление контактами в Белом списке аналогично Чёрному списку.
+        Это список контактов с номерами, звонки и СМС с которых никогда не блокируются.
+        Этот список полезен для дополнительной настройки исключений из блокировки.
+        Он имеет более высокий приоритет, чем другие списки при разрешении конфликтов
+        между ними. Управление контактами в Белом списке аналогично Чёрному списку.
     </string>
 
     <string name="Info_journal">
@@ -225,11 +220,14 @@
     <string name="Licence">Лицензия</string>
     <string name="Info_licence">Copyright (&#169;) 2017 Anton Kaliturin.
         Приложение Чёрный список является свободным программным обеспечением и
-        распространяется на условиях лицензии Apache License Version 2.0.
-        Приложение Чёрный список распространяется в надежде, что оно может быть
+        распространяется на условиях лицензии Apache License Version 2.0:
+        \n"https://www.apache.org/licenses/LICENSE-2.0"
+        \nПриложение Чёрный список распространяется в надежде, что оно может быть
         кому-нибудь полезным, но без каких-либо гарантий или условий.
-        Исходный код программы можно найти здесь:
-        "http://github.com/kaliturin/blacklist"
+        \nПолитика конфиденциальности приложения:
+        \n"https://github.com/kaliturin/blacklist/wiki/privacy-policy"
+        \nИсходный код приложения:
+        \n"https://github.com/kaliturin/blacklist"
     </string>
 
     <string name="App_version">Версия программы</string>

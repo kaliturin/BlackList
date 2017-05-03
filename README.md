@@ -21,7 +21,7 @@ Because of the security policy in Android 6.0 and up, the application requires p
 the device - for storing the block lists.
 2) "Send and view SMS messages". Allows to display and block incoming SMS messages.
 3) "Make and manage phone calls". Allows to block incoming calls.
-4) "Access contacts". Allows to display a list of contacts.
+4) "Access contacts". Allows to display the list of contacts.
 
 Because of the security policy in Android 4.4 and up to block the incoming SMS messages
 it is required to give to the application the permissions of "Default SMS-application" in the Settings.
@@ -33,26 +33,24 @@ Functionality details:
 
 1) Messaging.
 This list displays SMS-chats, sorted by the time of the last message in them. From here you can
-go to sending SMS messages.
+go to the reading, writing and sending SMS messages.
 
 2) Blacklist.
-This is a list of contacts with numbers, calls and SMS from which you plan to block. Add a contact
-to the list by clicking the \"+\" toolbar button and from the resulting menu choose one of the
-suggested ways to add a contact. If you manually add a blocked contact, you can choose one of the
-rules for comparing numbers: \"equals\", \"contains\", \"starts with\", or \"ends with\". To edit,
-delete, or move a contact to another list, make a long click on its line. If you want to
+This is the list of contacts with numbers, calls and SMS from which you\'re planning to block.
+Add a contact to the list by clicking the \"+\" toolbar button and from the resulting menu choose
+one of the suggested ways to add a contact. If you manually add a blocked contact, you can choose
+one of the rules for comparing numbers: \"equals\", \"contains\", \"starts with\", or \"ends with\".
+To edit, delete, or move a contact to another list, make a long click on its line. If you want to
 temporarily disable blocking contacts from the Blacklist, you can do this in the Settings.
 
 3) Whitelist.
-This is a list of contacts with numbers, calls and SMS from which you do not plan to block. This
+This is the list of contacts with numbers, calls and SMS from which will never be blocked. This
 list is useful for additional setting of exceptions from blocking. It has a higher priority than
-other lists when resolving conflicts between them.
-Attention! If in the Settings is set the blocking of all incoming calls or SMS, then even those
-calls/SMS, whose numbers are included in the Whitelist, will be blocked. Managing the contacts
-in the Whitelist is similar to the Blacklist.
+other lists when resolving conflicts between them. Managing the contacts in the Whitelist is
+similar to the Blacklist.
 
 4) Event list.
-This is a list of records with info about the events of calls/SMS blocking. Disabling logging of
+This is the list of records with info about the events of calls/SMS blocking. Disabling logging of
 the events can be done in the Settings.
 
 5) Settings.

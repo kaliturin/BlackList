@@ -15,25 +15,25 @@
     <string name="Import_data">Import data</string>
     <string name="Load_data_from_external">Load application data from external file</string>
     <string name="File_path">File path</string>
-    <string name="Block_calls_from_black_list">Block incoming calls from contacts which are in the Blacklist</string>
+    <string name="Block_calls_from_black_list">Block calls from numbers that are in the Blacklist</string>
     <string name="All_calls">All calls</string>
-    <string name="Block_all_calls">Block all incoming calls</string>
-    <string name="Block_calls_not_from_contacts">Block incoming calls from numbers which are not from the Contact list</string>
-    <string name="Block_calls_not_from_SMS_list">Block incoming calls from numbers which are not from the SMS list</string>
-    <string name="Block_calls_from_private">Block incoming calls from private numbers</string>
+    <string name="Block_all_calls">Block all calls (except calls from numbers that are in the Whitelist)</string>
+    <string name="Block_calls_not_from_contacts">Block calls from numbers that are not in the Contact list</string>
+    <string name="Block_calls_not_from_SMS_list">Block calls from numbers that are not in the SMS list</string>
+    <string name="Block_calls_from_private">Block calls from private numbers</string>
     <string name="Write_calls_to_journal">Write blocked calls to the Event log</string>
     <string name="Notify_in_status_bar_blocked_call">Notify in status bar about blocked call</string>
     <string name="Notify_with_sound_blocked_call">Notify with sound about blocked call</string>
     <string name="Notify_with_vibration_blocked_call">Notify with vibration about blocked call</string>
-    <string name="Block_SMS_from_black_list">Block incoming SMS from contacts which are in the Blacklist</string>
+    <string name="Block_SMS_from_black_list">Block SMS from numbers that are in the Blacklist</string>
     <string name="All_SMS">All SMS</string>
-    <string name="Block_all_SMS">Block all incoming SMS</string>
+    <string name="Block_all_SMS">Block all SMS (except SMS from numbers that are in the Whitelist)</string>
     <string name="Contacts_list">Contact list</string>
-    <string name="Block_SMS_not_from_contacts">Block incoming SMS from numbers which are not from the Contact list</string>
+    <string name="Block_SMS_not_from_contacts">Block SMS from numbers that are not in the Contact list</string>
     <string name="SMS_list">SMS list</string>
-    <string name="Block_SMS_not_from_SMS_list">Block incoming SMS from numbers which are not from the SMS list</string>
+    <string name="Block_SMS_not_from_SMS_list">Block SMS from numbers that are not in the SMS list</string>
     <string name="Private_numbers">Private numbers</string>
-    <string name="Block_SMS_from_private">Block incoming SMS from private numbers</string>
+    <string name="Block_SMS_from_private">Block SMS from private numbers</string>
     <string name="Status_bar">Status bar</string>
     <string name="Notify_in_status_bar_blocked_SMS">Notify in status bar about blocked SMS</string>
     <string name="Notify_with_sound_received_SMS">"Notify with sound about received SMS"</string>
@@ -102,7 +102,7 @@
     <string name="Move_to_white_list">Move contact to the Whitelist</string>
     <string name="Move_to_black_list">Move contact to the Blacklist</string>
     <string name="Default_SMS_app">Default SMS app</string>
-    <string name="Set_as_default_SMS_app">Set as default SMS app is needed for SMS blocking since Android 4.4 and up</string>
+    <string name="Set_as_default_SMS_app">Set as default SMS app is needed to block SMS since Android 4.4 and up</string>
     <string name="SMS_default_app">SMS application</string>
     <string name="New_message">New message</string>
     <string name="needs_permission">needs permission</string>
@@ -140,8 +140,6 @@
     <string name="UI_theme_light">Light UI theme</string>
     <string name="List_is_empty">List is empty</string>
     <string name="Logo_motto">Protection from unwanted \n calls and SMS</string>
-    <string name="Attention_all_SMS_blocked">Attention! All incoming SMS will be blocked!</string>
-    <string name="Attention_all_calls_blocked">Attention! All incoming calls will be blocked!</string>
     <string name="Go_to_Journal_at_start">Go to the Event log at the application start</string>
     <string name="Exit_on_back_pressed">Do not exit the application on the phone\'s \"Back\" button pressed</string>
     <string name="Back_button">\"Back\" button</string>
@@ -164,7 +162,7 @@
         \n2. \"Send and view SMS messages\". Allows to display and block
         incoming SMS messages.
         \n3. \"Make and manage phone calls\". Allows to block incoming calls.
-        \n4. \"Access contacts\". Allows to display a list of contacts.
+        \n4. \"Access contacts\". Allows to display the list of contacts.
 
         \nBecause of the security policy in Android 4.4 and up
         to block the incoming SMS messages it is required to give to the
@@ -177,7 +175,7 @@
 
     <string name="Info_messaging">
         This list displays SMS-chats, sorted by the time of the last message in
-        them. From here you can go to sending SMS messages.
+        them. From here you can go to the reading, writing and sending SMS messages.
     </string>
 
     <string name="Info_black_list">
@@ -192,14 +190,11 @@
         from the Blacklist, you can do this in the Settings.</string>
 
     <string name="Info_white_list">
-        This is the list of contacts with numbers, calls and SMS from which you do
-        not plan to block. This list is useful for additional setting of exceptions
+        This is the list of contacts with numbers, calls and SMS from which will
+        never be blocked. This list is useful for additional setting of exceptions
         from blocking. It has a higher priority than other lists when resolving
         conflicts between them.
-        Attention! If in the Settings is set the blocking of all incoming calls
-        or SMS, then even those calls/SMS, whose numbers are included in the
-        Whitelist, will be blocked. Managing the contacts in the Whitelist
-        is similar to the Blacklist.
+        Managing the contacts in the Whitelist is similar to the Blacklist.
     </string>
 
     <string name="Info_journal">
@@ -222,10 +217,14 @@
     <string name="Info_licence">
         Copyright (&#169;) 2017 Anton Kaliturin.
         The Blacklist blocker application is a free software and is distributed under
-        the terms of the Apache License Version 2.0. The Blacklist application is
-        distributed with the hope that it can be useful for someone, but without any
-        guarantees or conditions. The source code of the application can be found here:
-        "http://github.com/kaliturin/blacklist"
+        the terms of the Apache License Version 2.0:
+        \n"https://www.apache.org/licenses/LICENSE-2.0"
+        \nThe Blacklist application is distributed with the hope that it can be useful for someone,
+        but without any guarantees or conditions.
+        \nPrivacy policy of the application:
+        \n"https://github.com/kaliturin/blacklist/wiki/privacy-policy"
+        \nThe source code of the application:
+        \n"http://github.com/kaliturin/blacklist"
     </string>
 
     <string name="App_version">Application version</string>
