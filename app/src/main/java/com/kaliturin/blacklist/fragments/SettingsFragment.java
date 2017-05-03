@@ -360,8 +360,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
         @Override
         public void onClick(View view) {
-            // get the clicked row position
-            if (!adapter.isRowChecked(view)) {
+            if (isAdded() && !adapter.isRowChecked(view)) {
                 // open ringtone picker dialog
                 Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
                 intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
@@ -415,6 +414,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
 
     // Shows the dialog of database file path definition
     private void showFilePathDialog(@StringRes int titleId, final TextView.OnEditorActionListener listener) {
+        if (!isAdded()) return;
         String filePath = Environment.getExternalStorageDirectory().getPath() +
                 "/Download/" + DatabaseAccessHelper.DATABASE_NAME;
 

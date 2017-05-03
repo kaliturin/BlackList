@@ -464,30 +464,33 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                                 ContactSourceType.FROM_SMS_LIST,
                                 R.string.List_of_SMS);
                     }
-                }).
-                addItem(R.string.From_Black_list, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
-                                ContactSourceType.FROM_BLACK_LIST,
-                                R.string.Black_list);
-                    }
-                }).
-                addItem(R.string.From_White_list, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
-                                ContactSourceType.FROM_WHITE_LIST,
-                                R.string.White_list);
-                    }
-                }).
-                addItem(R.string.Manually, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
-                                null, R.string.Adding_contact);
-                    }
-                }).show();
+                });
+        if (contactType == Contact.TYPE_WHITE_LIST) {
+            dialog.addItem(R.string.From_Black_list, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
+                            ContactSourceType.FROM_BLACK_LIST,
+                            R.string.Black_list);
+                }
+            });
+        } else {
+            dialog.addItem(R.string.From_White_list, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
+                            ContactSourceType.FROM_WHITE_LIST,
+                            R.string.White_list);
+                }
+            });
+        }
+        dialog.addItem(R.string.Manually, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
+                        null, R.string.Adding_contact);
+            }
+        }).show();
     }
 
     // Shows activity of of contacts adding
