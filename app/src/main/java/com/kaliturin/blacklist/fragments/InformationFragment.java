@@ -88,14 +88,19 @@ public class InformationFragment extends Fragment implements FragmentArguments {
         adapter.addTitle(R.string.Author);
         adapter.addText(R.string.Info_author);
 
+        // add adapter to the ListView and scroll list to position
         listView.setAdapter(adapter);
-        listView.setSelection(listPosition);
+        listView.post(new Runnable() {
+            @Override
+            public void run() {
+                listView.setSelection(listPosition);
+            }
+        });
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        // save first showed row position
         outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
     }
 

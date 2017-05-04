@@ -41,12 +41,13 @@ import java.io.File;
  * Settings fragment
  */
 public class SettingsFragment extends Fragment implements FragmentArguments {
-    private static final int BLOCKED_SMS = 1;
-    private static final int RECEIVED_SMS = 2;
-    private static final int BLOCKED_CALL = 3;
-    private static final int DEFAULT_SMS_APP = 4;
+    private static final int DEFAULT_SMS_APP = 1;
+    private static final int BLOCKED_SMS = 2;
+    private static final int RECEIVED_SMS = 3;
+    private static final int BLOCKED_CALL = 4;
     private SettingsArrayAdapter adapter = null;
     private ListView listView = null;
+    private int listPosition = 0;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -66,6 +67,15 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
+        } else {
+            Bundle arguments = getArguments();
+            if (arguments != null) {
+                listPosition = arguments.getInt(LIST_POSITION, listPosition);
+            }
+        }
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
@@ -75,25 +85,20 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         super.onViewCreated(view, savedInstanceState);
         Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE);
 
-        int listPosition = 0;
-        if (savedInstanceState != null) {
-            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
-        } else {
-            Bundle arguments = getArguments();
-            if (arguments != null) {
-                listPosition = arguments.getInt(LIST_POSITION, 0);
-            }
-        }
-
         listView = (ListView) view.findViewById(R.id.settings_list);
-        loadListView(listPosition);
+        loadListViewItems(listPosition);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        // save first showed row position
         outState.putInt(LIST_POSITION, listView.getFirstVisiblePosition());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        listPosition = listView.getFirstVisiblePosition();
     }
 
     // Is used for getting result of ringtone picker dialog & default sms app dialog
@@ -107,9 +112,9 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 if (resultCode == Activity.RESULT_OK) {
                     Permissions.invalidateCache();
                 }
-                // reload settings list
-                int listPosition = listView.getFirstVisiblePosition();
-                loadListView(listPosition);
+                // reload list
+                listPosition = listView.getFirstVisiblePosition();
+                loadListViewItems(listPosition);
                 break;
             // ringtone picker dialog results
             default:
@@ -125,7 +130,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
     }
 
     // Loads settings list view
-    private void loadListView(int listPosition) {
+    private void loadListViewItems(final int listPosition) {
         // Create list adapter and fill it with data
         adapter = new SettingsArrayAdapter(getContext());
 
@@ -267,8 +272,14 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                     }
                 });
 
+        // add adapter to the ListView and scroll list to position
         listView.setAdapter(adapter);
-        listView.setSelection(listPosition);
+        listView.post(new Runnable() {
+            @Override
+            public void run() {
+                listView.setSelection(listPosition);
+            }
+        });
     }
 
     // Saves ringtone url as settings property value

@@ -174,9 +174,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // check for result code from the child activity
-        // (it could be a dialog-activity)
-        if (resultCode == RESULT_OK) {
+        // check for result code from the child activity (it could be a dialog-activity)
+        if (requestCode == 0 && resultCode == RESULT_OK) {
             fragmentSwitcher.updateFragment();
         }
     }
@@ -242,7 +241,9 @@ public class MainActivity extends AppCompatActivity
 
         // Switches fragment by navigation menu item
         void switchFragment(@IdRes int itemId) {
-            Bundle extras = getIntent().getExtras();
+            Intent intent = getIntent();
+            // passing intent's extra to the fragment
+            Bundle extras = intent.getExtras();
             Bundle arguments = (extras != null ? new Bundle(extras) : new Bundle());
             switch (itemId) {
                 case R.id.nav_journal:
@@ -272,6 +273,9 @@ public class MainActivity extends AppCompatActivity
                     switchFragment(informationFragment, arguments);
                     break;
             }
+
+            // remove used extras
+            intent.removeExtra(LIST_POSITION);
         }
 
         // Switches to passed fragment
