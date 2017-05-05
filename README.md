@@ -4,9 +4,9 @@ supported by devices with Android 2.3 and up.
 
 Features:
 
-- Managing the Blacklist - to block numbers from this list.
-- Managing the Whitelist - to exclude blocking of numbers from this list.
-- Reading the Contacts and SMS lists of your phone - to block numbers not included in these lists.
+- Managing the Blacklist - to block phone numbers.
+- Managing the Whitelist - to exclude phone numbers from blocking.
+- Reading the Contacts and SMS lists of your phone - to block phone numbers not included in these lists.
 - Blocking of private/anonymous numbers.
 - Different ways of comparing blocked numbers (equality, by fragment, etc.).
 - Recording of the event log - the history of blocked calls and SMS (with saving the texts).
