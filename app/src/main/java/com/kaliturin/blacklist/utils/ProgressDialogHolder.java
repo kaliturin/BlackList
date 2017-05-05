@@ -33,9 +33,7 @@ public class ProgressDialogHolder {
 
     public void show(Context context, @StringRes int titleId, @StringRes int messageId,
                      DialogInterface.OnCancelListener listener) {
-        if (dialog != null) {
-            dismiss();
-        }
+        dismiss();
         DialogBuilder builder = new DialogBuilder(context);
         if (titleId > 0) {
             builder.setTitle(titleId);

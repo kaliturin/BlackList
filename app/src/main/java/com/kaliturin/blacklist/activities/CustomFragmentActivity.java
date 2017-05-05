@@ -44,7 +44,7 @@ public class CustomFragmentActivity extends AppCompatActivity {
                 actionBar.setTitle(title);
             }
 
-            // Show custom toolbar shadow on pre LOLLIPOP devices
+            // show custom toolbar shadow on pre LOLLIPOP devices
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 View view = findViewById(R.id.toolbar_shadow);
                 if (view != null) {

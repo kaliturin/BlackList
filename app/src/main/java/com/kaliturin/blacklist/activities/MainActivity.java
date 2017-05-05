@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Show custom toolbar shadow on pre LOLLIPOP devices
+        // show custom toolbar shadow on pre LOLLIPOP devices
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             View view = findViewById(R.id.toolbar_shadow);
             if (view != null) {
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        // Updates the current fragment with the new arguments
+        // Updates the current fragment
         private void updateFragment() {
             Fragment fragment = getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT);
             if (fragment != null) {
@@ -299,6 +299,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // Shows the activity of SMS sending
     private void showSendSMSActivity() {
         Uri uri = getIntent().getData();
         if (uri == null) {
