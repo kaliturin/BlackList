@@ -2,54 +2,79 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.kaliturin.blacklist">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
-    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
-    <uses-permission android:name="android.permission.READ_SMS"/>
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.WRITE_SMS"/>
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="false"
         android:theme="@style/AppTheme.Dark">
 
-        <!-- The main activity and activity that allows the user to send new SMS/MMS messages -->
+        <!-- The main activity and activity that allows the user to send SMS messages -->
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Dark">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- filters for SMS messages sending-->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="sms" />
                 <data android:scheme="smsto" />
                 <data android:scheme="mms" />
                 <data android:scheme="mmsto" />
             </intent-filter>
+
+            <!-- Deep Link -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="kaliturin.com"
+                    android:pathPrefix="/blacklist"
+                    android:scheme="http" />
+            </intent-filter>
+
         </activity>
 
         <!-- Generic custom activity -->
         <activity
             android:name=".activities.CustomFragmentActivity"
-            android:theme="@style/AppTheme.Dark">
-        </activity>
+            android:theme="@style/AppTheme.Dark" />
 
         <!-- BroadcastReceiver that listens for incoming calls -->
         <receiver android:name=".CallBroadcastReceiver">
-            <intent-filter  android:priority="100" >
+            <intent-filter android:priority="100">
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
@@ -59,7 +84,7 @@
             android:name=".SMSBroadcastReceiver"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter android:priority="100">
-                <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
             </intent-filter>
         </receiver>
@@ -71,18 +96,20 @@
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_RECEIVED" />
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+
                 <data android:mimeType="application/vnd.wap.mms-message" />
             </intent-filter>
         </receiver>
 
         <!-- Service that delivers messages from the phone "quick response" -->
         <service
-            android:name=".HeadlessSMSSendService"
-            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE"
-            android:exported="true" >
+            android:name=".SMSRespondService"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
             <intent-filter>
                 <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:scheme="sms" />
                 <data android:scheme="smsto" />
                 <data android:scheme="mms" />
@@ -90,17 +117,14 @@
             </intent-filter>
         </service>
 
-        <!-- BroadcastReceiver that listens for sending/delivering SMS messages -->
-        <receiver
-            android:name=".SMSSendResultBroadcastReceiver">
-            <intent-filter android:priority="100">
-                <action android:name="com.kaliturin.blacklist.SMS_SENT"/>
-                <action android:name="com.kaliturin.blacklist.SMS_DELIVERY" />
-            </intent-filter>
-        </receiver>
+        <!-- BroadcastReceiver listens for sending/delivering SMS messages -->
+        <receiver android:name=".SMSSendResultBroadcastReceiver"/>
 
-        <!-- Writes SMS messages -->
-        <service android:name=".SMSBroadcastReceiver$SMSProcessingService" />
+        <!-- Service processes received SMS messages -->
+        <service android:name=".SMSProcessService" />
+
+        <!-- Service sends SMS messages -->
+        <service android:name=".SMSSendService" />
 
     </application>
 
