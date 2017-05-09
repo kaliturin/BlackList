@@ -60,3 +60,5 @@ exchanged SMS. These options can be used in conjunction with the Black and White
 separately. You can adjust the level of visual and audio information about the event of blocking.
 You can set the light or dark theme of the application interface. Here, you can also export and
 import application data, for example, to transfer them from one device to another.
+
+On Google Play: https://play.google.com/store/apps/details?id=com.kaliturin.blacklist
