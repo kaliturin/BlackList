@@ -16,7 +16,6 @@
 
 package com.kaliturin.blacklist;
 
-import android.app.IntentService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -78,7 +77,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // if isn't "default SMS app" or if message isn't blocked
         if (!isDefaultSmsApp || !processMessageData(context, data)) {
             // process message in service
-            SMSProcessingService.run(context, data);
+            SMSProcessService.run(context, data);
         }
     }
 
@@ -300,91 +299,5 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         writeToJournal(context, name, number, body);
         // notify user
         Notifications.onSmsBlocked(context, name);
-    }
-
-    // SMS message processing service
-    public static class SMSProcessingService extends IntentService {
-        private static final String TAG = SMSProcessingService.class.getName();
-        private static final String KEYS = "KEYS";
-        private static final String VALUES = "VALUES";
-
-        public SMSProcessingService() {
-            super(SMSProcessingService.class.getName());
-        }
-
-        @Override
-        protected void onHandleIntent(@Nullable Intent intent) {
-            try {
-                Map<String, String> data = extractMessageData(intent);
-                processMessageData(this, data);
-            } catch (IllegalArgumentException e) {
-                Log.w(TAG, e);
-            }
-        }
-
-        private void processMessageData(Context context, Map<String, String> data) throws IllegalArgumentException {
-            String address = data.get(ContactsAccessHelper.ADDRESS);
-            if (address == null || address.isEmpty()) {
-                throw new IllegalArgumentException("Message address is null or empty");
-            }
-
-            // if before API 19
-            if (!DefaultSMSAppHelper.isAvailable() ||
-                    // or if not "default SMS app"
-                    !DefaultSMSAppHelper.isDefault(context)) {
-                // SMS will be written by default app
-                try {
-                    // wait for writing to complete
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignored) {
-                }
-                // inform internal receivers
-                InternalEventBroadcast.sendSMSWasWritten(context, address);
-                return;
-            }
-
-            ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-            // get contact by number
-            Contact contact = db.getContact(context, address);
-            // write message to the inbox
-            if (db.writeSMSMessageToInbox(context, contact, data)) {
-                // send broadcast event
-                InternalEventBroadcast.sendSMSWasWritten(context, address);
-                // get name for notification
-                String name = (contact == null ? address : contact.name);
-                // notify user
-                String body = data.get(ContactsAccessHelper.BODY);
-                Notifications.onSmsReceived(context, name, body);
-            }
-        }
-
-        // Extracts message's data from intent.
-        // Throws exception on data intent is illegal.
-        private Map<String, String> extractMessageData(@Nullable Intent intent) throws IllegalArgumentException {
-            Map<String, String> data = new HashMap<>();
-            if (intent != null) {
-                String[] keys = intent.getStringArrayExtra(KEYS);
-                String[] values = intent.getStringArrayExtra(VALUES);
-                if (keys != null && values != null && keys.length == values.length) {
-                    for (int i = 0; i < keys.length; i++) {
-                        data.put(keys[i], values[i]);
-                    }
-                }
-            }
-
-            if (data.isEmpty()) {
-                String intentString = (intent == null ? "null" : intent.toString());
-                throw new IllegalArgumentException("Message intent data is illegal: " + intentString);
-            }
-
-            return data;
-        }
-
-        public static void run(Context context, Map<String, String> data) {
-            Intent intent = new Intent(context, SMSProcessingService.class);
-            intent.putExtra(KEYS, data.keySet().toArray(new String[data.size()]));
-            intent.putExtra(VALUES, data.values().toArray(new String[data.size()]));
-            context.startService(intent);
-        }
     }
 }

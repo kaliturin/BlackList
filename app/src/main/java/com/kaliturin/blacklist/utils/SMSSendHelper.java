@@ -79,7 +79,7 @@ public class SMSSendHelper {
             if (delivery) {
                 // pending intent for getting result of SMS delivery
                 pendingIntent = createPendingIntent(context, SMS_DELIVERY, messageId,
-                        phoneNumber, messagePart, messagePartId, messageParts.size(), delivery);
+                        phoneNumber, messagePart, messagePartId, messageParts.size(), true);
                 deliveryIntents.add(pendingIntent);
             }
         }

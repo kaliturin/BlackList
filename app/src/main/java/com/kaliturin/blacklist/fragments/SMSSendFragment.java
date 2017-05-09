@@ -37,11 +37,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kaliturin.blacklist.R;
+import com.kaliturin.blacklist.SMSSendService;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.utils.DialogBuilder;
 import com.kaliturin.blacklist.utils.Permissions;
-import com.kaliturin.blacklist.utils.SMSSendHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -244,12 +244,9 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
             return false;
         }
 
-        // TODO do it in a thread
         // send SMS message to the all contacts in container
-        SMSSendHelper smsSendHelper = new SMSSendHelper();
-        for (String number : number2NameMap.keySet()) {
-            smsSendHelper.sendSMS(getContext(), number, message);
-        }
+        String[] addresses = number2NameMap.keySet().toArray(new String[number2NameMap.size()]);
+        SMSSendService.run(getContext(), message, addresses);
 
         return true;
     }

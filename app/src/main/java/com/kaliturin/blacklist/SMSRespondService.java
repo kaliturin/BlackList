@@ -22,11 +22,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 /**
- * HeadlessSMSSendService stub
+ * SMSRespondService stub
  */
 
-public class HeadlessSMSSendService extends Service {
-    public HeadlessSMSSendService() {
+public class SMSRespondService extends Service {
+    public SMSRespondService() {
     }
 
     @Nullable
