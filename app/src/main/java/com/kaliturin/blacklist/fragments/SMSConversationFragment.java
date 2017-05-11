@@ -33,11 +33,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kaliturin.blacklist.InternalEventBroadcast;
 import com.kaliturin.blacklist.R;
+import com.kaliturin.blacklist.SMSSendService;
 import com.kaliturin.blacklist.activities.CustomFragmentActivity;
 import com.kaliturin.blacklist.adapters.SMSConversationCursorAdapter;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
@@ -45,6 +49,7 @@ import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
 import com.kaliturin.blacklist.utils.DefaultSMSAppHelper;
 import com.kaliturin.blacklist.utils.DialogBuilder;
+import com.kaliturin.blacklist.utils.MessageLengthCounter;
 import com.kaliturin.blacklist.utils.Permissions;
 import com.kaliturin.blacklist.utils.Utils;
 
@@ -59,6 +64,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
     private ListView listView = null;
     private String contactName = null;
     private String contactNumber = null;
+    private EditText messageEdit = null;
 
     public SMSConversationFragment() {
         // Required empty public constructor
@@ -83,6 +89,22 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
         // notify user if permission isn't granted
         Permissions.notifyIfNotGranted(getContext(), Permissions.READ_SMS);
+
+        // message counter view
+        TextView counterTextView = (TextView) view.findViewById(R.id.text_message_counter);
+        // message body edit
+        messageEdit = (EditText) view.findViewById(R.id.text_message);
+        // init message length counting
+        messageEdit.addTextChangedListener(new MessageLengthCounter(counterTextView));
+
+        // init "send" button
+        ImageButton sendButton = (ImageButton) view.findViewById(R.id.button_send);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendSMSMessage();
+            }
+        });
 
         // get fragment's arguments
         Bundle arguments = getArguments();
@@ -139,7 +161,8 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 // open activity with fragment of sending SMS
-                openSMSSendActivity(contactName, contactNumber, "");
+                openSMSSendActivity(contactName, contactNumber, messageEdit.getText().toString());
+                messageEdit.setText("");
                 return true;
             }
         });
@@ -368,5 +391,37 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
             return true;
         }
+    }
+
+    // Sends SMS message
+    boolean sendSMSMessage() {
+        if (Permissions.notifyIfNotGranted(getContext(), Permissions.SEND_SMS)) {
+            return false;
+        }
+
+        View view = getView();
+        if (view == null) {
+            return false;
+        }
+
+        if (contactNumber == null) {
+            Toast.makeText(getContext(), R.string.Address_is_not_defined, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // get SMS message text
+        String message = messageEdit.getText().toString();
+        if (message.isEmpty()) {
+            Toast.makeText(getContext(), R.string.Message_text_is_not_defined, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // send SMS message
+        SMSSendService.run(getContext(), message, new String[]{contactNumber});
+
+        // clear message edit
+        messageEdit.setText("");
+
+        return true;
     }
 }

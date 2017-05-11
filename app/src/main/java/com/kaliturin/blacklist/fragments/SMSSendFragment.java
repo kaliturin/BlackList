@@ -23,12 +23,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -41,6 +38,7 @@ import com.kaliturin.blacklist.SMSSendService;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.utils.DialogBuilder;
+import com.kaliturin.blacklist.utils.MessageLengthCounter;
 import com.kaliturin.blacklist.utils.Permissions;
 
 import java.util.ArrayList;
@@ -49,17 +47,10 @@ import java.util.Map;
 
 
 /**
- * Fragment of SMS sending.
+ * Fragment of SMS sending (in full screen).
  */
 public class SMSSendFragment extends Fragment implements FragmentArguments {
-    private static final int SMS_LENGTH = 160;
-    private static final int SMS_LENGTH2 = 153;
-    private static final int SMS_LENGTH_UNICODE = 70;
-    private static final int SMS_LENGTH2_UNICODE = 67;
     private Map<String, String> number2NameMap = new HashMap<>();
-    private EditText messageEdit = null;
-    private TextView lengthTextView = null;
-
 
     public SMSSendFragment() {
         // Required empty public constructor
@@ -76,22 +67,40 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        lengthTextView = (TextView) view.findViewById(R.id.text_message_length);
-        messageEdit = (EditText) view.findViewById(R.id.text_message);
+        // message counter view
+        TextView counterTextView = (TextView) view.findViewById(R.id.text_message_counter);
+        // message body edit
+        EditText messageEdit = (EditText) view.findViewById(R.id.text_message);
+        // init message length counting
+        messageEdit.addTextChangedListener(new MessageLengthCounter(counterTextView));
+        // phone number edit
+        final EditText numberEdit = (EditText) view.findViewById(R.id.edit_number);
 
-        // message text changed listener
-        messageEdit.addTextChangedListener(new TextWatcher() {
+        // init "add contact" button
+        ImageButton addContactView = (ImageButton) view.findViewById(R.id.button_add_contact);
+        addContactView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public void onClick(View v) {
+                String number = getNumberFromEdit(numberEdit);
+                if (!number.isEmpty()) {
+                    // add number to contacts list
+                    addRowToContactsList(number, "");
+                } else {
+                    // open menu dialog
+                    showAddContactsMenuDialog();
+                }
+                numberEdit.setText("");
             }
+        });
 
+        // init "send" button
+        ImageButton sendButton = (ImageButton) view.findViewById(R.id.button_send);
+        sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updateMessageTextLengthCounter();
+            public void onClick(View v) {
+                if (sendSMSMessage()) {
+                    finishActivity(Activity.RESULT_OK);
+                }
             }
         });
 
@@ -112,42 +121,10 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                 String body = arguments.getString(SMS_MESSAGE_BODY);
                 if (body != null) {
                     messageEdit.setText(body);
-                    updateMessageTextLengthCounter();
+                    messageEdit.setSelection(body.length());
                 }
             }
         }
-
-        // phone number edit
-        final EditText numberEdit = (EditText) view.findViewById(R.id.edit_number);
-
-        // add contact from contacts list
-        View addContactView = view.findViewById(R.id.button_add_contact);
-        addContactView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String number = getNumberFromEdit(numberEdit);
-                if (!number.isEmpty()) {
-                    // add number to contacts list
-                    addRowToContactsList(number, "");
-                } else {
-                    // open menu dialog
-                    showAddContactsMenuDialog();
-                }
-                numberEdit.setText("");
-            }
-        });
-
-        // init send button
-        Button sendButton = (Button) view.findViewById(R.id.button_send);
-        sendButton.setTransformationMethod(null);
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (sendSMSMessage()) {
-                    finishActivity(Activity.RESULT_OK);
-                }
-            }
-        });
     }
 
     @Override
@@ -178,37 +155,6 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     private void finishActivity(int result) {
         getActivity().setResult(result);
         getActivity().finish();
-    }
-
-    private void updateMessageTextLengthCounter() {
-        Editable editable = messageEdit.getText();
-        int messageLength = editable.length();
-
-        // is there unicode character in the message?
-        boolean unicode = false;
-        for (int i = 0; i < messageLength; i++) {
-            char c = editable.charAt(i);
-            if (Character.UnicodeBlock.of(c) != Character.UnicodeBlock.BASIC_LATIN) {
-                unicode = true;
-                break;
-            }
-        }
-
-        // get max length of sms part depending on encoding and full length
-        int length1 = (unicode ? SMS_LENGTH_UNICODE : SMS_LENGTH);
-        int length2 = (unicode ? SMS_LENGTH2_UNICODE : SMS_LENGTH2);
-        int partMaxLength = (messageLength > length1 ? length2 : length1);
-        // create current length status info
-        int partsNumber = messageLength / partMaxLength + 1;
-        int partLength = partMaxLength - messageLength % partMaxLength;
-        // correct length info for second part
-        if (partsNumber == 2 && partLength == partMaxLength) {
-            partLength = length1 - (length1 - length2) * 2;
-        }
-
-        // show current length status info
-        String text = "" + partLength + "/" + partsNumber;
-        lengthTextView.setText(text);
     }
 
 //-------------------------------------------------------------
@@ -372,4 +318,5 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
                 ContactsAccessHelper.getInstance(getContext());
         return contactsAccessHelper.normalizePhoneNumber(number);
     }
+
 }

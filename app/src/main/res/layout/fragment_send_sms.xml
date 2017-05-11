@@ -103,21 +103,22 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/text_message_length"
+                            android:id="@+id/text_message_counter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="3dp"
+                            android:layout_marginRight="3dp"
+                            android:layout_marginEnd="3dp"
+                            android:text="160/1"
                             android:textColor="?colorText"
-                            android:text="160/1" />
+                            android:textSize="@dimen/textSize12" />
 
-                        <Button
+                        <ImageButton
                             android:id="@+id/button_send"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:minHeight="40dp"
-                            android:minWidth="0dp"
-                            android:text="@string/Send"
-                            android:textSize="@dimen/textSize14" />
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:contentDescription="@string/Send"
+                            android:src="@drawable/ic_send"
+                            android:tint="?colorAccent" />
 
                     </LinearLayout>
 

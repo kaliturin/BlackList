@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RotateDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
 import android.os.Handler;
@@ -86,6 +87,8 @@ public class Utils {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 ((ColorDrawable) drawable).setColor(color);
             }
+        } else if (drawable instanceof RotateDrawable) {
+            setDrawableColor(context, ((RotateDrawable) drawable).getDrawable(), colorAttrRes);
         }
     }
 
@@ -228,9 +231,9 @@ public class Utils {
      * Scales passed view with passed dimension on Tablets only
      */
     public static void scaleViewOnTablet(Context context, View view, @DimenRes int dimenRes) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             boolean isTablet = context.getResources().getBoolean(R.bool.isTablet);
-            if(isTablet) {
+            if (isTablet) {
                 TypedValue outValue = new TypedValue();
                 context.getResources().getValue(dimenRes, outValue, true);
                 float scale = outValue.getFloat();
