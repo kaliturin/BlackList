@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Blacklist blocker</string>
+    <string name="app_name">Blacklist Blocker</string>
     <string name="Open_navigation_drawer">Open navigation drawer</string>
     <string name="Close_navigation_drawer">Close navigation drawer</string>
     <string name="Settings_action">Settings</string>
@@ -216,7 +216,7 @@
     <string name="Licence">Licence</string>
     <string name="Info_licence">
         Copyright (&#169;) 2017 Anton Kaliturin.
-        The Blacklist blocker application is a free software and is distributed under
+        The Blacklist Blocker application is a free software and is distributed under
         the terms of the Apache License Version 2.0:
         \n"https://www.apache.org/licenses/LICENSE-2.0"
         \nThe Blacklist application is distributed with the hope that it can be useful for someone,

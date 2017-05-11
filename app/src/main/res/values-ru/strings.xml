@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Чёрный список</string>
+    <string name="app_name">Чёрный Список</string>
     <string name="Open_navigation_drawer">Открыть меню навигации</string>
     <string name="Close_navigation_drawer">Закрыть меню нивигации</string>
     <string name="Settings_action">Настройки</string>
@@ -219,7 +219,7 @@
 
     <string name="Licence">Лицензия</string>
     <string name="Info_licence">Copyright (&#169;) 2017 Anton Kaliturin.
-        Приложение Чёрный список является свободным программным обеспечением и
+        Приложение Чёрный Список является свободным программным обеспечением и
         распространяется на условиях лицензии Apache License Version 2.0:
         \n"https://www.apache.org/licenses/LICENSE-2.0"
         \nПриложение Чёрный список распространяется в надежде, что оно может быть

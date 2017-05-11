@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kaliturin.blacklist">
+    package="com.kaliturin.blacklist"
+    android:versionCode="10"
+    android:versionName="1.2.6">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -12,6 +14,10 @@
     <uses-permission android:name="android.permission.WRITE_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="25" />
 
     <supports-screens
         android:anyDensity="true"
@@ -59,10 +65,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="kaliturin.com"
-                    android:pathPrefix="/blacklist"
-                    android:scheme="http" />
+                <data android:scheme="com.kaliturin.blacklist" />
             </intent-filter>
 
         </activity>
@@ -118,7 +121,7 @@
         </service>
 
         <!-- BroadcastReceiver listens for sending/delivering SMS messages -->
-        <receiver android:name=".SMSSendResultBroadcastReceiver"/>
+        <receiver android:name=".SMSSendResultBroadcastReceiver" />
 
         <!-- Service processes received SMS messages -->
         <service android:name=".SMSProcessService" />
