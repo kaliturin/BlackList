@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:background="?selector_edit"
             android:ellipsize="end"
-            android:hint="@string/Phone_number"
+            android:hint="@string/Enter_phone_number"
             android:inputType="text"
             android:lines="1"
             android:maxLength="25"

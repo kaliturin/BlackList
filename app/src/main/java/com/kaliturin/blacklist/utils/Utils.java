@@ -148,8 +148,7 @@ public class Utils {
                         (android.content.ClipboardManager)
                                 context.getSystemService(Context.CLIPBOARD_SERVICE);
                 android.content.ClipData clip =
-                        android.content.ClipData.newPlainText(
-                                context.getResources().getString(R.string.Message), text);
+                        android.content.ClipData.newPlainText("", text);
                 clipboard.setPrimaryClip(clip);
             }
             return true;

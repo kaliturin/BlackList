@@ -25,22 +25,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/text_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_margin="6dp"
             android:layout_weight="1"
             android:background="?selector_edit"
             android:gravity="top|start"
-            android:hint="@string/Message"
+            android:hint="@string/Enter_message"
             android:inputType="textCapSentences|textMultiLine"
-            android:minLines="2"
+            android:minLines="1"
             android:paddingBottom="2dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
@@ -49,12 +48,14 @@
             android:textSize="@dimen/textSize18" />
 
         <LinearLayout
+            android:id="@+id/button_send_area"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginBottom="3dp"
             android:gravity="bottom|end"
+            android:visibility="gone"
             android:orientation="vertical">
 
             <TextView
@@ -71,6 +72,8 @@
                 android:id="@+id/button_send"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_marginLeft="-3dp"
+                android:layout_marginStart="-3dp"
                 android:contentDescription="@string/Send"
                 android:src="@drawable/ic_send"
                 android:tint="?colorAccent" />

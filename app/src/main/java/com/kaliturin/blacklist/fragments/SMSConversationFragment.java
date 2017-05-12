@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -84,7 +85,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
     }
 
     @Override
-    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // notify user if permission isn't granted
@@ -92,10 +93,23 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
         // message counter view
         TextView counterTextView = (TextView) view.findViewById(R.id.text_message_counter);
+        // send button area
+        final View buttonArea = view.findViewById(R.id.button_send_area);
         // message body edit
         messageEdit = (EditText) view.findViewById(R.id.text_message);
         // init message length counting
         messageEdit.addTextChangedListener(new MessageLengthCounter(counterTextView));
+        messageEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    // increase edit
+                    messageEdit.setMinLines(2);
+                    // set visible of the button area
+                    buttonArea.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         // init "send" button
         ImageButton sendButton = (ImageButton) view.findViewById(R.id.button_send);

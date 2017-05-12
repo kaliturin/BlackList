@@ -88,6 +88,7 @@
     <string name="Contact_name_">Contact name:</string>
     <string name="Contact_name_nn">Not necessary</string>
     <string name="Phone_number">Phone number</string>
+    <string name="Enter_phone_number">Enter phone number</string>
     <string name="Add_another">Add another</string>
     <string name="Unnamed">Unnamed</string>
     <string name="Edit_contact">Edit contact</string>
@@ -110,7 +111,7 @@
     <string name="Delete_thread">Delete thread</string>
     <string name="Write_message">Write message</string>
     <string name="Add_from_contacts">Add from contacts</string>
-    <string name="Message">Message</string>
+    <string name="Enter_message">Enter message</string>
     <string name="Send">Send</string>
     <string name="Delete_message">Delete message</string>
     <string name="Copy_message">Copy message</string>

@@ -88,6 +88,7 @@
     <string name="Contact_name_">Имя контакта:</string>
     <string name="Contact_name_nn">Не обязательно</string>
     <string name="Phone_number">Номер телефона</string>
+    <string name="Enter_phone_number">Введите номер телефона</string>
     <string name="Add_another">Добавить ещё</string>
     <string name="Unnamed">Безымянный</string>
     <string name="Edit_contact">Изменить контакт</string>
@@ -111,7 +112,7 @@
     <string name="Delete_thread">Удалить ветвь</string>
     <string name="Write_message">Написать сообщение</string>
     <string name="Add_from_contacts">Добавить из контактов</string>
-    <string name="Message">Cообщение</string>
+    <string name="Enter_message">Введите сообщение</string>
     <string name="Send">Отпр.</string>
     <string name="Delete_message">Удалить сообщение</string>
     <string name="Copy_message">Скопировать текст</string>
