@@ -19,14 +19,15 @@ package com.kaliturin.blacklist;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.android.internal.telephony.ITelephony;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
-import com.kaliturin.blacklist.utils.Notifications;
 import com.kaliturin.blacklist.utils.Permissions;
 import com.kaliturin.blacklist.utils.Settings;
 
@@ -36,8 +37,9 @@ import java.util.List;
 /**
  * BroadcastReceiver for calls catching
  */
-
 public class CallBroadcastReceiver extends BroadcastReceiver {
+    private static final String TAG = CallBroadcastReceiver.class.getName();
+
     @Override
     public void onReceive(final Context context, Intent intent) {
         if (!Permissions.isGranted(context, Permissions.READ_PHONE_STATE) ||
@@ -55,19 +57,21 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         // get incoming call number
         String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
         if (number == null) {
+            Log.w(TAG, "Received call address is null");
             return;
         }
         number = number.trim();
         if (number.isEmpty()) {
+            Log.w(TAG, "Received call address is empty");
             return;
         }
 
         // private number detected
         if (isPrivateNumber(number)) {
             // if block private numbers
-            if (Settings.getBooleanValue(context, Settings.BLOCK_HIDDEN_CALLS)) {
+            if (Settings.getBooleanValue(context, Settings.BLOCK_PRIVATE_CALLS)) {
                 String name = context.getString(R.string.Private);
-                // break call and notify
+                // break call and notify user
                 breakCallAndNotify(context, name, name);
             }
             return;
@@ -79,35 +83,34 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        // is contact is int the white list
+        // if contact is from the white list
         Contact contact = findContactByType(contacts, Contact.TYPE_WHITE_LIST);
         if (contact != null) {
-            // do not break a call
             return;
         }
 
         // if block all calls (excluding the white list)
         if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_CALLS)) {
-            String name = getContactName(contacts, number);
-            // break call and notify
-            breakCallAndNotify(context, name, name);
+            // get name of contact
+            String name = (contacts.size() > 0 ? contacts.get(0).name : null);
+            // break call and notify user
+            breakCallAndNotify(context, number, name);
             return;
         }
 
         // if block calls from the black list
         if (Settings.getBooleanValue(context, Settings.BLOCK_CALLS_FROM_BLACK_LIST)) {
-            // if  contact is from the black list...
             contact = findContactByType(contacts, Contact.TYPE_BLACK_LIST);
             if (contact != null) {
-                // break call and notify
-                breakCallAndNotify(context, contact.name, number);
+                // break call and notify user
+                breakCallAndNotify(context, number, contact.name);
                 return;
             }
         }
 
         boolean abort = false;
 
-        // if number is from the contacts
+        // if block numbers that are not in the contact list
         if (Settings.getBooleanValue(context, Settings.BLOCK_CALLS_NOT_FROM_CONTACTS) &&
                 Permissions.isGranted(context, Permissions.READ_CONTACTS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
@@ -117,7 +120,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             abort = true;
         }
 
-        // if number is from the SMS content list
+        // if block numbers that are not in the sms content list
         if (Settings.getBooleanValue(context, Settings.BLOCK_CALLS_NOT_FROM_SMS_CONTENT) &&
                 Permissions.isGranted(context, Permissions.READ_SMS)) {
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
@@ -128,8 +131,10 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         }
 
         if (abort) {
-            // break call and notify
-            breakCallAndNotify(context, number, number);
+            // get name of contact
+            String name = (contacts.size() > 0 ? contacts.get(0).name : null);
+            // break call and notify user
+            breakCallAndNotify(context, number, name);
         }
     }
 
@@ -153,6 +158,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
+    // Finds contact by type
     private Contact findContactByType(List<Contact> contacts, int contactType) {
         for (Contact contact : contacts) {
             if (contact.type == contactType) {
@@ -162,38 +168,11 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         return null;
     }
 
-    private String getContactName(List<Contact> contacts, String number) {
-        String name;
-        if (contacts.size() > 0) {
-            Contact contact = contacts.get(0);
-            name = contact.name;
-        } else {
-            name = number;
-        }
-        return name;
-    }
-
-    // Writes record to the journal
-    private void writeToJournal(Context context, String name, String number) {
-        if (number.equals(name)) {
-            number = null;
-        }
-        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        if (db != null) {
-            // write to the journal
-            if (db.addJournalRecord(System.currentTimeMillis(), name, number, null) >= 0) {
-                // send broadcast message
-                InternalEventBroadcast.send(context, InternalEventBroadcast.JOURNAL_WAS_WRITTEN);
-            }
-        }
-    }
-
     // Checks whether number is private
     private boolean isPrivateNumber(String number) {
         try {
             // private number detected
-            if (number == null ||
-                    Long.valueOf(number) < 0) {
+            if (number == null || Long.valueOf(number) < 0) {
                 return true;
             }
         } catch (NumberFormatException ignored) {
@@ -201,21 +180,18 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         return false;
     }
 
+    // Finds contacts by number
     @Nullable
     private List<Contact> getContacts(Context context, String number) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
         return (db == null ? null : db.getContacts(number, false));
     }
 
-    private void breakCallAndNotify(Context context, String name, String number) {
-        if (name == null || number == null) {
-            return;
-        }
+    // Breaks the call and notifies the user
+    private void breakCallAndNotify(Context context, @NonNull String number, String name) {
         // end phone call
         breakCall(context);
-        // write record to the journal
-        writeToJournal(context, name, number);
-        // notify the user
-        Notifications.onCallBlocked(context, name);
+        // process the event of blocking in the service
+        BlockEventProcessService.start(context, number, name, null);
     }
 }

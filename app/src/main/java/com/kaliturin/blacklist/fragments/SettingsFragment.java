@@ -179,7 +179,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
             adapter.addCheckbox(R.string.SMS_list, R.string.Block_SMS_not_from_SMS_list,
                     Settings.BLOCK_SMS_NOT_FROM_SMS_CONTENT);
             adapter.addCheckbox(R.string.Private_numbers, R.string.Block_SMS_from_private,
-                    Settings.BLOCK_HIDDEN_SMS);
+                    Settings.BLOCK_PRIVATE_SMS);
             adapter.addCheckbox(R.string.Journal, R.string.Write_SMS_to_journal,
                     Settings.WRITE_SMS_JOURNAL);
 
@@ -213,7 +213,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         adapter.addCheckbox(R.string.SMS_list, R.string.Block_calls_not_from_SMS_list,
                 Settings.BLOCK_CALLS_NOT_FROM_SMS_CONTENT);
         adapter.addCheckbox(R.string.Private_numbers, R.string.Block_calls_from_private,
-                Settings.BLOCK_HIDDEN_CALLS);
+                Settings.BLOCK_PRIVATE_CALLS);
         adapter.addCheckbox(R.string.Journal, R.string.Write_calls_to_journal,
                 Settings.WRITE_CALLS_JOURNAL);
 

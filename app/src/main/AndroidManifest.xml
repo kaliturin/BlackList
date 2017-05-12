@@ -126,6 +126,9 @@
         <!-- Service processes received SMS messages -->
         <service android:name=".SMSProcessService" />
 
+        <!-- Service processes SMS/Call blocking events -->
+        <service android:name=".BlockEventProcessService" />
+
         <!-- Service sends SMS messages -->
         <service android:name=".SMSSendService" />
 

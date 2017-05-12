@@ -32,14 +32,14 @@ public class Settings {
     public static final String BLOCK_ALL_CALLS = "BLOCK_ALL_CALLS";
     public static final String BLOCK_CALLS_NOT_FROM_CONTACTS = "BLOCK_CALLS_NOT_FROM_CONTACTS";
     public static final String BLOCK_CALLS_NOT_FROM_SMS_CONTENT = "BLOCK_CALLS_NOT_FROM_SMS_CONTENT";
-    public static final String BLOCK_HIDDEN_CALLS = "BLOCK_HIDDEN_CALLS";
+    public static final String BLOCK_PRIVATE_CALLS = "BLOCK_PRIVATE_CALLS";
     public static final String BLOCKED_CALL_STATUS_NOTIFICATION = "BLOCKED_CALL_STATUS_NOTIFICATION";
     public static final String WRITE_CALLS_JOURNAL = "WRITE_CALLS_JOURNAL";
     public static final String BLOCK_SMS_FROM_BLACK_LIST = "BLOCK_SMS_FROM_BLACK_LIST";
     public static final String BLOCK_ALL_SMS = "BLOCK_ALL_SMS";
     public static final String BLOCK_SMS_NOT_FROM_CONTACTS = "BLOCK_SMS_NOT_FROM_CONTACTS";
     public static final String BLOCK_SMS_NOT_FROM_SMS_CONTENT = "BLOCK_SMS_NOT_FROM_SMS_CONTENT";
-    public static final String BLOCK_HIDDEN_SMS = "BLOCK_HIDDEN_SMS";
+    public static final String BLOCK_PRIVATE_SMS = "BLOCK_PRIVATE_SMS";
     public static final String BLOCKED_SMS_STATUS_NOTIFICATION = "BLOCKED_SMS_STATUS_NOTIFICATION";
     public static final String WRITE_SMS_JOURNAL = "WRITE_SMS_JOURNAL";
     public static final String BLOCKED_SMS_SOUND_NOTIFICATION = "BLOCKED_SMS_SOUND_NOTIFICATION";
@@ -107,7 +107,7 @@ public class Settings {
         map.put(BLOCK_ALL_CALLS, FALSE);
         map.put(BLOCK_CALLS_NOT_FROM_CONTACTS, FALSE);
         map.put(BLOCK_CALLS_NOT_FROM_SMS_CONTENT, FALSE);
-        map.put(BLOCK_HIDDEN_CALLS, FALSE);
+        map.put(BLOCK_PRIVATE_CALLS, FALSE);
         map.put(WRITE_CALLS_JOURNAL, TRUE);
         map.put(BLOCKED_CALL_STATUS_NOTIFICATION, TRUE);
         map.put(BLOCKED_CALL_SOUND_NOTIFICATION, FALSE);
@@ -116,7 +116,7 @@ public class Settings {
         map.put(BLOCK_ALL_SMS, FALSE);
         map.put(BLOCK_SMS_NOT_FROM_CONTACTS, FALSE);
         map.put(BLOCK_SMS_NOT_FROM_SMS_CONTENT, FALSE);
-        map.put(BLOCK_HIDDEN_SMS, FALSE);
+        map.put(BLOCK_PRIVATE_SMS, FALSE);
         map.put(BLOCKED_SMS_STATUS_NOTIFICATION, TRUE);
         map.put(WRITE_SMS_JOURNAL, TRUE);
         map.put(BLOCKED_SMS_SOUND_NOTIFICATION, FALSE);
