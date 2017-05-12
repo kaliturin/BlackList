@@ -91,10 +91,11 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
+        // get name of contact
+        String name = (contacts.size() > 0 ? contacts.get(0).name : null);
+
         // if block all calls (excluding the white list)
         if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_CALLS)) {
-            // get name of contact
-            String name = (contacts.size() > 0 ? contacts.get(0).name : null);
             // break call and notify user
             breakCallAndNotify(context, number, name);
             return;
@@ -119,6 +120,8 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             if (db.getContact(context, number) != null) {
                 return;
             }
+            // there is no contact - get number as name
+            name = number;
             abort = true;
         }
 
@@ -133,8 +136,6 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         }
 
         if (abort) {
-            // get name of contact
-            String name = (contacts.size() > 0 ? contacts.get(0).name : null);
             // break call and notify user
             breakCallAndNotify(context, number, name);
         }

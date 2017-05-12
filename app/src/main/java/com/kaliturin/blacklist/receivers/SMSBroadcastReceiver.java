@@ -152,10 +152,11 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             return false;
         }
 
+        // get name of contact
+        String name = (contacts.size() > 0 ? contacts.get(0).name : null);
+
         // if block all SMS (excluding the white list)
         if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
-            // get name of contact
-            String name = (contacts.size() > 0 ? contacts.get(0).name : null);
             // abort SMS and notify user
             abortSMSAndNotify(context, number, name, body);
             return true;
@@ -180,6 +181,8 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             if (db.getContact(context, number) != null) {
                 return false;
             }
+            // there is no contact - get number as name
+            name = number;
             abort = true;
         }
 
@@ -194,8 +197,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         }
 
         if (abort) {
-            // get name of contact
-            String name = (contacts.size() > 0 ? contacts.get(0).name : null);
             // abort SMS and notify user
             abortSMSAndNotify(context, number, name, body);
         }
