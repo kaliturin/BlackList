@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.kaliturin.blacklist;
+package com.kaliturin.blacklist.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -26,6 +26,9 @@ import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import com.kaliturin.blacklist.R;
+import com.kaliturin.blacklist.services.BlockEventProcessService;
+import com.kaliturin.blacklist.services.SMSProcessService;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
@@ -76,7 +79,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // if isn't "default SMS app" or if message isn't blocked
         if (!isDefaultSmsApp || !processMessageData(context, data)) {
             // process message in service
-            SMSProcessService.run(context, data);
+            SMSProcessService.start(context, data);
         }
     }
 

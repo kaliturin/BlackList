@@ -22,13 +22,13 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.telephony.SmsManager;
 
-import com.kaliturin.blacklist.InternalEventBroadcast;
-import com.kaliturin.blacklist.SMSSendResultBroadcastReceiver;
+import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
+import com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver;
 
 import java.util.ArrayList;
 
-import static com.kaliturin.blacklist.SMSSendResultBroadcastReceiver.SMS_DELIVERY;
-import static com.kaliturin.blacklist.SMSSendResultBroadcastReceiver.SMS_SENT;
+import static com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver.SMS_DELIVERY;
+import static com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver.SMS_SENT;
 
 /**
  * Sends SMS and processes the results of sending

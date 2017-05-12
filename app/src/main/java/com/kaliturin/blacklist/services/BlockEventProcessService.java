@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.kaliturin.blacklist;
+package com.kaliturin.blacklist.services;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;

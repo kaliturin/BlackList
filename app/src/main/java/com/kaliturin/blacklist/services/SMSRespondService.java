@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.kaliturin.blacklist;
+package com.kaliturin.blacklist.services;
 
 import android.app.Service;
 import android.content.Intent;

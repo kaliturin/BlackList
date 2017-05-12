@@ -39,9 +39,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kaliturin.blacklist.InternalEventBroadcast;
+import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.R;
-import com.kaliturin.blacklist.SMSSendService;
+import com.kaliturin.blacklist.services.SMSSendService;
 import com.kaliturin.blacklist.activities.CustomFragmentActivity;
 import com.kaliturin.blacklist.adapters.SMSConversationCursorAdapter;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
@@ -417,7 +417,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         }
 
         // send SMS message
-        SMSSendService.run(getContext(), message, new String[]{contactNumber});
+        SMSSendService.start(getContext(), message, new String[]{contactNumber});
 
         // clear message edit
         messageEdit.setText("");

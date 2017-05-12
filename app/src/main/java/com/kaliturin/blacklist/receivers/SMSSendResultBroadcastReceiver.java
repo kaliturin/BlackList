@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.kaliturin.blacklist;
+package com.kaliturin.blacklist.receivers;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.telephony.SmsManager;
 import android.widget.Toast;
 
+import com.kaliturin.blacklist.R;
+import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.Notifications;
 import com.kaliturin.blacklist.utils.Utils;

@@ -38,7 +38,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kaliturin.blacklist.InternalEventBroadcast;
+import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.activities.CustomFragmentActivity;
 import com.kaliturin.blacklist.adapters.SMSConversationsListCursorAdapter;

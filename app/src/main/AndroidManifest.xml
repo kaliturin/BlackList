@@ -76,7 +76,7 @@
             android:theme="@style/AppTheme.Dark" />
 
         <!-- BroadcastReceiver listens for incoming calls -->
-        <receiver android:name=".CallBroadcastReceiver">
+        <receiver android:name=".receivers.CallBroadcastReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
@@ -84,7 +84,7 @@
 
         <!-- BroadcastReceiver listens for incoming SMS messages -->
         <receiver
-            android:name=".SMSBroadcastReceiver"
+            android:name=".receivers.SMSBroadcastReceiver"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter android:priority="100">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
@@ -94,7 +94,7 @@
 
         <!-- BroadcastReceiver listens for incoming MMS messages -->
         <receiver
-            android:name=".MMSBroadcastReceiver"
+            android:name=".receivers.MMSBroadcastReceiver"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_RECEIVED" />
@@ -106,7 +106,7 @@
 
         <!-- Service delivers messages from the phone "quick response" -->
         <service
-            android:name=".SMSRespondService"
+            android:name=".services.SMSRespondService"
             android:exported="true"
             android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
             <intent-filter>
@@ -121,16 +121,16 @@
         </service>
 
         <!-- BroadcastReceiver listens for sending/delivering SMS messages -->
-        <receiver android:name=".SMSSendResultBroadcastReceiver" />
+        <receiver android:name=".receivers.SMSSendResultBroadcastReceiver" />
 
         <!-- Service processes received SMS messages -->
-        <service android:name=".SMSProcessService" />
+        <service android:name=".services.SMSProcessService" />
 
         <!-- Service processes SMS/Call blocking events -->
-        <service android:name=".BlockEventProcessService" />
+        <service android:name=".services.BlockEventProcessService" />
 
         <!-- Service sends SMS messages -->
-        <service android:name=".SMSSendService" />
+        <service android:name=".services.SMSSendService" />
 
     </application>
 

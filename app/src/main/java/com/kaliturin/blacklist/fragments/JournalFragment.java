@@ -40,7 +40,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kaliturin.blacklist.InternalEventBroadcast;
+import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.adapters.JournalCursorAdapter;
 import com.kaliturin.blacklist.utils.ButtonsBar;

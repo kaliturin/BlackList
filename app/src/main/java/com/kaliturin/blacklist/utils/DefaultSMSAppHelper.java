@@ -25,7 +25,7 @@ import android.os.Build;
 import android.provider.Telephony;
 import android.support.v4.app.Fragment;
 
-import com.kaliturin.blacklist.SMSBroadcastReceiver;
+import com.kaliturin.blacklist.receivers.SMSBroadcastReceiver;
 
 /**
  * Utilities class for check/set app as a default SMS app.

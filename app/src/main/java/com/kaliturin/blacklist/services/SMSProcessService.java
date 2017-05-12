@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.kaliturin.blacklist;
+package com.kaliturin.blacklist.services;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DefaultSMSAppHelper;
@@ -110,7 +111,8 @@ public class SMSProcessService extends IntentService {
         return data;
     }
 
-    public static void run(Context context, Map<String, String> data) {
+    // Starts the service
+    public static void start(Context context, Map<String, String> data) {
         Intent intent = new Intent(context, SMSProcessService.class);
         intent.putExtra(KEYS, data.keySet().toArray(new String[data.size()]));
         intent.putExtra(VALUES, data.values().toArray(new String[data.size()]));

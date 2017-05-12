@@ -34,7 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kaliturin.blacklist.R;
-import com.kaliturin.blacklist.SMSSendService;
+import com.kaliturin.blacklist.services.SMSSendService;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.utils.DialogBuilder;
@@ -192,7 +192,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
 
         // send SMS message to the all contacts in container
         String[] addresses = number2NameMap.keySet().toArray(new String[number2NameMap.size()]);
-        SMSSendService.run(getContext(), message, addresses);
+        SMSSendService.start(getContext(), message, addresses);
 
         return true;
     }

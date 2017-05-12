@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.kaliturin.blacklist;
+package com.kaliturin.blacklist.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,6 +25,8 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.android.internal.telephony.ITelephony;
+import com.kaliturin.blacklist.R;
+import com.kaliturin.blacklist.services.BlockEventProcessService;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;

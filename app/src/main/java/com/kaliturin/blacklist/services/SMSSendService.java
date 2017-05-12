@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.kaliturin.blacklist;
+package com.kaliturin.blacklist.services;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -54,7 +54,8 @@ public class SMSSendService extends IntentService {
         }
     }
 
-    public static void run(Context context, String message, String[] addresses) {
+    // Starts the service
+    public static void start(Context context, String message, String[] addresses) {
         Intent intent = new Intent(context, SMSSendService.class);
         intent.putExtra(MESSAGE, message);
         intent.putExtra(ADDRESSES, addresses);
