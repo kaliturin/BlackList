@@ -102,7 +102,8 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             Log.w(TAG, "Received message address is null");
             return null;
         }
-        number = number.trim();
+        // normalize number
+        number = ContactsAccessHelper.normalizePhoneNumber(number);
         if (number.isEmpty()) {
             Log.w(TAG, "Received message address is empty");
             return null;

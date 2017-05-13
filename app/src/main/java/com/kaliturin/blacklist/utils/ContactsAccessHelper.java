@@ -252,13 +252,13 @@ public class ContactsAccessHelper {
 
     // For the sake of performance we don't use comprehensive phone number pattern.
     // We just want to detect whether a phone number is digital but not symbolic.
-    private Pattern digitalPhoneNumberPattern = Pattern.compile("[+]?[0-9-() ]+");
+    private static final Pattern digitalPhoneNumberPattern = Pattern.compile("[+]?[0-9-() ]+");
     // Is used for normalizing a phone number, removing from it brackets, dashes and spaces.
-    private Pattern normalizePhoneNumberPattern = Pattern.compile("[-() ]");
+    private static final Pattern normalizePhoneNumberPattern = Pattern.compile("[-() ]");
 
     // If passed phone number is digital and not symbolic then normalizes
     // it, removing brackets, dashes and spaces.
-    public String normalizePhoneNumber(String number) {
+    public static String normalizePhoneNumber(String number) {
         number = number.trim();
         if (digitalPhoneNumberPattern.matcher(number).matches()) {
             number = normalizePhoneNumberPattern.matcher(number).replaceAll("");

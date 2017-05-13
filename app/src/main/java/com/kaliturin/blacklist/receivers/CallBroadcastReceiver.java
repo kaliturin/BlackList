@@ -62,7 +62,9 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             Log.w(TAG, "Received call address is null");
             return;
         }
-        number = number.trim();
+
+        // normalize number
+        number = ContactsAccessHelper.normalizePhoneNumber(number);
         if (number.isEmpty()) {
             Log.w(TAG, "Received call address is empty");
             return;
