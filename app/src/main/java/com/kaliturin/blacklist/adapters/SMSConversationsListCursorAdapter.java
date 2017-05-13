@@ -29,25 +29,36 @@ import android.widget.TextView;
 import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.SMSConversation;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.SMSConversationWrapper;
+import com.kaliturin.blacklist.utils.Utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Cursor adapter for all SMS conversations
  */
 public class SMSConversationsListCursorAdapter extends CursorAdapter {
+    private final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
     private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
+    private final DateFormat yearLessDateFormat = Utils.getYearLessDateFormat(dateFormat);
+    private final Calendar calendar = Calendar.getInstance();
     private Date datetime = new Date();
     private View.OnClickListener outerOnClickListener = null;
     private View.OnLongClickListener outerOnLongClickListener = null;
     private RowOnClickListener rowOnClickListener = new RowOnClickListener();
     private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
     private LongSparseArray<SMSConversation> smsConversationCache = new LongSparseArray<>();
+    private final int currentYear;
+    private final int currentDay;
 
     public SMSConversationsListCursorAdapter(Context context) {
         super(context, null, 0);
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        currentYear = calendar.get(Calendar.YEAR);
+        currentDay = calendar.get(Calendar.DAY_OF_YEAR);
     }
 
     @Override
@@ -190,7 +201,25 @@ public class SMSConversationsListCursorAdapter extends CursorAdapter {
             }
             addressTextView.setText(address);
             snippetTextView.setText(model.snippet);
-            dateTextView.setText(dateFormat.format(toDate(model.date)));
+
+            String text;
+            Date date = toDate(model.date);
+            calendar.setTimeInMillis(model.date);
+            // if current year
+            if(calendar.get(Calendar.YEAR) == currentYear) {
+                // if current day
+                if(calendar.get(Calendar.DAY_OF_YEAR) == currentDay) {
+                    // day-less format
+                    text = timeFormat.format(date);
+                } else {
+                    // year-less format
+                    text = yearLessDateFormat.format(date);
+                }
+            } else {
+                // full format
+                text = dateFormat.format(date);
+            }
+            dateTextView.setText(text);
 
             if (model.unread > 0) {
                 unreadTextView.setText(String.valueOf(model.unread));

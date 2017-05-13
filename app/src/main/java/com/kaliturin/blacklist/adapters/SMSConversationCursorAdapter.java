@@ -37,6 +37,7 @@ import com.kaliturin.blacklist.utils.Utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -44,18 +45,27 @@ import java.util.Date;
  */
 
 public class SMSConversationCursorAdapter extends CursorAdapter {
-    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
     private final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
+    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
+    private final DateFormat yearLessDateFormat = Utils.getYearLessDateFormat(dateFormat);
+    private final Calendar calendar = Calendar.getInstance();
+
     private Date datetime = new Date();
     private View.OnLongClickListener outerOnLongClickListener = null;
     private RowOnLongClickListener rowOnLongClickListener = new RowOnLongClickListener();
     private Padding paddingStart;
     private Padding paddingEnd;
+    private final int currentYear;
+    private final int currentDay;
 
     public SMSConversationCursorAdapter(Context context) {
         super(context, null, 0);
         paddingStart = new Padding(context, Gravity.START, 5, 50);
         paddingEnd = new Padding(context, Gravity.END, 5, 50);
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        currentYear = calendar.get(Calendar.YEAR);
+        currentDay = calendar.get(Calendar.DAY_OF_YEAR);
     }
 
     @Override
@@ -181,7 +191,21 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
                     break;
                 default:
                     Date date = toDate(message.date);
-                    text = timeFormat.format(date) + ", " + dateFormat.format(date);
+                    calendar.setTimeInMillis(message.date);
+                    // if current year
+                    if(calendar.get(Calendar.YEAR) == currentYear) {
+                        // if current day
+                        if(calendar.get(Calendar.DAY_OF_YEAR) == currentDay) {
+                            // day-less format
+                            text = timeFormat.format(date);
+                        } else {
+                            // year-less format
+                            text = timeFormat.format(date) + ", " + yearLessDateFormat.format(date);
+                        }
+                    } else {
+                        // full format
+                        text = timeFormat.format(date) + ", " + dateFormat.format(date);
+                    }
                     break;
             }
             dateTextView.setText(text);

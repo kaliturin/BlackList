@@ -47,8 +47,8 @@ import java.util.Date;
  */
 public class JournalCursorAdapter extends CursorAdapter {
     private final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
-    private final SimpleDateFormat dateFormat = (SimpleDateFormat) SimpleDateFormat.getDateInstance(DateFormat.LONG);
-    private final DateFormat yearLessDateFormat;
+    private final DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.LONG);
+    private final DateFormat yearLessDateFormat = Utils.getYearLessDateFormat(dateFormat);
     private final Date datetime = new Date();
     private final Calendar calendar = Calendar.getInstance();
     private final SparseBooleanArray unfoldedTextItems = new SparseBooleanArray();
@@ -62,15 +62,8 @@ public class JournalCursorAdapter extends CursorAdapter {
 
     public JournalCursorAdapter(Context context) {
         super(context, null, 0);
+
         foldSMSText = Settings.getBooleanValue(context, Settings.FOLD_SMS_TEXT_IN_JOURNAL);
-
-        // creating year less date format
-        String fullPattern = dateFormat.toPattern();
-        // checking 'de' we omit problems with Spain locale
-        String regex = fullPattern.contains("de") ? "[^Mm]*[Yy]+[^Mm]*" : "[^DdMm]*[Yy]+[^DdMm]*";
-        String yearLessPattern = fullPattern.replaceAll(regex, "");
-        yearLessDateFormat = new SimpleDateFormat(yearLessPattern);
-
         calendar.setTimeInMillis(System.currentTimeMillis());
         currentYear = calendar.get(Calendar.YEAR);
     }
