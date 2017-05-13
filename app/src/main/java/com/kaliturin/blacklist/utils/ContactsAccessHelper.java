@@ -379,12 +379,12 @@ public class ContactsAccessHelper {
             // set is used to filter repeated data
             Set<String> set = new HashSet<>();
             do {
-                String id = cursor.getString(_ID);
                 String address = cursor.getString(_ADDRESS);
                 address = normalizePhoneNumber(address);
                 if (!set.add(address)) {
                     continue;
                 }
+                String id = cursor.getString(_ID);
                 String person = address;
                 Contact contact = null;
                 if (!cursor.isNull(_PERSON)) {
@@ -392,11 +392,10 @@ public class ContactsAccessHelper {
                     long contactId = cursor.getLong(_PERSON);
                     contact = getContact(contactId);
                 }
-                // commented for the sake of performance
-                //if (contact == null) {
-                // find contact by address
-                //contact = getContact(address);
-                //}
+                if (contact == null) {
+                    // find contact by address
+                    contact = getContact(address);
+                }
                 // get person name from contact
                 if (contact != null) {
                     person = contact.name;
@@ -446,7 +445,7 @@ public class ContactsAccessHelper {
     private ContactFromCallsCursorWrapper getContactsFromCallsLog(@Nullable String filter) {
         filter = (filter == null ? "%%" : "%" + filter + "%");
         Cursor cursor = null;
-        // This try/catch is required by IDE because we use Calls.CONTENT_URI
+        // try/catch is required because of Calls.CONTENT_URI
         try {
             // filter by name or by number
             cursor = contentResolver.query(
