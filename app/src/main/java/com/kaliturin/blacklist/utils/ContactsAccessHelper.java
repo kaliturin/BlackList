@@ -24,10 +24,11 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.provider.*;
 import android.provider.CallLog.Calls;
-import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -300,6 +301,7 @@ public class ContactsAccessHelper {
     private static final Uri URI_CONTENT_SMS = Uri.parse("content://sms");
     private static final Uri URI_CONTENT_SMS_INBOX = Uri.parse("content://sms/inbox");
     private static final Uri URI_CONTENT_SMS_CONVERSATIONS = Uri.parse("content://sms/conversations");
+    private static final Uri URI_CONTENT_CALLS = Uri.parse("content://call_log/calls");
 
     // SMS data columns
     public static final String ID = "_id";
@@ -444,22 +446,17 @@ public class ContactsAccessHelper {
     @Nullable
     private ContactFromCallsCursorWrapper getContactsFromCallsLog(@Nullable String filter) {
         filter = (filter == null ? "%%" : "%" + filter + "%");
-        Cursor cursor = null;
-        // try/catch is required because of Calls.CONTENT_URI
-        try {
-            // filter by name or by number
-            cursor = contentResolver.query(
-                    Calls.CONTENT_URI,
-                    new String[]{Calls._ID, Calls.NUMBER, Calls.CACHED_NAME},
-                    Calls.NUMBER + " IS NOT NULL AND (" +
-                            Calls.CACHED_NAME + " IS NULL AND " +
-                            Calls.NUMBER + " LIKE ? OR " +
-                            Calls.CACHED_NAME + " LIKE ? )",
-                    new String[]{filter, filter},
-                    Calls.DATE + " DESC");
-        } catch (SecurityException e) {
-            Log.w(TAG, e);
-        }
+
+        // filter by name or by number
+        Cursor cursor = contentResolver.query(
+                URI_CONTENT_CALLS,
+                new String[]{Calls._ID, Calls.NUMBER, Calls.CACHED_NAME},
+                Calls.NUMBER + " IS NOT NULL AND (" +
+                        Calls.CACHED_NAME + " IS NULL AND " +
+                        Calls.NUMBER + " LIKE ? OR " +
+                        Calls.CACHED_NAME + " LIKE ? )",
+                new String[]{filter, filter},
+                Calls.DATE + " DESC");
 
         if (validate(cursor)) {
             cursor.moveToFirst();
@@ -514,6 +511,66 @@ public class ContactsAccessHelper {
 
             return new Contact(id, name, 0, numbers);
         }
+    }
+
+    // Deletes last Call log record that was written since "duration" time
+    public boolean deleteLastRecordFromCallLog(Context context, String number, long duration) {
+        if (!Permissions.isGranted(context, Permissions.WRITE_CALL_LOG)) {
+            return false;
+        }
+
+        // get id of the last record has been written since duration ago
+        long id = getLastRecordIdFromCallLog(context, number, duration);
+        if(id < 0) {
+            return false;
+        }
+
+        // delete record from log by id
+        int count = contentResolver.delete(
+                URI_CONTENT_CALLS,
+                ID + " = ? ",
+                new String[]{String.valueOf(id)});
+
+        return (count > 0);
+    }
+
+    // Returns last call record from the Call log that was written since "duration" time
+    private long getLastRecordIdFromCallLog(Context context, String number, long duration) {
+        if (!Permissions.isGranted(context, Permissions.READ_CALL_LOG)) {
+            return -1;
+        }
+
+        // We should not search call just by number because it can be not normalized.
+        // Therefore select all records have been written since passed time duration,
+        // normalize every number and then compare.
+        long time = System.currentTimeMillis() - duration;
+
+        Cursor cursor = contentResolver.query(
+                URI_CONTENT_CALLS,
+                new String[]{Calls._ID, Calls.NUMBER},
+                Calls.NUMBER + " IS NOT NULL AND " +
+                        Calls.DATE + " > ? ",
+                new String[]{String.valueOf(time)},
+                Calls.DATE + " DESC");
+
+        long id = -1;
+        if (validate(cursor)) {
+            cursor.moveToFirst();
+            final int ID = cursor.getColumnIndex(Calls._ID);
+            final int NUMBER = cursor.getColumnIndex(Calls.NUMBER);
+            // get first equal
+            do {
+                String _number = cursor.getString(NUMBER);
+                _number = normalizePhoneNumber(_number);
+                if(_number.equals(number)) {
+                    id = cursor.getLong(ID);
+                    break;
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return id;
     }
 
 //-------------------------------------------------------------------------------------

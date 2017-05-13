@@ -22,6 +22,7 @@
     <string name="Block_calls_not_from_SMS_list">Block calls from numbers that are not in the SMS list</string>
     <string name="Block_calls_from_private">Block calls from private numbers</string>
     <string name="Write_calls_to_journal">Write blocked calls to the Event log</string>
+    <string name="Remove_from_call_log">Remove blocked calls from the Call log</string>
     <string name="Notify_in_status_bar_blocked_call">Notify in status bar about blocked call</string>
     <string name="Notify_with_sound_blocked_call">Notify with sound about blocked call</string>
     <string name="Notify_with_vibration_blocked_call">Notify with vibration about blocked call</string>
@@ -64,6 +65,7 @@
     <string name="Settings">Settings</string>
     <string name="Information">Information</string>
     <string name="Exit">Exit</string>
+    <string name="Call_log">Call log</string>
     <string name="Messaging">Messaging</string>
     <string name="Select_all">Select all</string>
     <string name="SELECT_ALL">SELECT ALL</string>

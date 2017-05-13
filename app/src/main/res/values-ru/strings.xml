@@ -22,6 +22,7 @@
     <string name="Block_calls_not_from_SMS_list">Блокировать звонки с номеров не из списка СМС</string>
     <string name="Block_calls_from_private">Блокировать звонки со скрытых номеров</string>
     <string name="Write_calls_to_journal">Вести Журнал заблокированных звонков</string>
+    <string name="Remove_from_call_log">Удалять заблокированные звонки из Списка вызовов</string>
     <string name="Notify_in_status_bar_blocked_call">Уведомлять в строке состояния о заблокированном звонке</string>
     <string name="Notify_with_sound_blocked_call">Уведомлять звуком о заблокированном звонке</string>
     <string name="Notify_with_vibration_blocked_call">Уведомлять вибрацией о заблокированном звонке</string>
@@ -64,6 +65,7 @@
     <string name="Settings">Настройки</string>
     <string name="Information">Информация</string>
     <string name="Exit">Выход</string>
+    <string name="Call_log">Список вызовов</string>
     <string name="Messaging">Сообщения</string>
     <string name="Select_all">Выбрать все</string>
     <string name="SELECT_ALL">ВЫБРАТЬ ВСЕ</string>

@@ -53,6 +53,7 @@ public class Permissions {
     public static final String READ_PHONE_STATE = "android.permission.READ_PHONE_STATE";
     public static final String READ_CONTACTS = "android.permission.READ_CONTACTS";
     public static final String READ_CALL_LOG = "android.permission.READ_CALL_LOG";
+    public static final String WRITE_CALL_LOG = "android.permission.WRITE_CALL_LOG";
     public static final String VIBRATE = "android.permission.VIBRATE";
 
     private static String[] PERMISSIONS = new String[]{
@@ -65,6 +66,7 @@ public class Permissions {
             READ_PHONE_STATE,
             READ_CONTACTS,
             READ_CALL_LOG,
+            WRITE_CALL_LOG,
             VIBRATE
     };
 

@@ -216,6 +216,8 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                 Settings.BLOCK_PRIVATE_CALLS);
         adapter.addCheckbox(R.string.Journal, R.string.Write_calls_to_journal,
                 Settings.WRITE_CALLS_JOURNAL);
+        adapter.addCheckbox(R.string.Call_log, R.string.Remove_from_call_log,
+                Settings.REMOVE_FROM_CALL_LOG);
 
         // calls notifications settings
         adapter.addTitle(R.string.Calls_blocking_notification);
