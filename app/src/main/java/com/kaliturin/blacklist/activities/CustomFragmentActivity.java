@@ -44,7 +44,7 @@ public class CustomFragmentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        applyCurrentTheme();
+        Settings.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_bar_main);
 
@@ -100,15 +100,6 @@ public class CustomFragmentActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    // Applies the current UI theme depending on settings
-    private void applyCurrentTheme() {
-        if (Settings.getBooleanValue(this, Settings.UI_THEME_LIGHT)) {
-            setTheme(R.style.AppTheme_Light);
-        } else {
-            setTheme(R.style.AppTheme_Dark);
-        }
     }
 
     // Opens activity with fragment and waiting for result

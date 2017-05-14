@@ -141,7 +141,7 @@
     <string name="Error_file_is_not_valid">Ошибка: недопустимый формат Файла</string>
     <string name="Error_on_old_data_deletion">Ошибка при удалении старых данных</string>
     <string name="Import_complete">Импорт данных завершён</string>
-    <string name="UI_theme_light">Светлая тема интерфейса</string>
+    <string name="UI_theme_dark">Тёмная тема интерфейса</string>
     <string name="List_is_empty">Список пуст</string>
     <string name="Logo_motto">Защита от нежелательных звонков и СМС</string>
     <string name="Go_to_Journal_at_start">Переходить в Журнал событий при старте приложения</string>

@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        applyCurrentTheme();
+        Settings.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -228,15 +228,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().findItem(itemId).setChecked(true);
         // save selected item
         selectedMenuItemId = itemId;
-    }
-
-    // Applies the current UI theme depending on settings
-    private void applyCurrentTheme() {
-        if (Settings.getBooleanValue(this, Settings.UI_THEME_LIGHT)) {
-            setTheme(R.style.AppTheme_Light);
-        } else {
-            setTheme(R.style.AppTheme_Dark);
-        }
     }
 
     // Switcher of activity's fragments

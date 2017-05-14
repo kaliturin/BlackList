@@ -195,7 +195,7 @@ public class SMSConversationsListCursorAdapter extends CursorAdapter {
             rowView.setVisibility(View.VISIBLE);
             String address;
             if (model.person != null) {
-                address = model.person + " (" + model.number + ")";
+                address = model.person + "\n" + model.number;
             } else {
                 address = model.number;
             }

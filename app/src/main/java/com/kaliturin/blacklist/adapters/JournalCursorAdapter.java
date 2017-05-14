@@ -251,7 +251,7 @@ public class JournalCursorAdapter extends CursorAdapter {
             String sender = record.caller;
             if (record.number != null &&
                     !record.caller.equals(record.number)) {
-                sender += " (" + record.number + ")";
+                sender += "\n" + record.number;
             }
             senderTextView.setText(sender);
 

@@ -162,7 +162,7 @@ public class Notifications {
 
     private static int getColor(Context context, @AttrRes int attrRes) {
         int styleRes = R.style.AppTheme_Dark;
-        if (Settings.getBooleanValue(context, Settings.UI_THEME_LIGHT)) {
+        if (Settings.getBooleanValue(context, Settings.UI_THEME_DARK)) {
             styleRes = R.style.AppTheme_Light;
         }
         int colorRes = Utils.getResourceId(context, attrRes, styleRes);
