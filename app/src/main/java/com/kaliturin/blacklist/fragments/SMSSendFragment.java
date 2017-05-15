@@ -314,9 +314,7 @@ public class SMSSendFragment extends Fragment implements FragmentArguments {
     private String getNumberFromEdit(EditText numberEdit) {
         String number = numberEdit.getText().toString().trim();
         // normalize number
-        ContactsAccessHelper contactsAccessHelper =
-                ContactsAccessHelper.getInstance(getContext());
-        return contactsAccessHelper.normalizePhoneNumber(number);
+        return ContactsAccessHelper.normalizePhoneNumber(number);
     }
 
 }

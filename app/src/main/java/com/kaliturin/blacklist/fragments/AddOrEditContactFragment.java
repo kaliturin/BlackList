@@ -221,9 +221,6 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
 
     // Saves contact data from the View to DB
     private boolean saveContact() {
-        ContactsAccessHelper contactsAccessHelper =
-                ContactsAccessHelper.getInstance(getContext());
-
         // get contact name
         String name = getName();
 
@@ -231,7 +228,7 @@ public class AddOrEditContactFragment extends Fragment implements FragmentArgume
         List<ContactNumber> numbers = new LinkedList<>();
         Set<Pair<String, Integer>> numbers2TypeSet = getNumber2TypePairs();
         for (Pair<String, Integer> pair : numbers2TypeSet) {
-            String number = contactsAccessHelper.normalizePhoneNumber(pair.first);
+            String number = ContactsAccessHelper.normalizePhoneNumber(pair.first);
             if (number.isEmpty()) {
                 continue;
             }
