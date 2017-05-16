@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.activities.CustomFragmentActivity;
@@ -45,6 +46,7 @@ import com.kaliturin.blacklist.utils.ButtonsBar;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper.ContactSourceType;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
+import com.kaliturin.blacklist.utils.DefaultSMSAppHelper;
 import com.kaliturin.blacklist.utils.DialogBuilder;
 import com.kaliturin.blacklist.utils.IdentifiersContainer;
 import com.kaliturin.blacklist.utils.Permissions;
@@ -55,6 +57,7 @@ import com.kaliturin.blacklist.utils.Utils;
  */
 
 public class ContactsFragment extends Fragment implements FragmentArguments {
+    private boolean defaultSMSAppPrompt = true;
     private ContactsCursorAdapter cursorAdapter = null;
     private ButtonsBar snackBar = null;
     private int contactType = 0;
@@ -203,6 +206,9 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
 
         // load the list view
         loadListViewItems(itemsFilter, false, listPosition);
+
+        // prompt how to enable SMS-blocking
+        showDefaultSMSAppPrompt();
     }
 
     @Override
@@ -521,7 +527,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         Bundle arguments = new Bundle();
         Class<? extends Fragment> fragmentClass;
         if (sourceType != null) {
-            // fragment of adding contacts from sms content / calls log
+            // fragment of adding contacts from sms-content / call log
             arguments.putInt(CONTACT_TYPE, contactType);
             arguments.putSerializable(SOURCE_TYPE, sourceType);
             arguments.putBoolean(SINGLE_NUMBER_MODE, true);
@@ -532,8 +538,18 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
             fragmentClass = AddOrEditContactFragment.class;
         }
 
-        // open the dialog activity with the fragment of contact adding
+        // open activity with contacts adding fragment
         CustomFragmentActivity.show(getActivity(),
                 getString(titleId), fragmentClass, arguments, 0);
+    }
+
+    // Prompts how to enable SMS-blocking
+    private void showDefaultSMSAppPrompt() {
+        if (defaultSMSAppPrompt && contactType == Contact.TYPE_BLACK_LIST) {
+            defaultSMSAppPrompt = false;
+            if (!DefaultSMSAppHelper.isDefault(getContext())) {
+                Toast.makeText(getContext(), R.string.To_block_SMS_set_def_app, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

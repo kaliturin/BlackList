@@ -18,28 +18,28 @@ Features
 - Recording of the event log - the history of blocked calls and SMS (with saving the texts)
 - Manage notifications about block events
 - Support for light and dark themes of the interface
-- Common functions of SMS-application - reading/writing/exchanging SMS messages
+- Common functions of SMS-application - reading/writing/exchanging SMS-messages
 
 Permissions granting
 ---
-Because of the security policy in Android 6.0 and up, the application requires permissions:
-1. "Access photos, media and files". Allows reading and writing files in the internal memory of
-the device - for storing the block lists.
-2. "Send and view SMS messages". Allows to display and block incoming SMS messages.
-3. "Make and manage phone calls". Allows to block incoming calls.
-4. "Access contacts". Allows to display the list of contacts.
-
-Because of the security policy in Android 4.4 and up to block the incoming SMS messages
+Because of the security policy in Android 4.4 and up to block the incoming SMS-messages
 it is required to give to the application the permissions of "Default SMS-application" in the Settings.
 If necessary, you can always opt-out and return to the previous "Default SMS-application".
 In this case, the SMS blocking will be disabled. At the moment the application supports blocking
-and exchanging SMS messages only. Support for MMS messages has not yet been implemented.
+and exchanging SMS-messages only. Support for MMS-messages has not yet been implemented.
+
+Because of the security policy in Android 6.0 and up, the application requires permissions:
+1. "Access photos, media and files". Allows reading and writing files in the internal memory of
+the device - for storing the block lists.
+2. "Send and view SMS-messages". Allows to display and block incoming SMS-messages.
+3. "Make and manage phone calls". Allows to block incoming calls.
+4. "Access contacts". Allows to display the list of contacts.
 
 Functionality details
 ---
 1. Messaging.
 Messages list displays SMS-chats, sorted by the time of the last message in them. From here you can
-go to the reading, writing and sending SMS messages.
+go to the reading, writing and sending SMS-messages.
 
 2. Blacklist.
 This is the list of contacts with numbers, calls and SMS from which you\'re planning to block.

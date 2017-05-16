@@ -104,8 +104,8 @@
     <string name="Exclude_from_black_list">Exclude contact from the Blacklist</string>
     <string name="Move_to_white_list">Move contact to the Whitelist</string>
     <string name="Move_to_black_list">Move contact to the Blacklist</string>
-    <string name="Default_SMS_app">Default SMS app</string>
-    <string name="Set_as_default_SMS_app">Set as default SMS app is needed to block SMS since Android 4.4 and up</string>
+    <string name="Default_SMS_app">Default SMS-app</string>
+    <string name="Set_as_default_SMS_app">Set as default SMS-app is needed to block SMS since Android 4.4 and up</string>
     <string name="SMS_default_app">SMS application</string>
     <string name="New_message">New message</string>
     <string name="needs_permission">needs permission</string>
@@ -128,7 +128,7 @@
     <string name="SMS_is_not_delivered">SMS isn not delivered</string>
     <string name="Message_text_is_not_defined">Message text is not defined</string>
     <string name="Address_is_not_defined">Address is not defined</string>
-    <string name="Need_default_SMS_app">Need default SMS application permissions</string>
+    <string name="Need_default_SMS_app">Need default SMS-application permissions</string>
     <string name="Unknown_error">Unknown error</string>
     <string name="Ringtone_picker">Ringtone picker</string>
     <string name="Menu_button">Menu button</string>
@@ -148,6 +148,8 @@
     <string name="Back_button">\"Back\" button</string>
     <string name="Sending_">Sending...</string>
     <string name="Not_sent">Not sent</string>
+    <string name="To_block_SMS_set_def_app">To block SMS-messages set as \"Default SMS-app\" in the Settings
+    </string>
 
     <string name="About">About</string>
     <string name="Info_about">
@@ -158,27 +160,27 @@
 
     <string name="Attention">Attention</string>
     <string name="Info_attention">
-        Because of the security policy in Android 6.0 and up, the
-        application requires permissions:
-        \n1. \"Access photos, media and files\". Allows reading and writing
-        files in the internal memory of the device - for storing the block lists.
-        \n2. \"Send and view SMS messages\". Allows to display and block
-        incoming SMS messages.
-        \n3. \"Make and manage phone calls\". Allows to block incoming calls.
-        \n4. \"Access contacts\". Allows to display the list of contacts.
-
-        \nBecause of the security policy in Android 4.4 and up
-        to block the incoming SMS messages it is required to give to the
+        Because of the security policy in Android 4.4 and up
+        to block the incoming SMS-messages it is required to give to the
         application the permissions of \"Default SMS-application\" in the Settings.
         If necessary, you can always opt-out and return to the previous
         \"Default SMS-application\". In this case, the SMS blocking will be
         disabled. At the moment the application supports blocking and exchanging
-        SMS messages only. Support the MMS messages has not yet been implemented.
+        SMS-messages only. Support the MMS-messages has not yet been implemented.
+
+        \nBecause of the security policy in Android 6.0 and up, the
+        application requires permissions:
+        \n1. \"Access photos, media and files\". Allows reading and writing
+        files in the internal memory of the device - for storing the block lists.
+        \n2. \"Send and view SMS-messages\". Allows to display and block
+        incoming SMS-messages.
+        \n3. \"Make and manage phone calls\". Allows to block incoming calls.
+        \n4. \"Access contacts\". Allows to display the list of contacts.
     </string>
 
     <string name="Info_messaging">
         This list displays SMS-chats, sorted by the time of the last message in
-        them. From here you can go to the reading, writing and sending SMS messages.
+        them. From here you can go to the reading, writing and sending SMS-messages.
     </string>
 
     <string name="Info_black_list">
