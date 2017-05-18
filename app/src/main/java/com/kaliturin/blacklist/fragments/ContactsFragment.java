@@ -439,15 +439,13 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
         public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
             cursorAdapter.changeCursor(data);
 
-            if (listView != null) {
-                // scroll list to saved position
-                listView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        listView.setSelection(listPosition);
-                    }
-                });
-            }
+            // scroll list to the saved position
+            listView.post(new Runnable() {
+                @Override
+                public void run() {
+                    listView.setSelection(listPosition);
+                }
+            });
         }
 
         @Override

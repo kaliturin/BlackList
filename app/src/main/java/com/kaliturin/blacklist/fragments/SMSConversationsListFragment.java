@@ -355,18 +355,17 @@ public class SMSConversationsListFragment extends Fragment implements FragmentAr
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             cursorAdapter.changeCursor(cursor);
 
-            if (!cursorAdapter.isEmpty()) {
-                // scroll list to saved position
-                listView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (cursorAdapter.getCount() > 0) {
-                            listView.setSelection(listPosition);
-                            listView.setVisibility(View.VISIBLE);
-                        }
+            // scroll list to the saved position
+            listView.post(new Runnable() {
+                @Override
+                public void run() {
+                    Cursor cursor = cursorAdapter.getCursor();
+                    if (cursor != null && !cursor.isClosed() && cursor.getCount() > 0) {
+                        listView.setSelection(listPosition);
+                        listView.setVisibility(View.VISIBLE);
                     }
-                });
-            }
+                }
+            });
 
             if (markSeen) {
                 // mark all SMS are seen

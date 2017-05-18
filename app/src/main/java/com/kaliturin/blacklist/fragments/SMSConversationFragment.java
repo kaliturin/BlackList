@@ -102,7 +102,7 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
         messageEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
+                if (hasFocus) {
                     // increase edit
                     messageEdit.setMinLines(2);
                     // set visible of the button area
@@ -277,22 +277,23 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
             // apply loaded data to cursor adapter
             cursorAdapter.changeCursor(cursor);
 
-            if (!cursorAdapter.isEmpty()) {
-                // scroll list to the bottom
-                listView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int count = cursorAdapter.getCount();
+            // scroll list to the bottom or saved position
+            listView.post(new Runnable() {
+                @Override
+                public void run() {
+                    Cursor cursor = cursorAdapter.getCursor();
+                    if (cursor != null && !cursor.isClosed()) {
+                        int count = cursor.getCount();
                         if (count > 0) {
                             int pos = (listPosition == END_OF_LIST ? count - 1 : listPosition);
                             listView.setSelection(pos);
                             listView.setVisibility(View.VISIBLE);
                         }
                     }
-                });
-            }
+                }
+            });
 
-            // is there unread sms in the thread
+            // are there unread sms in the thread
             if (unreadCount > 0) {
                 // mark such sms as are read
                 new SMSReadMarker(context).execute(threadId);
