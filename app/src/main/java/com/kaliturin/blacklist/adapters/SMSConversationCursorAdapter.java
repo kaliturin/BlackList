@@ -193,9 +193,9 @@ public class SMSConversationCursorAdapter extends CursorAdapter {
                     Date date = toDate(message.date);
                     calendar.setTimeInMillis(message.date);
                     // if current year
-                    if(calendar.get(Calendar.YEAR) == currentYear) {
+                    if (calendar.get(Calendar.YEAR) == currentYear) {
                         // if current day
-                        if(calendar.get(Calendar.DAY_OF_YEAR) == currentDay) {
+                        if (calendar.get(Calendar.DAY_OF_YEAR) == currentDay) {
                             // day-less format
                             text = timeFormat.format(date);
                         } else {
