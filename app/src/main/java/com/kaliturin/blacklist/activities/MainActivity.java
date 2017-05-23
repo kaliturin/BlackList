@@ -51,9 +51,9 @@ import com.kaliturin.blacklist.utils.Settings;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String ACTION_JOURNAL = "ACTION_JOURNAL";
-    public static final String ACTION_SMS_CONVERSATIONS = "ACTION_SMS_CONVERSATIONS";
-    public static final String ACTION_SETTINGS = "ACTION_SETTINGS";
+    public static final String ACTION_JOURNAL = "com.kaliturin.blacklist.ACTION_JOURNAL";
+    public static final String ACTION_SMS_CONVERSATIONS = "com.kaliturin.blacklist.ACTION_SMS_CONVERSATIONS";
+    public static final String ACTION_SETTINGS = "com.kaliturin.blacklist.ACTION_SETTINGS";
     public static final String ACTION_SMS_SEND_TO = "android.intent.action.SENDTO";
 
     private static final String CURRENT_ITEM_ID = "CURRENT_ITEM_ID";
