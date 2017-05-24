@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Permissions check and request helper
@@ -41,7 +42,7 @@ import java.util.Map;
 public class Permissions {
     private static final String TAG = Permissions.class.getName();
     private static final int REQUEST_CODE = 1020;
-    private static final Map<String, Boolean> permissionsResults = new HashMap<>();
+    private static final Map<String, Boolean> permissionsResults = new ConcurrentHashMap<>();
 
     // Permissions names
     public static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";

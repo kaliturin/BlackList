@@ -25,6 +25,7 @@ import com.kaliturin.blacklist.R;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Settings name/value persistence container
@@ -65,7 +66,7 @@ public class Settings {
     private static final String TRUE = "TRUE";
     private static final String FALSE = "FALSE";
 
-    private static Map<String, String> settingsMap = new HashMap<>();
+    private static Map<String, String> settingsMap = new ConcurrentHashMap<>();
 
     public static synchronized void invalidateCache() {
         settingsMap.clear();
@@ -136,7 +137,7 @@ public class Settings {
         map.put(REMOVE_FROM_CALL_LOG, FALSE);
 
         if (!Permissions.isGranted(context, Permissions.WRITE_EXTERNAL_STORAGE)) {
-            settingsMap = map;
+            settingsMap = new ConcurrentHashMap<>(map);
         } else {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 String setting = entry.getKey();
