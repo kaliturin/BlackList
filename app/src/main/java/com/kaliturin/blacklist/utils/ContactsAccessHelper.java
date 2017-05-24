@@ -49,16 +49,20 @@ import java.util.regex.Pattern;
  */
 public class ContactsAccessHelper {
     private static final String TAG = ContactsAccessHelper.class.getName();
-    private static ContactsAccessHelper sInstance = null;
+    private static volatile ContactsAccessHelper sInstance = null;
     private ContentResolver contentResolver = null;
 
     private ContactsAccessHelper(Context context) {
         contentResolver = context.getApplicationContext().getContentResolver();
     }
 
-    public static synchronized ContactsAccessHelper getInstance(Context context) {
+    public static ContactsAccessHelper getInstance(Context context) {
         if (sInstance == null) {
-            sInstance = new ContactsAccessHelper(context);
+            synchronized (ContactsAccessHelper.class) {
+                if (sInstance == null) {
+                    sInstance = new ContactsAccessHelper(context);
+                }
+            }
         }
         return sInstance;
     }
@@ -72,7 +76,7 @@ public class ContactsAccessHelper {
         return true;
     }
 
-    // Types of the contact sources
+    // Types of contact sources
     public enum ContactSourceType {
         FROM_CONTACTS,
         FROM_CALLS_LOG,

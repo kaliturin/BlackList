@@ -44,22 +44,30 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     private static final String TAG = DatabaseAccessHelper.class.getName();
     public static final String DATABASE_NAME = "blacklist.db";
     private static final int DATABASE_VERSION = 1;
-    private static DatabaseAccessHelper sInstance = null;
+    private static volatile DatabaseAccessHelper sInstance = null;
 
     @Nullable
-    public static synchronized DatabaseAccessHelper getInstance(Context context) {
+    public static DatabaseAccessHelper getInstance(Context context) {
         if (sInstance == null) {
-            if (Permissions.isGranted(context, Permissions.WRITE_EXTERNAL_STORAGE)) {
-                sInstance = new DatabaseAccessHelper(context.getApplicationContext());
+            synchronized (DatabaseAccessHelper.class) {
+                if (sInstance == null) {
+                    if (Permissions.isGranted(context, Permissions.WRITE_EXTERNAL_STORAGE)) {
+                        sInstance = new DatabaseAccessHelper(context.getApplicationContext());
+                    }
+                }
             }
         }
         return sInstance;
     }
 
-    public static synchronized void invalidateCache() {
+    public static void invalidateCache() {
         if (sInstance != null) {
-            sInstance.close();
-            sInstance = null;
+            synchronized (DatabaseAccessHelper.class) {
+                if (sInstance != null) {
+                    sInstance.close();
+                    sInstance = null;
+                }
+            }
         }
     }
 
