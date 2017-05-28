@@ -90,7 +90,9 @@ public class Settings {
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
             if (db != null) {
                 value = db.getSettingsValue(name);
-                settingsMap.put(name, value);
+                if(value != null) {
+                    settingsMap.put(name, value);
+                }
             }
         }
         return value;
