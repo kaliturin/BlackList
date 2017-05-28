@@ -24,11 +24,10 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.MatrixCursor;
 import android.net.Uri;
-import android.provider.*;
 import android.provider.CallLog.Calls;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -525,7 +524,7 @@ public class ContactsAccessHelper {
 
         // get id of the last record has been written since duration ago
         long id = getLastRecordIdFromCallLog(context, number, duration);
-        if(id < 0) {
+        if (id < 0) {
             return false;
         }
 
@@ -566,7 +565,7 @@ public class ContactsAccessHelper {
             do {
                 String _number = cursor.getString(NUMBER);
                 _number = normalizePhoneNumber(_number);
-                if(_number.equals(number)) {
+                if (_number.equals(number)) {
                     id = cursor.getLong(ID);
                     break;
                 }

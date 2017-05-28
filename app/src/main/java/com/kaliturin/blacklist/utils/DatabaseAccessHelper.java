@@ -27,8 +27,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.sqlite.util.StringUtils;
-
 import java.io.File;
 import java.io.FileReader;
 import java.util.LinkedList;
@@ -146,30 +144,29 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
          * If "all" is true - includes all items, except of specified in list.
          * Else includes all items specified in list.
          */
-        static
         @Nullable
-        String getInClause(String column, boolean all, List<String> items) {
+        static String getInClause(String column, boolean all, List<String> items) {
             if (all) {
                 if (items.isEmpty()) {
                     // include all items
                     return null;
                 } else {
                     // include all items except of specified
-                    String args = StringUtils.join(items, ", ");
+                    String args = joinStrings(items, ", ");
                     return column + " NOT IN ( " + args + " ) ";
                 }
             }
             // include all specified items
-            String args = StringUtils.join(items, ", ");
+            String args = joinStrings(items, ", ");
             return column + " IN ( " + args + " ) ";
         }
 
         /**
          * Creates 'LIKE part' of 'WHERE' clause
          */
-        static
+
         @Nullable
-        String getLikeClause(String column, String filter) {
+        static String getLikeClause(String column, String filter) {
             return (filter == null ? null :
                     column + " LIKE '%" + filter + "%' ");
         }
@@ -183,6 +180,20 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
                 if (TextUtils.isEmpty(clause)) continue;
                 if (sb.length() > 0) sb.append(" AND ");
                 sb.append(clause);
+            }
+            return sb.toString();
+        }
+
+        static String joinStrings(List<String> list, String separator) {
+            StringBuilder sb = new StringBuilder();
+            boolean first = true;
+            for (String item : list) {
+                if (first)
+                    first = false;
+                else
+                    sb.append(separator);
+
+                sb.append(item);
             }
             return sb.toString();
         }
