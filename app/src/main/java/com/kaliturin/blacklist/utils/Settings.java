@@ -68,29 +68,27 @@ public class Settings {
 
     private static Map<String, String> settingsMap = new ConcurrentHashMap<>();
 
-    public static synchronized void invalidateCache() {
+    public static void invalidateCache() {
         settingsMap.clear();
     }
 
-    public static synchronized boolean setStringValue(Context context, @NonNull String name, @NonNull String value) {
+    public static boolean setStringValue(Context context, @NonNull String name, @NonNull String value) {
         DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        if (db != null) {
-            if (db.setSettingsValue(name, value)) {
-                settingsMap.put(name, value);
-                return true;
-            }
+        if (db != null && db.setSettingsValue(name, value)) {
+            settingsMap.put(name, value);
+            return true;
         }
         return false;
     }
 
     @Nullable
-    public static synchronized String getStringValue(Context context, @NonNull String name) {
+    public static String getStringValue(Context context, @NonNull String name) {
         String value = settingsMap.get(name);
         if (value == null) {
             DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
             if (db != null) {
                 value = db.getSettingsValue(name);
-                if(value != null) {
+                if (value != null) {
                     settingsMap.put(name, value);
                 }
             }
@@ -108,7 +106,7 @@ public class Settings {
         return (value != null && value.equals(TRUE));
     }
 
-    public static synchronized void initDefaults(Context context) {
+    public static void initDefaults(Context context) {
         Map<String, String> map = new HashMap<>();
         map.put(BLOCK_CALLS_FROM_BLACK_LIST, TRUE);
         map.put(BLOCK_ALL_CALLS, FALSE);
@@ -142,10 +140,10 @@ public class Settings {
             settingsMap = new ConcurrentHashMap<>(map);
         } else {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                String setting = entry.getKey();
-                if (getStringValue(context, setting) == null) {
+                String name = entry.getKey();
+                if (getStringValue(context, name) == null) {
                     String value = entry.getValue();
-                    setStringValue(context, setting, value);
+                    setStringValue(context, name, value);
                 }
             }
         }
