@@ -36,6 +36,7 @@ import android.view.View;
 
 import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.fragments.ContactsFragment;
+import com.kaliturin.blacklist.fragments.ContactsFragment_;
 import com.kaliturin.blacklist.fragments.FragmentArguments;
 import com.kaliturin.blacklist.fragments.InformationFragment;
 import com.kaliturin.blacklist.fragments.JournalFragment;
@@ -233,8 +234,8 @@ public class MainActivity extends AppCompatActivity
     // Switcher of activity's fragments
     private class FragmentSwitcher implements FragmentArguments {
         private final String CURRENT_FRAGMENT = "CURRENT_FRAGMENT";
-        private ContactsFragment blackListFragment = new ContactsFragment();
-        private ContactsFragment whiteListFragment = new ContactsFragment();
+        private ContactsFragment blackListFragment = new ContactsFragment_.FragmentBuilder_().build();
+        private ContactsFragment whiteListFragment = new ContactsFragment_.FragmentBuilder_().build();
         private JournalFragment journalFragment = new JournalFragment();
         private SettingsFragment settingsFragment = new SettingsFragment();
         private InformationFragment informationFragment = new InformationFragment();

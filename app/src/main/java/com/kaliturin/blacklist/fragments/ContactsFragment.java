@@ -52,161 +52,106 @@ import com.kaliturin.blacklist.utils.IdentifiersContainer;
 import com.kaliturin.blacklist.utils.Permissions;
 import com.kaliturin.blacklist.utils.Utils;
 
+import org.androidannotations.annotations.AfterPreferences;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.InstanceState;
+import org.androidannotations.annotations.ViewById;
+
 /**
  * Contacts fragment (black/white list)
  */
 
+@EFragment(R.layout.fragment_contacts)
 public class ContactsFragment extends Fragment implements FragmentArguments {
     private boolean defaultSMSAppPrompt = true;
     private ContactsCursorAdapter cursorAdapter = null;
     private ButtonsBar snackBar = null;
-    private int contactType = 0;
     private String itemsFilter = null;
-    private ListView listView = null;
-    private int listPosition = 0;
 
-    public ContactsFragment() {
-        // Required empty public constructor
-    }
+    @FragmentArg(CONTACT_TYPE)
+    int contactType = 0;
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    @InstanceState
+    int listPosition = 0;
+
+    @ViewById(R.id.contacts_list)
+    ListView listView;
+
+    @ViewById(R.id.text_empty)
+    TextView textEmptyView;
+
+    @AfterViews
+    void onAfterViews() {
+        setHasOptionsMenu(true);
         // set activity title
         Bundle arguments = getArguments();
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (arguments != null && actionBar != null) {
             actionBar.setTitle(arguments.getString(TITLE));
         }
-    }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            contactType = arguments.getInt(CONTACT_TYPE, 0);
-        }
-
-        if (savedInstanceState != null) {
-            listPosition = savedInstanceState.getInt(LIST_POSITION, 0);
-        }
-
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_contacts, container, false);
-    }
-
-    @Override
-    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         Permissions.notifyIfNotGranted(getContext(), Permissions.WRITE_EXTERNAL_STORAGE);
 
         // snack bar
-        snackBar = new ButtonsBar(view, R.id.three_buttons_bar);
+        snackBar = new ButtonsBar(getView(), R.id.three_buttons_bar);
         // "Cancel button" button
-        snackBar.setButton(R.id.button_left,
-                getString(R.string.CANCEL),
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        snackBar.dismiss();
-                        clearCheckedItems();
-                    }
-                });
+        snackBar.setButton(R.id.button_left, getString(R.string.CANCEL), v -> {
+            snackBar.dismiss();
+            clearCheckedItems();
+        });
         // "Delete" button
-        snackBar.setButton(R.id.button_center,
-                getString(R.string.DELETE),
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        snackBar.dismiss();
-                        deleteCheckedItems();
-                    }
-                });
+        snackBar.setButton(R.id.button_center, getString(R.string.DELETE), v -> {
+            snackBar.dismiss();
+            deleteCheckedItems();
+        });
         // "Select all" button
-        snackBar.setButton(R.id.button_right,
-                getString(R.string.SELECT_ALL),
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        setAllItemsChecked();
-                    }
-                });
+        snackBar.setButton(R.id.button_right, getString(R.string.SELECT_ALL), v -> setAllItemsChecked());
 
         // cursor adapter
         cursorAdapter = new ContactsCursorAdapter(getContext());
 
         // on row click listener
-        cursorAdapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View row) {
-                if (cursorAdapter.hasCheckedItems()) {
-                    snackBar.show();
-                } else {
-                    snackBar.dismiss();
-                }
+        cursorAdapter.setOnClickListener(row -> {
+            if (cursorAdapter.hasCheckedItems()) {
+                snackBar.show();
+            } else {
+                snackBar.dismiss();
             }
         });
 
         // on row long click listener (receives clicked row)
-        cursorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View row) {
-                // get contact from the clicked row
-                final Contact contact = cursorAdapter.getContact(row);
-                if (contact != null) {
-                    // create and show menu dialog for actions with the contact
-                    DialogBuilder dialog = new DialogBuilder(getContext());
-                    dialog.setTitle(contact.name).
-                            // add menu item of contact editing
-                                    addItem(R.string.Edit_contact, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    // edit contact
-                                    editContact(contact.id);
-                                }
-                            }).
-                            // add menu item of contact deletion
-                                    addItem(R.string.Remove_contact, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    deleteContact(contact.id);
-                                    reloadItems(itemsFilter);
-                                }
-                            });
-                    // add menu item of contact moving to opposite list
-                    String itemTitle = (contact.type == Contact.TYPE_WHITE_LIST ?
-                            getString(R.string.Move_to_black_list) :
-                            getString(R.string.Move_to_white_list));
-                    dialog.addItem(itemTitle, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            moveContactToOppositeList(contact);
+        cursorAdapter.setOnLongClickListener(row -> {
+            // get contact from the clicked row
+            final Contact contact = cursorAdapter.getContact(row);
+            if (contact != null) {
+                // create and show menu dialog for actions with the contact
+                DialogBuilder dialog = new DialogBuilder(getContext());
+                dialog.setTitle(contact.name)
+                        .addItem(R.string.Edit_contact, v -> editContact(contact.id))
+                        .addItem(R.string.Remove_contact, v -> {
+                            deleteContact(contact.id);
                             reloadItems(itemsFilter);
-                        }
-                    }).show();
-                }
-                return true;
+                        });
+                // add menu item of contact moving to opposite list
+                String itemTitle = (contact.type == Contact.TYPE_WHITE_LIST ?
+                        getString(R.string.Move_to_black_list) :
+                        getString(R.string.Move_to_white_list));
+                dialog.addItem(itemTitle, v -> {
+                    moveContactToOppositeList(contact);
+                    reloadItems(itemsFilter);
+                }).show();
             }
+            return true;
         });
 
         // add cursor listener to the list
-        listView = (ListView) view.findViewById(R.id.contacts_list);
         listView.setAdapter(cursorAdapter);
-
         // on list empty comment
-        TextView textEmptyView = (TextView) view.findViewById(R.id.text_empty);
         listView.setEmptyView(textEmptyView);
-
         // load the list view
         loadListViewItems(itemsFilter, false, listPosition);
-
         // prompt how to enable SMS-blocking
         showDefaultSMSAppPrompt();
     }
@@ -263,14 +208,10 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
                 });
 
         // item's 'add contact' on click listener
-        itemAdd.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                // show menu dialog
-                showAddContactsMenuDialog();
-
-                return true;
-            }
+        itemAdd.setOnMenuItemClickListener(item -> {
+            // show menu dialog
+            showAddContactsMenuDialog();
+            return true;
         });
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -440,12 +381,7 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
             cursorAdapter.changeCursor(data);
 
             // scroll list to the saved position
-            listView.post(new Runnable() {
-                @Override
-                public void run() {
-                    listView.setSelection(listPosition);
-                }
-            });
+            listView.post(() -> listView.setSelection(listPosition));
         }
 
         @Override
@@ -460,57 +396,29 @@ public class ContactsFragment extends Fragment implements FragmentArguments {
     private void showAddContactsMenuDialog() {
         // create and show menu dialog for actions with the contact
         DialogBuilder dialog = new DialogBuilder(getContext());
-        dialog.setTitle(R.string.Add_contact).
-                addItem(R.string.From_contacts_list, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+        dialog.setTitle(R.string.Add_contact)
+                .addItem(R.string.From_contacts_list, v ->
                         showAddContactsActivity(Permissions.READ_CONTACTS,
-                                ContactSourceType.FROM_CONTACTS,
-                                R.string.List_of_contacts);
-                    }
-                }).
-                addItem(R.string.From_calls_list, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                                ContactSourceType.FROM_CONTACTS, R.string.List_of_contacts))
+                .addItem(R.string.From_calls_list, v ->
                         showAddContactsActivity(Permissions.READ_CALL_LOG,
-                                ContactSourceType.FROM_CALLS_LOG,
-                                R.string.List_of_calls);
-                    }
-                }).
-                addItem(R.string.From_SMS_list, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                                ContactSourceType.FROM_CALLS_LOG, R.string.List_of_calls))
+                .addItem(R.string.From_SMS_list, v ->
                         showAddContactsActivity(Permissions.READ_SMS,
-                                ContactSourceType.FROM_SMS_LIST,
-                                R.string.List_of_SMS);
-                    }
-                });
+                                ContactSourceType.FROM_SMS_LIST, R.string.List_of_SMS));
         if (contactType == Contact.TYPE_WHITE_LIST) {
-            dialog.addItem(R.string.From_Black_list, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            dialog.addItem(R.string.From_Black_list, v ->
                     showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
-                            ContactSourceType.FROM_BLACK_LIST,
-                            R.string.Black_list);
-                }
-            });
+                            ContactSourceType.FROM_BLACK_LIST, R.string.Black_list));
         } else {
-            dialog.addItem(R.string.From_White_list, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            dialog.addItem(R.string.From_White_list, v ->
                     showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
-                            ContactSourceType.FROM_WHITE_LIST,
-                            R.string.White_list);
-                }
-            });
+                            ContactSourceType.FROM_WHITE_LIST, R.string.White_list));
         }
-        dialog.addItem(R.string.Manually, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        dialog.addItem(R.string.Manually, v ->
                 showAddContactsActivity(Permissions.WRITE_EXTERNAL_STORAGE,
-                        null, R.string.Adding_contact);
-            }
-        }).show();
+                        null, R.string.Adding_contact))
+                .show();
     }
 
     // Shows activity of of contacts adding

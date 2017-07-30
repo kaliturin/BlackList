@@ -62,6 +62,7 @@ public class SMSSendHelper {
 
         // divide message into parts
         SmsManager smsManager = SmsManager.getDefault();
+        // FIXME: java.lang.SecurityException
         ArrayList<String> messageParts = smsManager.divideMessage(message);
 
         // create pending intents for each part of message
