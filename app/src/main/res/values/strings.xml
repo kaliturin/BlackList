@@ -81,7 +81,7 @@
     <string name="call_is_blocked">call is blocked</string>
     <string name="message_is_blocked">message is blocked</string>
     <string name="message_is_received">message is received</string>
-    <string name="Private">Private</string>
+    <string name="Private">Private number</string>
     <string name="Search_action">Search</string>
     <string name="Starts_with">Starts with:</string>
     <string name="Ends_with">Ends with:</string>

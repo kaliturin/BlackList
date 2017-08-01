@@ -97,16 +97,18 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         // Assume that all messages in array received at ones have the same data except of bodies.
         // So get just the first message to get the rest data.
         SmsMessage message = messages[0];
-        String number = message.getOriginatingAddress();
-        if (number == null) {
-            Log.w(TAG, "Received message address is null");
+        if (message == null) {
+            Log.w(TAG, "Received message is null");
             return null;
         }
-        // normalize number
-        number = ContactsAccessHelper.normalizePhoneNumber(number);
-        if (number.isEmpty()) {
-            Log.w(TAG, "Received message address is empty");
-            return null;
+        String number = message.getOriginatingAddress();
+        if (number != null) {
+            // normalize number
+            number = ContactsAccessHelper.normalizePhoneNumber(number);
+            if (number.isEmpty()) {
+                Log.w(TAG, "Received message address is empty");
+                return null;
+            }
         }
 
         Map<String, String> data = new HashMap<>();
@@ -131,13 +133,21 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         // private number detected
         if (isPrivateNumber(number)) {
+            String name = context.getString(R.string.Private);
+            data.put(ContactsAccessHelper.ADDRESS, name);
             // if block private numbers
-            if (Settings.getBooleanValue(context, Settings.BLOCK_PRIVATE_SMS)) {
-                String name = context.getString(R.string.Private);
+            if (Settings.getBooleanValue(context, Settings.BLOCK_PRIVATE_SMS) ||
+                    // or if block all SMS
+                    Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
                 // abort broadcast and notify user
                 abortSMSAndNotify(context, name, name, body);
                 return true;
             }
+            return false;
+        }
+
+        if (number == null) {
+            Log.w(TAG, "Received message address is null");
             return false;
         }
 

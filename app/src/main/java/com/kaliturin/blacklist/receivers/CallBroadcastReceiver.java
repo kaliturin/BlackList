@@ -44,6 +44,9 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
+
+        Log.w(TAG, "intent = " + intent.toString());
+
         if (!Permissions.isGranted(context, Permissions.READ_PHONE_STATE) ||
                 !Permissions.isGranted(context, Permissions.CALL_PHONE)) {
             return;
@@ -58,8 +61,22 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
 
         // get incoming call number
         String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+
+        // private number detected
+        if (isPrivateNumber(number)) {
+            // if block private numbers
+            if (Settings.getBooleanValue(context, Settings.BLOCK_PRIVATE_CALLS) ||
+                    // or if block all calls
+                    Settings.getBooleanValue(context, Settings.BLOCK_ALL_CALLS)) {
+                String name = context.getString(R.string.Private);
+                // break call and notify user
+                breakCallAndNotify(context, name, name);
+            }
+            return;
+        }
+
         if (number == null) {
-            Log.w(TAG, "Received call address is null");
+            Log.w(TAG, "Received call address is null/private");
             return;
         }
 
@@ -67,17 +84,6 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         number = ContactsAccessHelper.normalizePhoneNumber(number);
         if (number.isEmpty()) {
             Log.w(TAG, "Received call address is empty");
-            return;
-        }
-
-        // private number detected
-        if (isPrivateNumber(number)) {
-            // if block private numbers
-            if (Settings.getBooleanValue(context, Settings.BLOCK_PRIVATE_CALLS)) {
-                String name = context.getString(R.string.Private);
-                // break call and notify user
-                breakCallAndNotify(context, name, name);
-            }
             return;
         }
 
