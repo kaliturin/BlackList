@@ -236,8 +236,6 @@
         \n"https://github.com/kaliturin/blacklist"
     </string>
 
-    <string name="App_version">Версия программы</string>
-
     <string name="Author">Автор</string>
     <string name="Info_author">
         "Антон Калитурин (kaliturin@gmail.com)"
