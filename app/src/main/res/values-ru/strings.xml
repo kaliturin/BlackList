@@ -81,7 +81,7 @@
     <string name="call_is_blocked">звонок заблокирован</string>
     <string name="message_is_blocked">сообщение заблокировано</string>
     <string name="message_is_received">сообщение получено</string>
-    <string name="Private">Скрытый номер</string>
+    <string name="Private_number">Скрытый номер</string>
     <string name="Search_action">Поиск</string>
     <string name="Starts_with">Начинается на:</string>
     <string name="Ends_with">Заканчивается на:</string>

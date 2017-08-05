@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.SmsMessage;
 import android.util.Log;
@@ -102,14 +101,6 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             return null;
         }
         String number = message.getOriginatingAddress();
-        if (number != null) {
-            // normalize number
-            number = ContactsAccessHelper.normalizePhoneNumber(number);
-            if (number.isEmpty()) {
-                Log.w(TAG, "Received message address is empty");
-                return null;
-            }
-        }
 
         Map<String, String> data = new HashMap<>();
         data.put(ContactsAccessHelper.BODY, getSMSMessageBody(context, messages));
@@ -132,24 +123,29 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         String body = data.get(ContactsAccessHelper.BODY);
 
         // private number detected
-        if (isPrivateNumber(number)) {
-            String name = context.getString(R.string.Private);
-            data.put(ContactsAccessHelper.ADDRESS, name);
+        if (ContactsAccessHelper.isPrivatePhoneNumber(number)) {
+            String name = context.getString(R.string.Private_number);
+            data.put(ContactsAccessHelper.NAME, name);
             // if block private numbers
             if (Settings.getBooleanValue(context, Settings.BLOCK_PRIVATE_SMS) ||
                     // or if block all SMS
                     Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
                 // abort broadcast and notify user
-                abortSMSAndNotify(context, name, name, body);
+                abortSMSAndNotify(context, number, name, body);
                 return true;
             }
             return false;
         }
 
-        if (number == null) {
-            Log.w(TAG, "Received message address is null");
+        // normalize number
+        number = ContactsAccessHelper.normalizePhoneNumber(number);
+        if (number.isEmpty()) {
+            Log.w(TAG, "Received message address is empty");
             return false;
         }
+
+        // save normalized number
+        data.put(ContactsAccessHelper.ADDRESS, number);
 
         // get contacts linked to the number
         List<Contact> contacts = getContacts(context, number);
@@ -225,6 +221,13 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         return null;
     }
 
+    // Finds contacts by number
+    @Nullable
+    private List<Contact> getContacts(Context context, String number) {
+        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
+        return (db == null ? null : db.getContacts(number, false));
+    }
+
     // Extracts received SMS message from intent
     @SuppressWarnings("deprecation")
     private SmsMessage[] getSMSMessages(Intent intent) {
@@ -263,27 +266,8 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
         return body;
     }
 
-    // Returns true if number is private
-    private boolean isPrivateNumber(String number) {
-        try {
-            // private number detected
-            if (number == null || Long.valueOf(number) < 0) {
-                return true;
-            }
-        } catch (NumberFormatException ignored) {
-        }
-        return false;
-    }
-
-    // Finds contacts by number
-    @Nullable
-    private List<Contact> getContacts(Context context, String number) {
-        DatabaseAccessHelper db = DatabaseAccessHelper.getInstance(context);
-        return (db == null ? null : db.getContacts(number, false));
-    }
-
     // Aborts broadcast (if available) and notifies the user
-    private void abortSMSAndNotify(Context context, @NonNull String number, String name, String body) {
+    private void abortSMSAndNotify(Context context, String number, String name, String body) {
         // prevent placing this SMS to the inbox
         abortBroadcast();
         // process the event of blocking in the service

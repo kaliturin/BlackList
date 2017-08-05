@@ -19,7 +19,6 @@ package com.kaliturin.blacklist.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -44,9 +43,6 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-
-        Log.w(TAG, "intent = " + intent.toString());
-
         if (!Permissions.isGranted(context, Permissions.READ_PHONE_STATE) ||
                 !Permissions.isGranted(context, Permissions.CALL_PHONE)) {
             return;
@@ -63,20 +59,15 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
         // private number detected
-        if (isPrivateNumber(number)) {
+        if (ContactsAccessHelper.isPrivatePhoneNumber(number)) {
             // if block private numbers
             if (Settings.getBooleanValue(context, Settings.BLOCK_PRIVATE_CALLS) ||
                     // or if block all calls
                     Settings.getBooleanValue(context, Settings.BLOCK_ALL_CALLS)) {
-                String name = context.getString(R.string.Private);
+                String name = context.getString(R.string.Private_number);
                 // break call and notify user
-                breakCallAndNotify(context, name, name);
+                breakCallAndNotify(context, number, name);
             }
-            return;
-        }
-
-        if (number == null) {
-            Log.w(TAG, "Received call address is null/private");
             return;
         }
 
@@ -179,18 +170,6 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         return null;
     }
 
-    // Checks whether number is private
-    private boolean isPrivateNumber(String number) {
-        try {
-            // private number detected
-            if (number == null || Long.valueOf(number) < 0) {
-                return true;
-            }
-        } catch (NumberFormatException ignored) {
-        }
-        return false;
-    }
-
     // Finds contacts by number
     @Nullable
     private List<Contact> getContacts(Context context, String number) {
@@ -199,7 +178,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
     }
 
     // Breaks the call and notifies the user
-    private void breakCallAndNotify(Context context, @NonNull String number, String name) {
+    private void breakCallAndNotify(Context context, String number, String name) {
         // end phone call
         breakCall(context);
         // process the event of blocking in the service
