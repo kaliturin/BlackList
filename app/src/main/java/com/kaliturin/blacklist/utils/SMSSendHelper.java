@@ -19,13 +19,17 @@ package com.kaliturin.blacklist.utils;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.telephony.SmsManager;
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
 
 import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver.SMS_DELIVERY;
 import static com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver.SMS_SENT;
@@ -61,7 +65,7 @@ public class SMSSendHelper {
         long messageId = writeSMSMessageToOutbox(context, phoneNumber, message);
 
         // divide message into parts
-        SmsManager smsManager = SmsManager.getDefault();
+        SmsManager smsManager = getSmsManager(context);
         ArrayList<String> messageParts = smsManager.divideMessage(message);
 
         // create pending intents for each part of message
@@ -124,5 +128,26 @@ public class SMSSendHelper {
         intent.putExtra(DELIVERY, delivery);
 
         return PendingIntent.getBroadcast(context, intent.hashCode(), intent, 0);
+    }
+
+    // Returns current SmsManager
+    private SmsManager getSmsManager(Context context) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            int subscriptionId = 0;
+            try {
+                subscriptionId = Integer.valueOf(Settings.getStringValue(context, Settings.SIM_SUBSCRIPTION_ID));
+            } catch (NumberFormatException ignored) {
+                Settings.setStringValue(context, Settings.SIM_SUBSCRIPTION_ID, "0");
+            }
+
+            SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
+            List<SubscriptionInfo> list = subscriptionManager.getActiveSubscriptionInfoList();
+            for(SubscriptionInfo info : list) {
+                if(subscriptionId == info.getSubscriptionId()) {
+                    return SmsManager.getSmsManagerForSubscriptionId(subscriptionId);
+                }
+            }
+        }
+        return SmsManager.getDefault();
     }
 }

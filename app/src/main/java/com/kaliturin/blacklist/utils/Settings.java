@@ -62,6 +62,7 @@ public class Settings {
     public static final String DEFAULT_SMS_APP_NATIVE_PACKAGE = "DEFAULT_SMS_APP_NATIVE_PACKAGE";
     public static final String DONT_EXIT_ON_BACK_PRESSED = "DONT_EXIT_ON_BACK_PRESSED";
     public static final String REMOVE_FROM_CALL_LOG = "REMOVE_FROM_CALL_LOG";
+    public static final String SIM_SUBSCRIPTION_ID = "SIM_SUBSCRIPTION";
 
     private static final String TRUE = "TRUE";
     private static final String FALSE = "FALSE";
@@ -135,6 +136,7 @@ public class Settings {
         map.put(GO_TO_JOURNAL_AT_START, FALSE);
         map.put(DONT_EXIT_ON_BACK_PRESSED, FALSE);
         map.put(REMOVE_FROM_CALL_LOG, FALSE);
+        map.put(SIM_SUBSCRIPTION_ID, "0");
 
         if (!Permissions.isGranted(context, Permissions.WRITE_EXTERNAL_STORAGE)) {
             settingsMap = new ConcurrentHashMap<>(map);
