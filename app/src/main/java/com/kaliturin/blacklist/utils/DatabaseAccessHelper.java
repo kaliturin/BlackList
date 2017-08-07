@@ -371,6 +371,9 @@ public class DatabaseAccessHelper extends SQLiteOpenHelper {
     // Writes journal record
     public long addJournalRecord(long time, @NonNull String caller,
                                  String number, String text) {
+        if (number != null && number.equals(caller)) {
+            number = null;
+        }
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(JournalTable.Column.TIME, time);

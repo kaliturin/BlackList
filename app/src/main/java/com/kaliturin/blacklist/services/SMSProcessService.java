@@ -38,6 +38,7 @@ public class SMSProcessService extends IntentService {
     private static final String TAG = SMSProcessService.class.getName();
     private static final String KEYS = "KEYS";
     private static final String VALUES = "VALUES";
+    private static final String PRIVATE_NUMBER = "-2";
 
     public SMSProcessService() {
         super(SMSProcessService.class.getName());
@@ -53,10 +54,14 @@ public class SMSProcessService extends IntentService {
         }
     }
 
-    private void processMessageData(Context context, Map<String, String> data) throws IllegalArgumentException {
-        String address = data.get(ContactsAccessHelper.ADDRESS);
-        if (address == null || address.isEmpty()) {
-            throw new IllegalArgumentException("Message address is null or empty");
+    private void processMessageData(Context context, Map<String, String> data) {
+        String number = data.get(ContactsAccessHelper.ADDRESS);
+
+        boolean isPrivate = ContactsAccessHelper.isPrivatePhoneNumber(number);
+        if (isPrivate) {
+            // TODO: consider to use real number
+            number = PRIVATE_NUMBER;
+            data.put(ContactsAccessHelper.ADDRESS, number);
         }
 
         // if before API 19
@@ -69,20 +74,27 @@ public class SMSProcessService extends IntentService {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {
             }
+            // FIXME: showing private numbers isn't valid
             // inform internal receivers
-            InternalEventBroadcast.sendSMSWasWritten(context, address);
+            InternalEventBroadcast.sendSMSWasWritten(context, number);
             return;
         }
 
         ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
-        // get contact by number
-        DatabaseAccessHelper.Contact contact = db.getContact(context, address);
+        DatabaseAccessHelper.Contact contact = null;
+        if (!isPrivate) {
+            // get contact by number
+            contact = db.getContact(context, number);
+        }
         // write message to the inbox
         if (db.writeSMSMessageToInbox(context, contact, data)) {
             // send broadcast event
-            InternalEventBroadcast.sendSMSWasWritten(context, address);
+            InternalEventBroadcast.sendSMSWasWritten(context, number);
             // get name for notification
-            String name = (contact == null ? address : contact.name);
+            String name = data.get(ContactsAccessHelper.NAME);
+            if (name == null) {
+                name = (contact == null ? number : contact.name);
+            }
             // notify user
             String body = data.get(ContactsAccessHelper.BODY);
             Notifications.onSmsReceived(context, name, body);

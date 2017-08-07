@@ -81,7 +81,7 @@
     <string name="call_is_blocked">call is blocked</string>
     <string name="message_is_blocked">message is blocked</string>
     <string name="message_is_received">message is received</string>
-    <string name="Private">Private</string>
+    <string name="Private_number">Private number</string>
     <string name="Search_action">Search</string>
     <string name="Starts_with">Starts with:</string>
     <string name="Ends_with">Ends with:</string>
@@ -231,8 +231,6 @@
         \nThe source code of the application:
         \n"http://github.com/kaliturin/blacklist"
     </string>
-
-    <string name="App_version">Application version</string>
 
     <string name="Author">Author</string>
     <string name="Info_author">

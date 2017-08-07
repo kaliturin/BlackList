@@ -253,22 +253,6 @@ public class ContactsAccessHelper {
         }
     }
 
-    // For the sake of performance we don't use comprehensive phone number pattern.
-    // We just want to detect whether a phone number is digital but not symbolic.
-    private static final Pattern digitalPhoneNumberPattern = Pattern.compile("[+]?[0-9-() ]+");
-    // Is used for normalizing a phone number, removing from it brackets, dashes and spaces.
-    private static final Pattern normalizePhoneNumberPattern = Pattern.compile("[-() ]");
-
-    // If passed phone number is digital and not symbolic then normalizes
-    // it, removing brackets, dashes and spaces.
-    public static String normalizePhoneNumber(String number) {
-        number = number.trim();
-        if (digitalPhoneNumberPattern.matcher(number).matches()) {
-            number = normalizePhoneNumberPattern.matcher(number).replaceAll("");
-        }
-        return number;
-    }
-
     // Contact's number cursor wrapper
     private static class ContactNumberCursorWrapper extends CursorWrapper {
         private final int NUMBER;
@@ -324,6 +308,7 @@ public class ContactsAccessHelper {
     public static final String DELIVERY_DATE = "delivery_date";
     public static final String THREAD_ID = "thread_id";
     public static final String MSG_COUNT = "msg_count";
+    public static final String NAME = "name";
 
 //-------------------------------------------------------------------------------------
 
@@ -456,6 +441,8 @@ public class ContactsAccessHelper {
                 new String[]{Calls._ID, Calls.NUMBER, Calls.CACHED_NAME},
                 Calls.NUMBER + " IS NOT NULL AND (" +
                         Calls.CACHED_NAME + " IS NULL AND " +
+                        // leave out private numbers
+                        Calls.NUMBER + " NOT LIKE '-%' AND " +
                         Calls.NUMBER + " LIKE ? OR " +
                         Calls.CACHED_NAME + " LIKE ? )",
                 new String[]{filter, filter},
@@ -551,8 +538,7 @@ public class ContactsAccessHelper {
         Cursor cursor = contentResolver.query(
                 URI_CONTENT_CALLS,
                 new String[]{Calls._ID, Calls.NUMBER},
-                Calls.NUMBER + " IS NOT NULL AND " +
-                        Calls.DATE + " > ? ",
+                Calls.DATE + " > ? ",
                 new String[]{String.valueOf(time)},
                 Calls.DATE + " DESC");
 
@@ -561,13 +547,27 @@ public class ContactsAccessHelper {
             cursor.moveToFirst();
             final int ID = cursor.getColumnIndex(Calls._ID);
             final int NUMBER = cursor.getColumnIndex(Calls.NUMBER);
-            // get first equal
+            boolean isPrivate = isPrivatePhoneNumber(number);
+
+            // get the first equal
             do {
                 String _number = cursor.getString(NUMBER);
-                _number = normalizePhoneNumber(_number);
-                if (_number.equals(number)) {
-                    id = cursor.getLong(ID);
-                    break;
+
+                if (isPrivate) {
+                    // searching for private number
+                    if (isPrivatePhoneNumber(_number)) {
+                        id = cursor.getLong(ID);
+                        break;
+                    }
+                } else {
+                    // searching for normal number
+                    if (_number != null) {
+                        _number = normalizePhoneNumber(_number);
+                        if (_number.equals(number)) {
+                            id = cursor.getLong(ID);
+                            break;
+                        }
+                    }
                 }
             } while (cursor.moveToNext());
             cursor.close();
@@ -950,7 +950,7 @@ public class ContactsAccessHelper {
     // Writes SMS message to the Inbox. This method is needed only since API19 -
     // where only default SMS app can write to the content resolver.
     @TargetApi(19)
-    public boolean writeSMSMessageToInbox(Context context, Contact contact, Map<String, String> data) {
+    public boolean writeSMSMessageToInbox(Context context, @Nullable Contact contact, Map<String, String> data) {
         if (!Permissions.isGranted(context, Permissions.WRITE_SMS)) {
             return false;
         }
@@ -1091,6 +1091,43 @@ public class ContactsAccessHelper {
         }
 
         return set;
+    }
+
+//---------------------------------------------------------------------
+
+    // For the sake of performance we don't use comprehensive phone number pattern.
+    // We just want to detect whether a phone number is digital but not symbolic.
+    private static final Pattern digitalPhoneNumberPattern = Pattern.compile("[+]?[0-9-() ]+");
+    // Is used for normalizing a phone number, removing from it brackets, dashes and spaces.
+    private static final Pattern normalizePhoneNumberPattern = Pattern.compile("[-() ]");
+
+    /**
+     * If passed phone number is digital and not symbolic then normalizes
+     * it, removing brackets, dashes and spaces.
+     */
+    public static String normalizePhoneNumber(@NonNull String number) {
+        number = number.trim();
+        if (digitalPhoneNumberPattern.matcher(number).matches()) {
+            number = normalizePhoneNumberPattern.matcher(number).replaceAll("");
+        }
+        return number;
+    }
+
+    /**
+     * Checks whether passed phone number is private
+     */
+    public static boolean isPrivatePhoneNumber(@Nullable String number) {
+        try {
+            if (number == null) {
+                return true;
+            }
+            number = number.trim();
+            if (number.isEmpty() || Long.valueOf(number) < 0) {
+                return true;
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        return false;
     }
 
 //---------------------------------------------------------------------

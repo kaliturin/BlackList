@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.kaliturin.blacklist.utils.ContactsAccessHelper;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -22,5 +24,30 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("com.kaliturin.blacklist", appContext.getPackageName());
+    }
+
+    @Test
+    public void privatePhoneNumber() throws Exception {
+        String[] privateNumbers = {null, "-1", "-2", " -3", " -4\n", " ", "\n", "\t", ""};
+        for (String number : privateNumbers) {
+            assertTrue("number = {" + number + "} is not private", ContactsAccessHelper.isPrivatePhoneNumber(number));
+        }
+
+        String[] normalNumbers = {"-2-2", "-2 -2", "+01234567890", "+0 123 456 78 90", "0 123 456 78 90",
+                "(123) 456 78 90", "(123)-456-78-90", "0 (123)-456-78-90", "-4 (123)-456-78-90"};
+        for (String number : normalNumbers) {
+            assertFalse("number = {" + number + "} is private", ContactsAccessHelper.isPrivatePhoneNumber(number));
+        }
+    }
+
+    @Test
+    public void normalizePhoneNumber() throws Exception {
+        String normalizedNumber = "+01234567890";
+        String[] notNormalizedNumbers = {"+0 123 456 78 90", "+0 (123) 456-78-90", "+0-123-456-78-90",
+                "+ 0 (123) 456 78 90", " +0 123 456 78-90 ", "\n+ 0123 456 78 90\n"};
+        for (String number : notNormalizedNumbers) {
+            assertEquals("number = {" + number + "} cannot be normalized", normalizedNumber,
+                    ContactsAccessHelper.normalizePhoneNumber(number));
+        }
     }
 }

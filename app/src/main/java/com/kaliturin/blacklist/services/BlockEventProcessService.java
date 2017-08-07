@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
@@ -33,6 +34,8 @@ import com.kaliturin.blacklist.utils.Settings;
  * SMS/Call blocking events processing service
  */
 public class BlockEventProcessService extends IntentService {
+    private static final String TAG = BlockEventProcessService.class.getName();
+
     private static final String NUMBER = "NUMBER";
     private static final String NAME = "NAME";
     private static final String BODY = "BODY";
@@ -45,9 +48,6 @@ public class BlockEventProcessService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null) {
             String number = intent.getStringExtra(NUMBER);
-            if (number == null) {
-                return;
-            }
             String name = intent.getStringExtra(NAME);
             String body = intent.getStringExtra(BODY);
             processEvent(this, number, name, body);
@@ -55,7 +55,13 @@ public class BlockEventProcessService extends IntentService {
     }
 
     // Processes the event
-    private void processEvent(Context context, @NonNull String number, String name, String body) {
+    private void processEvent(Context context, String number, String name, String body) {
+        // everything can't be null
+        if (name == null && number == null) {
+            Log.w(TAG, "number and name can't be null");
+            return;
+        }
+
         if (name == null) {
             // get name from the contacts
             ContactsAccessHelper db = ContactsAccessHelper.getInstance(context);
@@ -66,12 +72,12 @@ public class BlockEventProcessService extends IntentService {
         // write to the journal
         writeToJournal(context, number, name, body);
 
-        // if no body - there was a call
+        // if there is no body - there was a call
         if (body == null) {
             // notify the user
             Notifications.onCallBlocked(context, name);
             // remove the last call from the log
-            if(Settings.getBooleanValue(context, Settings.REMOVE_FROM_CALL_LOG)) {
+            if (Settings.getBooleanValue(context, Settings.REMOVE_FROM_CALL_LOG)) {
                 removeFromCallLog(context, number);
             }
         } else {
@@ -81,8 +87,8 @@ public class BlockEventProcessService extends IntentService {
     }
 
     // Writes record to the journal
-    private void writeToJournal(Context context, String number, String name, String body) {
-        if (number.equals(name)) {
+    private void writeToJournal(Context context, String number, @NonNull String name, String body) {
+        if (ContactsAccessHelper.isPrivatePhoneNumber(number)) {
             number = null;
         }
         long time = System.currentTimeMillis();
@@ -106,7 +112,7 @@ public class BlockEventProcessService extends IntentService {
     }
 
     // Starts the service
-    public static void start(Context context, @NonNull String number, String name, String body) {
+    public static void start(Context context, String number, String name, String body) {
         Intent intent = new Intent(context, BlockEventProcessService.class);
         intent.putExtra(NUMBER, number);
         intent.putExtra(NAME, name);

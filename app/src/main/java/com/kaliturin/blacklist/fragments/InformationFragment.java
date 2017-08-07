@@ -77,7 +77,7 @@ public class InformationFragment extends Fragment implements FragmentArguments {
         InformationArrayAdapter adapter = new InformationArrayAdapter(getContext());
 
         adapter.addTitle(R.string.About);
-        String title = getString(R.string.app_name) + " (v" + getAppVersion() + ")";
+        String title = getString(R.string.app_name) + " (" + getAppVersion() + ")";
         adapter.addText(title, getString(R.string.Info_about));
 
         adapter.addTitle(R.string.Attention);
