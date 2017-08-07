@@ -161,6 +161,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
 
         // get name of contact
         String name = (contacts.size() > 0 ? contacts.get(0).name : null);
+        //data.put(ContactsAccessHelper.NAME, name);
 
         // if block all SMS (excluding the white list)
         if (Settings.getBooleanValue(context, Settings.BLOCK_ALL_SMS)) {
