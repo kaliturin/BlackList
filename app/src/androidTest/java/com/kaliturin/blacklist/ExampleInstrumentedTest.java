@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.telephony.SmsManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.util.Log;
@@ -16,7 +15,9 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -64,13 +65,14 @@ public class ExampleInstrumentedTest {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
             List<SubscriptionInfo> list = subscriptionManager.getActiveSubscriptionInfoList();
-            int subscriptionId = -1;
-            for (SubscriptionInfo info : list) {
-                Log.d("TEST_SmsSubManager", info.toString());
-                subscriptionId = info.getSubscriptionId();
+            if (list != null) {
+                int subscriptionId = -1;
+                for (SubscriptionInfo info : list) {
+                    Log.d("TEST_SmsManager", info.toString());
+                    subscriptionId = info.getSubscriptionId();
+                }
+                assertTrue(subscriptionId >= 0);
             }
-
-            assertTrue(subscriptionId >= 0);
         }
     }
 }

@@ -132,7 +132,7 @@ public class SMSSendHelper {
 
     // Returns current SmsManager
     private SmsManager getSmsManager(Context context) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             int subscriptionId = 0;
             try {
                 subscriptionId = Integer.valueOf(Settings.getStringValue(context, Settings.SIM_SUBSCRIPTION_ID));
@@ -142,9 +142,11 @@ public class SMSSendHelper {
 
             SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
             List<SubscriptionInfo> list = subscriptionManager.getActiveSubscriptionInfoList();
-            for(SubscriptionInfo info : list) {
-                if(subscriptionId == info.getSubscriptionId()) {
-                    return SmsManager.getSmsManagerForSubscriptionId(subscriptionId);
+            if (list != null) {
+                for (SubscriptionInfo info : list) {
+                    if (subscriptionId == info.getSubscriptionId()) {
+                        return SmsManager.getSmsManagerForSubscriptionId(subscriptionId);
+                    }
                 }
             }
         }
