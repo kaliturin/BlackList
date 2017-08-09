@@ -9,6 +9,7 @@ import android.telephony.SubscriptionManager;
 import android.util.Log;
 
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
+import com.kaliturin.blacklist.utils.SubscriptionHelper;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,8 +64,7 @@ public class ExampleInstrumentedTest {
     public void smsSubscriptionManager() throws Exception {
         Context context = InstrumentationRegistry.getTargetContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
-            List<SubscriptionInfo> list = subscriptionManager.getActiveSubscriptionInfoList();
+            List<SubscriptionInfo> list = SubscriptionHelper.getSubscriptions(context);
             if (list != null) {
                 int subscriptionId = -1;
                 for (SubscriptionInfo info : list) {

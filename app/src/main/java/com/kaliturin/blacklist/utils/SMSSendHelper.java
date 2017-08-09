@@ -21,10 +21,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.telephony.SmsManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 
+import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver;
 
@@ -133,23 +135,13 @@ public class SMSSendHelper {
     // Returns current SmsManager
     private SmsManager getSmsManager(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            int subscriptionId = 0;
-            try {
-                subscriptionId = Integer.valueOf(Settings.getStringValue(context, Settings.SIM_SUBSCRIPTION_ID));
-            } catch (NumberFormatException ignored) {
-                Settings.setStringValue(context, Settings.SIM_SUBSCRIPTION_ID, "0");
-            }
-
-            SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
-            List<SubscriptionInfo> list = subscriptionManager.getActiveSubscriptionInfoList();
-            if (list != null) {
-                for (SubscriptionInfo info : list) {
-                    if (subscriptionId == info.getSubscriptionId()) {
-                        return SmsManager.getSmsManagerForSubscriptionId(subscriptionId);
-                    }
-                }
+            Integer subscriptionId = SubscriptionHelper.getCurrentSubscriptionId(context);
+            if (subscriptionId != null) {
+                return SmsManager.getSmsManagerForSubscriptionId(subscriptionId);
             }
         }
+
         return SmsManager.getDefault();
     }
+
 }

@@ -49,7 +49,7 @@
     <string name="SMS_blocking">SMS blocking</string>
     <string name="SMS_blocking_notification">SMS blocking notification</string>
     <string name="SMS_sending">SMS sending</string>
-    <string name="SMS_receiving_notification">SMS receiving notification</string>
+    <string name="SMS_common">SMS common</string>
     <string name="From_contacts_list">From the Contact list</string>
     <string name="From_calls_list">From the Call log</string>
     <string name="From_SMS_list">From the SMS list</string>
@@ -148,8 +148,10 @@
     <string name="Back_button">\"Back\" button</string>
     <string name="Sending_">Sending...</string>
     <string name="Not_sent">Not sent</string>
-    <string name="To_block_SMS_set_def_app">To block SMS-messages set as \"Default SMS-app\" in the Settings
-    </string>
+    <string name="To_block_SMS_set_def_app">To block SMS-messages set as \"Default SMS-app\" in the Settings</string>
+    <string name="By_default">By default</string>
+    <string name="Choose_SIM">Choose a SIM-card</string>
+    <string name="Chosen_SIM">Chosen SIM-card</string>
 
     <string name="About">About</string>
     <string name="Info_about">

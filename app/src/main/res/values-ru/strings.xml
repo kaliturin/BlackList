@@ -49,7 +49,7 @@
     <string name="SMS_blocking">СМС - блокировка</string>
     <string name="SMS_blocking_notification">СМС - уведомления о блокировке</string>
     <string name="SMS_sending">СМС - отправка</string>
-    <string name="SMS_receiving_notification">СМС - уведомления о получении</string>
+    <string name="SMS_common">СМС - общее</string>
     <string name="From_contacts_list">Из списка Контактов</string>
     <string name="From_calls_list">Из списка Вызовов</string>
     <string name="From_SMS_list">Из списка СМС</string>
@@ -150,8 +150,10 @@
     <string name="Sending_">Отправка...</string>
     <string name="Not_sent">Не отправлено</string>
     <string name="To_block_SMS_set_def_app">Для блокировки СМС-сообщений установите
-        \"СМС-приложение по умолчанию\" в Настройках программы
-    </string>
+        \"СМС-приложение по умолчанию\" в Настройках программы</string>
+    <string name="By_default">По умолчанию</string>
+    <string name="Choose_SIM">Выберите СИМ-карту</string>
+    <string name="Chosen_SIM">Выбранная СИМ-карта</string>
 
     <string name="About">О приложении</string>
     <string name="Info_about">
