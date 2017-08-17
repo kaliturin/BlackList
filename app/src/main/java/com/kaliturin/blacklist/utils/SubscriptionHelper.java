@@ -30,6 +30,10 @@ import java.util.List;
 
 public class SubscriptionHelper {
 
+    public static boolean isAvailable() {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
+
     @Nullable
     public static List<SubscriptionInfo> getSubscriptions(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {

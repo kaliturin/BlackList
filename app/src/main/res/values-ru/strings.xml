@@ -48,8 +48,7 @@
     <string name="Write_SMS_to_journal">Вести Журнал заблокированных СМС</string>
     <string name="SMS_blocking">СМС - блокировка</string>
     <string name="SMS_blocking_notification">СМС - уведомления о блокировке</string>
-    <string name="SMS_sending">СМС - отправка</string>
-    <string name="SMS_common">СМС - общее</string>
+    <string name="SMS_messaging">СМС - обмен</string>
     <string name="From_contacts_list">Из списка Контактов</string>
     <string name="From_calls_list">Из списка Вызовов</string>
     <string name="From_SMS_list">Из списка СМС</string>

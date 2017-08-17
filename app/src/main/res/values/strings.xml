@@ -48,8 +48,7 @@
     <string name="Write_SMS_to_journal">Write blocked SMS to the Event log</string>
     <string name="SMS_blocking">SMS blocking</string>
     <string name="SMS_blocking_notification">SMS blocking notification</string>
-    <string name="SMS_sending">SMS sending</string>
-    <string name="SMS_common">SMS common</string>
+    <string name="SMS_messaging">SMS messaging</string>
     <string name="From_contacts_list">From the Contact list</string>
     <string name="From_calls_list">From the Call log</string>
     <string name="From_SMS_list">From the SMS list</string>
