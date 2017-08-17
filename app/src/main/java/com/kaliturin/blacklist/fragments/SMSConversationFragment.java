@@ -409,7 +409,8 @@ public class SMSConversationFragment extends Fragment implements FragmentArgumen
 
     // Sends SMS message
     boolean sendSMSMessage() {
-        if (Permissions.notifyIfNotGranted(getContext(), Permissions.SEND_SMS)) {
+        if (Permissions.notifyIfNotGranted(getContext(), Permissions.SEND_SMS) ||
+                Permissions.notifyIfNotGranted(getContext(), Permissions.READ_PHONE_STATE)) {
             return false;
         }
 

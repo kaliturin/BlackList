@@ -176,6 +176,23 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                     });
         }
 
+        if (SubscriptionHelper.isAvailable()) {
+            // SIM-card
+            adapter.addTitle(R.string.SIM_card);
+            adapter.addButton(getString(R.string.Chosen_SIM), getCurrentSimName(),
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // check permissions
+                            if (Permissions.notifyIfNotGranted(getContext(), Permissions.READ_PHONE_STATE)) {
+                                return;
+                            }
+                            // open the dialog of SIM choosing
+                            showSimChoosingDialog();
+                        }
+                    });
+        }
+
         if (isDefaultSmsApp) {
             // sms blocking settings
             adapter.addTitle(R.string.SMS_blocking);
@@ -202,21 +219,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         }
 
         // sms receiving/sending
-        adapter.addTitle(R.string.SMS_messaging);
-        if(SubscriptionHelper.isAvailable()) {
-            adapter.addButton(getString(R.string.Chosen_SIM), getCurrentSimName(),
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // check permissions
-                            if (Permissions.notifyIfNotGranted(getContext(), Permissions.READ_PHONE_STATE)) {
-                                return;
-                            }
-                            // open the dialog of SIM choosing
-                            showSimChoosingDialog();
-                        }
-                    });
-        }
+        adapter.addTitle(R.string.SMS_receiving_notification);
         adapter.addCheckbox(R.string.Sound, R.string.Notify_with_sound_received_SMS,
                 Settings.RECEIVED_SMS_SOUND_NOTIFICATION, new RingtonePickerOnClickListener(RECEIVED_SMS));
         adapter.addCheckbox(R.string.Vibration, R.string.Notify_with_vibration_received_SMS,

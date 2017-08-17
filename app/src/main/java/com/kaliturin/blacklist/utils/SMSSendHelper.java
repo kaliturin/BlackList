@@ -21,23 +21,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.telephony.SmsManager;
-import android.telephony.SubscriptionInfo;
-import android.telephony.SubscriptionManager;
 
-import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.receivers.InternalEventBroadcast;
 import com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver.SMS_DELIVERY;
 import static com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver.SMS_SENT;
 
 /**
- * Sends SMS and processes the results of sending
+ * Sends SMS and processes the results of sending.
+ * Requires android.permission.READ_PHONE_STATE and android.permission.SEND_SMS.
  */
 
 public class SMSSendHelper {

@@ -48,7 +48,7 @@
     <string name="Write_SMS_to_journal">Write blocked SMS to the Event log</string>
     <string name="SMS_blocking">SMS blocking</string>
     <string name="SMS_blocking_notification">SMS blocking notification</string>
-    <string name="SMS_messaging">SMS messaging</string>
+    <string name="SMS_receiving_notification">SMS receiving notification</string>
     <string name="From_contacts_list">From the Contact list</string>
     <string name="From_calls_list">From the Call log</string>
     <string name="From_SMS_list">From the SMS list</string>
@@ -151,6 +151,7 @@
     <string name="By_default">By default</string>
     <string name="Choose_SIM">Choose a SIM-card</string>
     <string name="Chosen_SIM">Chosen SIM-card</string>
+    <string name="SIM_card">SIM-card</string>
 
     <string name="About">About</string>
     <string name="Info_about">

@@ -48,7 +48,7 @@
     <string name="Write_SMS_to_journal">Вести Журнал заблокированных СМС</string>
     <string name="SMS_blocking">СМС - блокировка</string>
     <string name="SMS_blocking_notification">СМС - уведомления о блокировке</string>
-    <string name="SMS_messaging">СМС - обмен</string>
+    <string name="SMS_receiving_notification">СМС - уведомления о получении</string>
     <string name="From_contacts_list">Из списка Контактов</string>
     <string name="From_calls_list">Из списка Вызовов</string>
     <string name="From_SMS_list">Из списка СМС</string>
@@ -153,6 +153,7 @@
     <string name="By_default">По умолчанию</string>
     <string name="Choose_SIM">Выберите СИМ-карту</string>
     <string name="Chosen_SIM">Выбранная СИМ-карта</string>
+    <string name="SIM_card">СИМ-карта</string>
 
     <string name="About">О приложении</string>
     <string name="Info_about">

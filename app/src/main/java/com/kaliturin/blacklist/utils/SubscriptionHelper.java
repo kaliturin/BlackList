@@ -25,7 +25,8 @@ import android.telephony.SubscriptionManager;
 import java.util.List;
 
 /**
- * Subscriptions helper (see SubscriptionManager)
+ * Subscriptions helper (see SubscriptionManager).
+ * Requires android.permission.READ_PHONE_STATE.
  */
 
 public class SubscriptionHelper {
