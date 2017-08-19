@@ -138,7 +138,11 @@ public class SettingsArrayAdapter extends ArrayAdapter<SettingsArrayAdapter.Mode
     }
 
     public void addButton(@StringRes int titleId, @StringRes int commentId, View.OnClickListener listener) {
-        addModel(Model.BUTTON, getString(titleId), getString(commentId), null, false, listener);
+        addButton(getString(titleId), getString(commentId), listener);
+    }
+
+    public void addButton(String title, String comment, View.OnClickListener listener) {
+        addModel(Model.BUTTON, title, comment, null, false, listener);
     }
 
     @Nullable

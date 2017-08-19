@@ -31,6 +31,7 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.SubscriptionInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,9 +49,11 @@ import com.kaliturin.blacklist.utils.DefaultSMSAppHelper;
 import com.kaliturin.blacklist.utils.DialogBuilder;
 import com.kaliturin.blacklist.utils.Permissions;
 import com.kaliturin.blacklist.utils.Settings;
+import com.kaliturin.blacklist.utils.SubscriptionHelper;
 import com.kaliturin.blacklist.utils.Utils;
 
 import java.io.File;
+import java.util.List;
 
 
 /**
@@ -129,8 +132,7 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                     Permissions.invalidateCache();
                 }
                 // reload list
-                listPosition = listView.getFirstVisiblePosition();
-                loadListViewItems(listPosition);
+                reloadListViewItems();
                 break;
             // ringtone picker dialog results
             default:
@@ -145,7 +147,13 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         }
     }
 
-    // Loads settings list view
+    // Reloads the Settings list
+    private void reloadListViewItems() {
+        listPosition = listView.getFirstVisiblePosition();
+        loadListViewItems(listPosition);
+    }
+
+    // Loads the Settings list
     private void loadListViewItems(final int listPosition) {
         // Create list adapter and fill it with data
         adapter = new SettingsArrayAdapter(getContext());
@@ -164,6 +172,23 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
                         public void onClick(View v) {
                             DefaultSMSAppHelper.askForDefaultAppChange(
                                     SettingsFragment.this, DEFAULT_SMS_APP);
+                        }
+                    });
+        }
+
+        if (SubscriptionHelper.isAvailable()) {
+            // SIM-card
+            adapter.addTitle(R.string.SIM_card);
+            adapter.addButton(getString(R.string.Chosen_SIM), getCurrentSimName(),
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // check permissions
+                            if (Permissions.notifyIfNotGranted(getContext(), Permissions.READ_PHONE_STATE)) {
+                                return;
+                            }
+                            // open the dialog of SIM choosing
+                            showSimChoosingDialog();
                         }
                     });
         }
@@ -528,5 +553,45 @@ public class SettingsFragment extends Fragment implements FragmentArguments {
         intent.putExtra(LIST_POSITION, listView.getFirstVisiblePosition());
         startActivity(intent);
         getActivity().finish();
+    }
+
+    // Returns the name of the current chosen SIM-card
+    private String getCurrentSimName() {
+        String name = SubscriptionHelper.getCurrentSubscriptionName(getContext());
+        return name == null ? getString(R.string.By_default) : name;
+    }
+
+    // Shows dialog of SIM choosing
+    private void showSimChoosingDialog() {
+        // create and show menu dialog for actions with the contact
+        DialogBuilder dialog = new DialogBuilder(getContext());
+        dialog.setTitle(R.string.Choose_SIM);
+
+        List<SubscriptionInfo> list = SubscriptionHelper.getSubscriptions(getContext());
+        if (list != null) {
+            for (SubscriptionInfo info : list) {
+                String name = SubscriptionHelper.getName(info);
+                if (name != null) {
+                    dialog.addItem(0, name, info, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            SubscriptionInfo info2 = (SubscriptionInfo) v.getTag();
+                            Integer id = SubscriptionHelper.getId(info2);
+                            if (id != null) {
+                                Settings.setIntegerValue(getContext(), Settings.SIM_SUBSCRIPTION_ID, id);
+                                reloadListViewItems();
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        dialog.addItem(R.string.By_default, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Settings.setIntegerValue(getContext(), Settings.SIM_SUBSCRIPTION_ID, -1);
+                reloadListViewItems();
+            }
+        }).show();
     }
 }

@@ -1,15 +1,24 @@
 package com.kaliturin.blacklist;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
+import android.util.Log;
 
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
+import com.kaliturin.blacklist.utils.SubscriptionHelper;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -48,6 +57,22 @@ public class ExampleInstrumentedTest {
         for (String number : notNormalizedNumbers) {
             assertEquals("number = {" + number + "} cannot be normalized", normalizedNumber,
                     ContactsAccessHelper.normalizePhoneNumber(number));
+        }
+    }
+
+    @Test
+    public void smsSubscriptionManager() throws Exception {
+        Context context = InstrumentationRegistry.getTargetContext();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            List<SubscriptionInfo> list = SubscriptionHelper.getSubscriptions(context);
+            if (list != null) {
+                int subscriptionId = -1;
+                for (SubscriptionInfo info : list) {
+                    Log.d("TEST_SmsManager", info.toString());
+                    subscriptionId = info.getSubscriptionId();
+                }
+                assertTrue(subscriptionId >= 0);
+            }
         }
     }
 }

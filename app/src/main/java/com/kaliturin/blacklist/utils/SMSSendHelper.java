@@ -19,6 +19,7 @@ package com.kaliturin.blacklist.utils;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.telephony.SmsManager;
 
@@ -31,7 +32,8 @@ import static com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver.S
 import static com.kaliturin.blacklist.receivers.SMSSendResultBroadcastReceiver.SMS_SENT;
 
 /**
- * Sends SMS and processes the results of sending
+ * Sends SMS and processes the results of sending.
+ * Requires android.permission.READ_PHONE_STATE and android.permission.SEND_SMS.
  */
 
 public class SMSSendHelper {
@@ -61,7 +63,7 @@ public class SMSSendHelper {
         long messageId = writeSMSMessageToOutbox(context, phoneNumber, message);
 
         // divide message into parts
-        SmsManager smsManager = SmsManager.getDefault();
+        SmsManager smsManager = getSmsManager(context);
         // FIXME: java.lang.SecurityException
         ArrayList<String> messageParts = smsManager.divideMessage(message);
 
@@ -125,5 +127,17 @@ public class SMSSendHelper {
         intent.putExtra(DELIVERY, delivery);
 
         return PendingIntent.getBroadcast(context, intent.hashCode(), intent, 0);
+    }
+
+    // Returns current SmsManager
+    private SmsManager getSmsManager(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            Integer subscriptionId = SubscriptionHelper.getCurrentSubscriptionId(context);
+            if (subscriptionId != null) {
+                return SmsManager.getSmsManagerForSubscriptionId(subscriptionId);
+            }
+        }
+
+        return SmsManager.getDefault();
     }
 }
