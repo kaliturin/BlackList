@@ -16,9 +16,12 @@
 
 package com.kaliturin.blacklist.receivers;
 
+import android.app.IntentService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -42,7 +45,23 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = CallBroadcastReceiver.class.getName();
 
     @Override
-    public void onReceive(final Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent) {
+        String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+        if (state != null && !state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+            return;
+        }
+
+        //SilentModeSwitcher silentMode = new SilentModeSwitcher();
+        //silentMode.enable(context);
+        try {
+            processCall(context, intent);
+        } catch (Exception ignored) {
+        }
+        //silentMode.disable(context);
+        //RingerModeService.start(context, silentMode.getRingerMode(), silentMode.getVibrateSettings());
+    }
+
+    private void processCall(Context context, Intent intent) {
         if (!Permissions.isGranted(context, Permissions.READ_PHONE_STATE) ||
                 !Permissions.isGranted(context, Permissions.CALL_PHONE)) {
             return;
@@ -183,5 +202,118 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         breakCall(context);
         // process the event of blocking in the service
         BlockEventProcessService.start(context, number, name, null);
+    }
+
+    // Silent mode enabling/disabling
+    private static class SilentModeSwitcher {
+        private AudioManager audioManager;
+        private int ringerMode = AudioManager.RINGER_MODE_NORMAL;
+        @SuppressWarnings("deprecation")
+        private int vibrateSettings = AudioManager.VIBRATE_SETTING_ON;
+
+        public int getRingerMode() {
+            return ringerMode;
+        }
+
+        public int getVibrateSettings() {
+            return vibrateSettings;
+        }
+
+        public void setRingerMode(Context context, int ringerMode) {
+            getAudioManager(context).setRingerMode(ringerMode);
+        }
+
+        @SuppressWarnings("deprecation")
+        public void setVibrateSettings(Context context, int vibrateSettings) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                getAudioManager(context).setVibrateSetting(AudioManager.VIBRATE_TYPE_RINGER, vibrateSettings);
+            }
+        }
+
+        public void enable(Context context) {
+            setSilentMode(context, true);
+        }
+
+        public void disable(Context context) {
+            setSilentMode(context, false);
+        }
+
+        private AudioManager getAudioManager(Context context) {
+            if (audioManager == null) {
+                audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            }
+            return audioManager;
+        }
+
+        // Switch ringer mode to silent and back depending in passed flag
+        @SuppressWarnings("deprecation")
+        private void setSilentMode(Context context, boolean enabled) {
+            if (!Permissions.isGranted(context, Permissions.WRITE_SETTINGS) ||
+                    !Permissions.isGranted(context, Permissions.MODIFY_AUDIO_SETTINGS)) {
+                return;
+            }
+
+            AudioManager audioManager = getAudioManager(context);
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                if (enabled) {
+                    vibrateSettings = audioManager.getVibrateSetting(AudioManager.VIBRATE_TYPE_RINGER);
+                    audioManager.setVibrateSetting(AudioManager.VIBRATE_TYPE_RINGER, AudioManager.VIBRATE_SETTING_OFF);
+                } else {
+                    audioManager.setVibrateSetting(AudioManager.VIBRATE_TYPE_RINGER, vibrateSettings);
+                }
+            }
+
+            if (enabled) {
+                ringerMode = audioManager.getRingerMode();
+                audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            } else {
+                audioManager.setRingerMode(ringerMode);
+            }
+        }
+    }
+
+    public static class RingerModeService extends IntentService {
+        public static final String RINGER_MODE = "RINGER_MODE";
+        public static final String VIBRATE_SETTINGS = "VIBRATE_SETTINGS";
+
+        public RingerModeService() {
+            super(RingerModeService.class.getName());
+        }
+
+        @Override
+        protected void onHandleIntent(@Nullable Intent intent) {
+            Context context = getBaseContext();
+            if (!Permissions.isGranted(context, Permissions.WRITE_SETTINGS) ||
+                    !Permissions.isGranted(context, Permissions.MODIFY_AUDIO_SETTINGS)) {
+                return;
+            }
+
+            if (intent == null) {
+                return;
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+            }
+
+            SilentModeSwitcher silentMode = new SilentModeSwitcher();
+            int ringerMode = intent.getIntExtra(RINGER_MODE, -1);
+            if(ringerMode >= 0) {
+                silentMode.setRingerMode(context, ringerMode);
+            }
+            int vibrateSettings = intent.getIntExtra(VIBRATE_SETTINGS, -1);
+            if(vibrateSettings >= 0) {
+                silentMode.setVibrateSettings(context, vibrateSettings);
+            }
+        }
+
+        public static void start(Context context, int ringerMode, int vibrateSettings) {
+            Intent intent = new Intent(context, RingerModeService.class);
+            intent.putExtra(RINGER_MODE, ringerMode);
+            intent.putExtra(VIBRATE_SETTINGS, vibrateSettings);
+            context.startService(intent);
+        }
     }
 }

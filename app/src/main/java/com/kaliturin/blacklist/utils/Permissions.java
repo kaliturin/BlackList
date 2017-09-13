@@ -56,6 +56,8 @@ public class Permissions {
     public static final String READ_CALL_LOG = "android.permission.READ_CALL_LOG";
     public static final String WRITE_CALL_LOG = "android.permission.WRITE_CALL_LOG";
     public static final String VIBRATE = "android.permission.VIBRATE";
+    public static final String MODIFY_AUDIO_SETTINGS = "android.permission.MODIFY_AUDIO_SETTINGS";
+    public static final String WRITE_SETTINGS = "android.permission.WRITE_SETTINGS";
 
     private static String[] PERMISSIONS = new String[]{
             WRITE_EXTERNAL_STORAGE,
@@ -69,7 +71,9 @@ public class Permissions {
             WRITE_CONTACTS,
             READ_CALL_LOG,
             WRITE_CALL_LOG,
-            VIBRATE
+            VIBRATE,
+            MODIFY_AUDIO_SETTINGS,
+            WRITE_SETTINGS
     };
 
     /**

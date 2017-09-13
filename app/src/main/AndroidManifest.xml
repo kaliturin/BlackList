@@ -16,6 +16,8 @@
     <uses-permission android:name="android.permission.WRITE_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -81,7 +83,7 @@
 
         <!-- BroadcastReceiver listens for incoming calls -->
         <receiver android:name=".receivers.CallBroadcastReceiver">
-            <intent-filter android:priority="100">
+            <intent-filter android:priority="999">
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
@@ -135,6 +137,9 @@
 
         <!-- Service sends SMS messages -->
         <service android:name=".services.SMSSendService" />
+
+        <!-- Service switcher ringer mode -->
+        <service android:name=".receivers.CallBroadcastReceiver$RingerModeService" />
 
     </application>
 
