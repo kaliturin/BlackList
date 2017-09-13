@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Telephony;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import com.kaliturin.blacklist.receivers.SMSBroadcastReceiver;
@@ -69,20 +70,23 @@ public class DefaultSMSAppHelper {
         String packageName;
         // current app package is already set as default
         if (isDefault(context)) {
-            // get native app package as default
+            // get previously saved app package as default
             packageName = Settings.getStringValue(context, Settings.DEFAULT_SMS_APP_NATIVE_PACKAGE);
         } else {
-            // save native app package to the settings
-            String nativePackage = Telephony.Sms.getDefaultSmsPackage(context);
-            Settings.setStringValue(context, Settings.DEFAULT_SMS_APP_NATIVE_PACKAGE, nativePackage);
-            // get current app package as default
+            // get blacklist app package as default
             packageName = context.getPackageName();
+            // save current default sms app package to the settings
+            String nativePackage = Telephony.Sms.getDefaultSmsPackage(context);
+            if (nativePackage != null) {
+                Settings.setStringValue(context, Settings.DEFAULT_SMS_APP_NATIVE_PACKAGE, nativePackage);
+            }
         }
+        // start sms app change dialog
         askForDefaultAppChange(fragment, packageName, requestCode);
     }
 
     @TargetApi(19)
-    private static void askForDefaultAppChange(Fragment fragment, String packageName, int requestCode) {
+    private static void askForDefaultAppChange(Fragment fragment, @Nullable String packageName, int requestCode) {
         if (!isAvailable()) return;
         Intent intent;
         if (packageName == null) {
