@@ -138,9 +138,6 @@
         <!-- Service sends SMS messages -->
         <service android:name=".services.SMSSendService" />
 
-        <!-- Service switcher ringer mode -->
-        <service android:name=".receivers.CallBroadcastReceiver$RingerModeService" />
-
     </application>
 
 </manifest>
