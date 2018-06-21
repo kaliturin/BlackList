@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Blacklist Blocker</string>
+    <string name="Open_navigation_drawer">Navigatiemenu openen</string>
+    <string name="Close_navigation_drawer">Navigatiemenu sluiten</string>
+    <string name="Settings_action">Instellingen</string>
+    <string name="Calls_blocking">Oproepblokkering</string>
+    <string name="Calls_blocking_notification">Melding tonen bij geblokkeerde oproep</string>
+    <string name="App_interface">Uiterlijk</string>
+    <string name="Text_folding">Beknopte tekst</string>
+    <string name="Journal_SMS_text_folding">Beknopte SMS-tekst tonen in het evenementenlog</string>
+    <string name="App_data">App-gegevens</string>
+    <string name="Export_data">Gegevens exporteren</string>
+    <string name="Write_data_into_external">App-gegevens wegschrijven naar extern bestand</string>
+    <string name="Import_data">Gegevens importeren</string>
+    <string name="Load_data_from_external">App-gegevens laden uit extern bestand</string>
+    <string name="File_path">Bestandspad</string>
+    <string name="Block_calls_from_black_list">Oproepen blokkeren van nummers op de zwarte lijst</string>
+    <string name="All_calls">Alle oproepen</string>
+    <string name="Block_all_calls">Alle oproepen blokkeren (behalve oproepen van nummers op de witte lijst)</string>
+    <string name="Block_calls_not_from_contacts">Oproepen blokkeren van nummers die niet bij een contactpersoon horen</string>
+    <string name="Block_calls_not_from_SMS_list">Oproepen blokkeren van nummers die niet op de SMS-lijst staan</string>
+    <string name="Block_calls_from_private">Oproepen blokkeren van privénummers</string>
+    <string name="Write_calls_to_journal">Geblokkeerde oproepen wegschrijven naar evenementenlog</string>
+    <string name="Remove_from_call_log">Geblokkeerde oproepen verwijderen uit evenementenlog</string>
+    <string name="Notify_in_status_bar_blocked_call">Melding tonen in statusbalk bij geblokkeerde oproep</string>
+    <string name="Notify_with_sound_blocked_call">Geluidsmelding</string>
+    <string name="Notify_with_vibration_blocked_call">Trilmelding</string>
+    <string name="Block_SMS_from_black_list">SMS'jes blokkeren van nummers op de zwarte lijst</string>
+    <string name="All_SMS">Alle SMS'jes</string>
+    <string name="Block_all_SMS">Alle SMS'jes blokkeren (behalve van nummers op de witte lijst)</string>
+    <string name="Contacts_list">Contactpersoonlijst</string>
+    <string name="Block_SMS_not_from_contacts">Alle SMS'jes blokkeren van nummers die niet op de contactpersoonlijst staan</string>
+    <string name="SMS_list">SMS-lijst</string>
+    <string name="Block_SMS_not_from_SMS_list">SMS'jes blokkeren van nummers die niet op de SMS-lijst staan</string>
+    <string name="Private_numbers">Privénummers</string>
+    <string name="Block_SMS_from_private">Alle SMS'jes van privénummers blokkeren</string>
+    <string name="Status_bar">Statusbalk</string>
+    <string name="Notify_in_status_bar_blocked_SMS">Melding tonen in statusbalk bij geblokkeerde SMS</string>
+    <string name="Notify_with_sound_received_SMS">Geluidsmelding</string>
+    <string name="Sound">Geluid</string>
+    <string name="Notify_with_sound_blocked_SMS">Geluidsmelding</string>
+    <string name="Notify_with_vibration_received_SMS">Trilmelding</string>
+    <string name="Vibration">Trillen</string>
+    <string name="Notify_with_vibration_blocked_SMS">Trilmelding</string>
+    <string name="SMS_delivery">SMS-ontvanging</string>
+    <string name="Notify_on_SMS_delivery">Melding bij ontvangen van SMS</string>
+    <string name="Write_SMS_to_journal">Gelokkeerde SMS wegschrijven naar evenementenlog</string>
+    <string name="SMS_blocking">SMS-blokkering</string>
+    <string name="SMS_blocking_notification">Melding bij geblokkeerde SMS</string>
+    <string name="SMS_receiving_notification">Melding bij ontvangen SMS</string>
+    <string name="From_contacts_list">Uit de contactpersoonlijst</string>
+    <string name="From_calls_list">Uit de gespreksgeschiedenis</string>
+    <string name="From_SMS_list">Uit de SMS-lijst</string>
+    <string name="From_Black_list">Uit de zwarte lijst</string>
+    <string name="From_White_list">Uit de witte lijst</string>
+    <string name="Manually">Handmatig</string>
+    <string name="List_of_contacts">Contactpersoonlijst</string>
+    <string name="List_of_calls">Gespreksgeschiedenis</string>
+    <string name="List_of_SMS">SMS-lijst</string>
+    <string name="Black_list">Zwarte lijst</string>
+    <string name="White_list">Witte lijst</string>
+    <string name="Journal">Evenementlog</string>
+    <string name="Settings">Instellingen</string>
+    <string name="Information">Informatie</string>
+    <string name="Exit">Afsluiten</string>
+    <string name="Call_log">Gespreksgeschiedenis</string>
+    <string name="Messaging">Berichten</string>
+    <string name="Select_all">Alles selecteren</string>
+    <string name="SELECT_ALL">ALLES SELECTEREN</string>
+    <string name="DELETE">VERWIJDEREN</string>
+    <string name="CANCEL">ANNULEREN</string>
+    <string name="ADD">TOEVOEGEN</string>
+    <string name="OK">OKÉ</string>
+    <string name="Add_contact">Contactpersoon toevoegen</string>
+    <string name="Add_number">Telefoonnummer toevoegen</string>
+    <string name="Adding_contact">Bezig met toevoegen van contactpersoon</string>
+    <string name="Saving_">Bezig met opslaan...</string>
+    <string name="Loading_">Bezig met laden...</string>
+    <string name="call_is_blocked">geblokkeerde oproep</string>
+    <string name="message_is_blocked">geblokkeerd bericht</string>
+    <string name="message_is_received">ontvangen bericht</string>
+    <string name="Private_number">Privénummer</string>
+    <string name="Search_action">Zoeken</string>
+    <string name="Starts_with">Begint met:</string>
+    <string name="Ends_with">Eindigt op:</string>
+    <string name="Contains">Bevat:</string>
+    <string name="No_text">Geen tekst</string>
+    <string name="Contact_name_">Naam van contactpersoon:</string>
+    <string name="Contact_name_nn">Niet van toepassing</string>
+    <string name="Phone_number">Telefoonnummer</string>
+    <string name="Enter_phone_number">Telefoonnummer invoeren</string>
+    <string name="Add_another">Nóg een nummer invoeren</string>
+    <string name="Unnamed">Naamloos</string>
+    <string name="Edit_contact">Contactpersoon bewerken</string>
+    <string name="Editing_contact">Bewerken</string>
+    <string name="SAVE">OPSLAAN</string>
+    <string name="Delete_record">Vermelding verwijderen</string>
+    <string name="Copy_number">Nummer kopiëren</string>
+    <string name="Copy_text">Tekst kopiëren</string>
+    <string name="Remove_contact">Contactpersoon verwijderen</string>
+    <string name="Find_similar_records">Vergelijkbare vermeldingen zoeken</string>
+    <string name="Exclude_from_black_list">Contactpersoon uitsluiten van zwarte lijst</string>
+    <string name="Move_to_white_list">Contactpersoon verplaatsen naar witte lijst</string>
+    <string name="Move_to_black_list">Contactpersoon verplaatsen naar zwarte lijst</string>
+    <string name="Default_SMS_app">Standaard SMS-app</string>
+    <string name="Set_as_default_SMS_app">Sinds Android 4.4 is het instellen als standaard SMS-app benodigd om SMS'jes te kunnen blokkeren.</string>
+    <string name="SMS_default_app">SMS-app</string>
+    <string name="New_message">Nieuw bericht</string>
+    <string name="needs_permission">machtiging vereist</string>
+    <string name="needs_permissions">machtigingen vereist</string>
+    <string name="Delete_thread">Gesprek verwijderen</string>
+    <string name="Write_message">Bericht opstellen</string>
+    <string name="Add_from_contacts">Toevoegen uit contactpersonen</string>
+    <string name="Enter_message">Typ een bericht</string>
+    <string name="Send">Versturen</string>
+    <string name="Delete_message">Bericht verwijderen</string>
+    <string name="Copy_message">Bericht kopiëren</string>
+    <string name="Forward_message">Bericht doorsturen</string>
+    <string name="Copied_to_clipboard">Gekopieerd naar klembord</string>
+    <string name="SMS_is_sent">SMS is verstuurd</string>
+    <string name="Generic_failure">Fout: algemene fout</string>
+    <string name="No_service">Fout: geen bereik</string>
+    <string name="Null_PDU">Fout: null PDU</string>
+    <string name="Radio_off">Fout: mobiel netwerk is uitgeschakeld</string>
+    <string name="SMS_is_delivered">SMS is afgeleverd</string>
+    <string name="SMS_is_not_delivered">SMS is niet afgeleverd</string>
+    <string name="Message_text_is_not_defined">Er is geen berichttekst ingevoerd</string>
+    <string name="Address_is_not_defined">Adres is niet opgegeven</string>
+    <string name="Need_default_SMS_app">Standaard SMS-app-machtiging vereist</string>
+    <string name="Unknown_error">Onbekende fout</string>
+    <string name="Ringtone_picker">Beltoonkiezer</string>
+    <string name="Menu_button">Menuknop</string>
+    <string name="Error_file_already_exists">Fout: bestand bestaat al</string>
+    <string name="Error_invalid_file_path">Fout: ongeldig bestandspad</string>
+    <string name="Error_on_file_path_creating">Fout bij creëren van pad</string>
+    <string name="Error_on_file_writing">Fout bij wegschrijven van bestand</string>
+    <string name="Export_complete">Exporteren voltooid</string>
+    <string name="Error_file_is_not_valid">Fout: bestand is ongeldig</string>
+    <string name="Error_on_old_data_deletion">Fout bij verwijderen van oude gegevens</string>
+    <string name="Import_complete">Importeren voltooid</string>
+    <string name="UI_theme_dark">Donker thema</string>
+    <string name="List_is_empty">Lijst is leeg</string>
+    <string name="Logo_motto">Bescherming tegen ongewenste \n oproepen en SMS\'jes</string>
+    <string name="Go_to_Journal_at_start">Evenementlog openen bij starten van app</string>
+    <string name="Exit_on_back_pressed">App niet afsluiten na drukken op \"Terug\"-knop</string>
+    <string name="Back_button">\"Terug\"-knop</string>
+    <string name="Sending_">Bezig met versturen...</string>
+    <string name="Not_sent">Niet verstuurd</string>
+    <string name="To_block_SMS_set_def_app">Als je SMS\'jes wilt blokkeren, stel deze app dan in als \"Standaard SMS-app\" via de instellingen</string>
+    <string name="By_default">Standaard</string>
+    <string name="Choose_SIM">Kies een SIM-kaart</string>
+    <string name="Chosen_SIM">Gekozen SIM-kaart</string>
+    <string name="SIM_card">SIM-kaart</string>
+
+    <string name="About">Over</string>
+    <string name="Info_about">
+        Dit is een gratis app die je in staat stelt om eenvoudig oproep- en SMS-blokkadelijsten
+        in te stellen. Er is ondersteuning voor lichte en donkere thema's,
+        er zijn geen advertenties en de broncode wordt meegegeven.
+    </string>
+
+    <string name="Attention">Let op!</string>
+    <string name="Info_attention">
+        Vanwege het beveiligingsbeleid van Android 4.4 en hoger, moet de machtiging
+        \"Standaard SMS-applicatie\" middels de Instellingen worden gegeven om SMS'jes te
+        kunnen blokkeren. Indien nodig kun je dit altijd terugdraaien en de vorige
+        \"Standaard SMS-applicatie\" herstellen. SMS-blokkade is momenteel uitgeschakeld.
+        Momenteel ondersteunt de app alleen het blokkeren en uitwissele van SMS'jes; ondersteuning voor
+        MMS'jes is nog niet geïmplementeerd.
+
+        \nVanwege het beveiligingsbeleid in Android 6.0 en hoger, vereist de
+        app de volgende machtigingen:
+        \n1. \"Toegang tot foto's, media en bestanden\". Dit stelt de app in staat om
+        blokkadelijsten op te slaan op het interne geheugen en deze uit te lezen.
+        \n2. \"SMS-berichten lezen en versturen\". Dit stelt de app in staat om SMS'jes
+        uit te lezen te blokkeren.
+        \n3. \"Telefoonoproepen doen en beheren\". Dit stelt de app in staat om inkomende
+        oproepen te blokkeren.
+        \n4. \"Toegang tot contactpersonen\". Dit stelt de app in staat om de lijst met contactpersonen
+        te tonen.
+    </string>
+
+    <string name="Info_messaging">
+        Deze lijst toont SMS-gesprekken, gesorteerd op de tijd van het laatst aangekomen bericht.
+        Vanuit hier kun je SMS'jes lezen, schrijven en versturen.
+    </string>
+
+    <string name="Info_black_list">
+        Dit is de lijst van te blokkeren contactpersonen bij telefoonoproepen en SMS'jes.
+        Voeg een contactpersoon toe aan de lijst door te drukken op de \"+\"-knop in de werkbalk
+        en vervolgens op één van de aanbevolen methodes. Als je een contactpersoon handmatig
+        hebt geblokkeerd, dan is één van de regels voor het vergelijken van nummers: \"is gelijk aan\",
+        \"bevat\", \"begint met\", of \"eindigt op\".
+        Als je een contactpersoon wilt bewerken, verwijderen of verplaatsen naar een andere lijst, dan
+        moet je de naam ingedrukt houden. Als je deze lijst tijdelijk wilt uitschakelen, dan kun je
+        dit doen middels de Instellingen.</string>
+
+    <string name="Info_white_list">
+        Dit is de lijst van nooit te blokkeren contactpersonen bij telefoonoproepen en SMS'jes.
+        Deze lijst is handig voor het instellen van uitzonderingen. Als er conflicten optreden,
+        dan krijgt deze lijst een hogere prioriteit.
+        Het beheren van contactpersonen op deze lijst is vergelijkbaar met het beheren op de Zwarte lijst.
+    </string>
+
+    <string name="Info_journal">
+        Dit is de lijst met vermeldingen met informatie over gespreks- en SMS-blokkering.
+        Als je dit wilt uitschakelen, dan kun je dit doen middels de Instellingen.
+    </string>
+
+    <string name="Info_settings">
+        In de Instellingen kun je instellen dat alle oproepen en SMS'jes van nummers die niet in je
+        lijst met contactpersonen staan en/of je nooit berichten mee hebt uitgewisseld, geblokkeerd worden.
+        Deze opties kunnen tegelijk worden gebruikt met de Zwarte en Witte lijsten, of onafhankelijk.
+        Je kunt het niveau van visuele meldingen en audiomeldingen over blokkeringen aanpassen.
+        Je kunt het lichte of donkere app-thema instellen.
+        Je kunt ook app-gegevens importeren en exporteren, bijv. om ze over te zetten naar een ander apparaat.
+    </string>
+
+    <string name="Licence">Licentie</string>
+    <string name="Info_licence">
+        Auteursrecht (&#169;) 2017 Anton Kaliturin.
+        De Blacklist Blocker-app is vrije software en wordt verspreid onder de
+        voorwaarden van de Apache-licentie, versie 2.0:
+        \n"https://www.apache.org/licenses/LICENSE-2.0"
+        \nDe app wordt verspreid in de hoop nuttig voor iemand te zijn, maar komt
+        zonder garanties of voorwaarden.
+        \nPrivacybeleid van de app:
+        \n"https://github.com/kaliturin/blacklist/wiki/privacy-policy"
+        \nBroncode van de app:
+        \n"http://github.com/kaliturin/blacklist"
+    </string>
+
+    <string name="Author">Auteur</string>
+    <string name="Info_author">
+        "Anton Kaliturin (kaliturin@gmail.com)"
+    </string>
+
+    <string-array name="phone_metadata">
+        <item>is gelijk aan:</item>
+        <item>bevat:</item>
+        <item>begint met:</item>
+        <item>eindigt op:</item>
+    </string-array>
+
+</resources>
