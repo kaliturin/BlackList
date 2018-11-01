@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Blacklist Blocker</string>
+    <string name="Open_navigation_drawer">Öppna navigationsmenyn</string>
+    <string name="Close_navigation_drawer">Stäng navigationsmenyn</string>
+    <string name="Settings_action">Inställningar</string>
+    <string name="Calls_blocking">Blockering av samtal</string>
+    <string name="Calls_blocking_notification">Avisering för samtalsblockering</string>
+    <string name="App_interface">Applikationens gränssnitt</string>
+    <string name="Text_folding">Beknopte tekst</string>
+    <string name="Journal_SMS_text_folding">Beknopte SMS-tekst tonen in het evenementenlog</string>
+    <string name="App_data">Applikationsdata</string>
+    <string name="Export_data">Exportera data</string>
+    <string name="Write_data_into_external">Skriv data till en extern fil</string>
+    <string name="Import_data">Importera data</string>
+    <string name="Load_data_from_external">Ladda data från en extern fil</string>
+    <string name="File_path">Genväg till fil</string>
+    <string name="Block_calls_from_black_list">Blockera samtal från svartlista</string>
+    <string name="All_calls">Alla samtal</string>
+    <string name="Block_all_calls">Blockera alla samtal (Förutom de som är vitlistade)</string>
+    <string name="Block_calls_not_from_contacts">Blockera nummer som inte finns i kontaktlistan</string>
+    <string name="Block_calls_not_from_SMS_list">Blockera nummer som inte är i SMS-listan</string>
+    <string name="Block_calls_from_private">Blockera samtal från privata nummer</string>
+    <string name="Write_calls_to_journal">Skriv samtal till händelseloggen</string>
+    <string name="Remove_from_call_log">Ta bort blockerade samtal från samtalsloggen</string>
+    <string name="Notify_in_status_bar_blocked_call">Avisera i statusfältet när samtal blockeras</string>
+    <string name="Notify_with_sound_blocked_call">Ljudavisering när samtal blockeras</string>
+    <string name="Notify_with_vibration_blocked_call">Avisera med vibration när samtal blockeras</string>
+    <string name="Block_SMS_from_black_list">Blockera SMS från nummer som är i svartlistan</string>
+    <string name="All_SMS">Alla SMS</string>
+    <string name="Block_all_SMS">Blockera alla SMS (förutom SMS från de nummer som är vitlistade)</string>
+    <string name="Contacts_list">Kontaktlista</string>
+    <string name="Block_SMS_not_from_contacts">Blockera SMS från nummer som inte är i kontaktlistan</string>
+    <string name="SMS_list">SMS-lista</string>
+    <string name="Block_SMS_not_from_SMS_list">Blockera SMS från nummer som inte är i SMS-listan</string>
+    <string name="Private_numbers">Privata nummer</string>
+    <string name="Block_SMS_from_private">Blockera SMS från privata nummer</string>
+    <string name="Status_bar">Statusfält</string>
+    <string name="Notify_in_status_bar_blocked_SMS">Avisera i statusfältet när ett SMS blockeras</string>
+    <string name="Notify_with_sound_received_SMS">Avisera med ljud när ett meddelande tas emot</string>
+    <string name="Sound">Ljud</string>
+    <string name="Notify_with_sound_blocked_SMS">Avisera med ljud när ett SMS blockeras</string>
+    <string name="Notify_with_vibration_received_SMS">Avisera med en vibration när ett SMS tas emot</string>
+    <string name="Vibration">Vibration</string>
+    <string name="Notify_with_vibration_blocked_SMS">Avisera med vibration när ett SMS blockeras</string>
+    <string name="SMS_delivery">Leveransmeddelande för SMS</string>
+    <string name="Notify_on_SMS_delivery">Avisera när SMS:et levererades</string>
+    <string name="Write_SMS_to_journal">Skriv SMS till händelselogg</string>
+    <string name="SMS_blocking">SMS-blockering</string>
+    <string name="SMS_blocking_notification">Avisering när SMS blockeras</string>
+    <string name="SMS_receiving_notification">Avisering när SMS tas emot</string>
+    <string name="From_contacts_list">Från kontaktlista</string>
+    <string name="From_calls_list">Från samtalslista</string>
+    <string name="From_SMS_list">Från SMS-lista</string>
+    <string name="From_Black_list">Från svartlista</string>
+    <string name="From_White_list">Från vitlista</string>
+    <string name="Manually">Manuellt</string>
+    <string name="List_of_contacts">Kontaktlista</string>
+    <string name="List_of_calls">Samtalslista/string>
+    <string name="List_of_SMS">SMS-lista</string>
+    <string name="Black_list">Svartlista</string>
+    <string name="White_list">Vitlista</string>
+    <string name="Journal">Händelselogg</string>
+    <string name="Settings">Inställningar</string>
+    <string name="Information">Information</string>
+    <string name="Exit">Avsluta</string>
+    <string name="Call_log">Samtalslogg</string>
+    <string name="Messaging">Meddelandetjänster</string>
+    <string name="Select_all">Välj alla</string>
+    <string name="SELECT_ALL">VÄLJ ALLA</string>
+    <string name="DELETE">TA BORT</string>
+    <string name="CANCEL">AVBRYT</string>
+    <string name="ADD">LÄGG TILL</string>
+    <string name="OK">OK</string>
+    <string name="Add_contact">Lägg till kontakt</string>
+    <string name="Add_number">Lägg till telefonnummer</string>
+    <string name="Adding_contact">Lägger till kontaktpersonen</string>
+    <string name="Saving_">Sparar...</string>
+    <string name="Loading_">Laddar...</string>
+    <string name="call_is_blocked">samtalet blockerades</string>
+    <string name="message_is_blocked">meddelandet blockerades</string>
+    <string name="message_is_received">meddelandet togs emot</string>
+    <string name="Private_number">Privata nummer</string>
+    <string name="Search_action">Sök</string>
+    <string name="Starts_with">Börjar med:</string>
+    <string name="Ends_with">Slutar med:</string>
+    <string name="Contains">Innehåller:</string>
+    <string name="No_text">Ingen text</string>
+    <string name="Contact_name_">Namn på kontakten:</string>
+    <string name="Contact_name_nn">Inte nödvändigt</string>
+    <string name="Phone_number">Telefonnummer</string>
+    <string name="Enter_phone_number">Fyll i telefonnummer</string>
+    <string name="Add_another">Lägg till ett annat</string>
+    <string name="Unnamed">Utan namn</string>
+    <string name="Edit_contact">Redigera kontakt</string>
+    <string name="Editing_contact">Redigerar kontakten</string>
+    <string name="SAVE">SPARA</string>
+    <string name="Delete_record">Ta bort post</string>
+    <string name="Copy_number">Kopiera telefonnummer</string>
+    <string name="Copy_text">Kopiera text</string>
+    <string name="Remove_contact">Ta bort kontakt</string>
+    <string name="Find_similar_records">Hitta liknande poster</string>
+    <string name="Exclude_from_black_list">Exkludera från Svartlista</string>
+    <string name="Move_to_white_list">Flytta till Vitlista</string>
+    <string name="Move_to_black_list">Flytta till Svartlista</string>
+    <string name="Default_SMS_app">Standard-app för SMS</string>
+    <string name="Set_as_default_SMS_app">Ställ in som standard-app för SMS.</string>
+    <string name="SMS_default_app">SMS-applikation</string>
+    <string name="New_message">Nytt meddelande</string>
+    <string name="needs_permission">behöver tillstånd</string>
+    <string name="needs_permissions">Behöver flera tillstånd</string>
+    <string name="Delete_thread">Ta bort tråd</string>
+    <string name="Write_message">Skriv meddelande</string>
+    <string name="Add_from_contacts">Lägg till från kontakter</string>
+    <string name="Enter_message">Skriv ett meddelande</string>
+    <string name="Send">Skicka</string>
+    <string name="Delete_message">Ta bort meddelande</string>
+    <string name="Copy_message">Kopiera meddelande</string>
+    <string name="Forward_message">Vidarebefordra meddelande</string>
+    <string name="Copied_to_clipboard">Kopierade till klippbord</string>
+    <string name="SMS_is_sent">SMS:et levererades</string>
+    <string name="Generic_failure">Fel: misslyckades generellt</string>
+    <string name="No_service">Fel: ingen tjänst</string>
+    <string name="Null_PDU">Fel: null PDU</string>
+    <string name="Radio_off">Fel: Radio är av</string>
+    <string name="SMS_is_delivered">SMS:et har levererats</string>
+    <string name="SMS_is_not_delivered">SMS:et har inte levererats</string>
+    <string name="Message_text_is_not_defined">Meddelandetexten har inte angivits</string>
+    <string name="Address_is_not_defined">Adressen har inte angivits</string>
+    <string name="Need_default_SMS_app">Behöver åtkomst för standard-app för SMS</string>
+    <string name="Unknown_error">Okänt fel</string>
+    <string name="Ringtone_picker">Val av ringsignal</string>
+    <string name="Menu_button">Menyknapp</string>
+    <string name="Error_file_already_exists">Fel: filen finns redan</string>
+    <string name="Error_invalid_file_path">Fel: ogiltig genväg till fil</string>
+    <string name="Error_on_file_path_creating">Fel uppstod när filens genväg skulle skapas</string>
+    <string name="Error_on_file_writing">Fel uppstod när filen skulle skrivas</string>
+    <string name="Export_complete">Exporteringen slutfördes</string>
+    <string name="Error_file_is_not_valid">Fel: filen är inte giltig</string>
+    <string name="Error_on_old_data_deletion">Fel uppstod när gammal data skulle tas bort</string>
+    <string name="Import_complete">Importen slutfördes</string>
+    <string name="UI_theme_dark">Mörkt tema för gränssnittet</string>
+    <string name="List_is_empty">Listan är tom</string>
+    <string name="Logo_motto">Skydd för oönskade \n samtal och SMS</string>
+    <string name="Go_to_Journal_at_start">Gå till händelseloggen när applikationen öppnas</string>
+    <string name="Exit_on_back_pressed">Avsluta inte applikationen vid användning av telefonen\'s \"Bakåt\"-knapp</string>
+    <string name="Back_button">\"Bakåt\"-knapp</string>
+    <string name="Sending_">Skickar...</string>
+    <string name="Not_sent">Ej skickade</string>
+    <string name="To_block_SMS_set_def_app">Ställ in som \"Standard-app för SMS\" i Inställningar för att blockera SMS-meddelanden</string>
+    <string name="By_default">Som standard</string>
+    <string name="Choose_SIM">Välj SIM-kort</string>
+    <string name="Chosen_SIM">SIM-kortet som har valts</string>
+    <string name="SIM_card">SIM-kort</string>
+
+    <string name="About">Om</string>
+    <string name="Info_about">
+        Det här är en fri applikation som ger dig ett bekvämt sätt att ställa in
+        blockeringen av oönskade samtal och SMS. Den har stöd för både ljust och
+        mörka teman för gränssnittet, har inga annonser och är försedd med öppen källkod.
+    </string>
+
+    <string name="Attention">Hör upp!</string>
+    <string name="Info_attention">
+        På grund av säkerhetspolicyn i Android 4.4 och nyare för
+        att blockera inkommande SMS-meddelanden så krävs det att man ger
+        applikationen åtkomst som \"Standard-applikation för SMS\" i Inställningar.
+        Om det är nödvändigt så kan du alltid ångra dig och återvända till den föregående
+        \"Standard-appen för SMS\". I det här fallet så kommer SMS-blockeringen att bli
+        avstängd. För närvarande så har appen endast stöd för blockering och utbyte av
+        SMS-meddelanden. Stöd för MMS-meddelanden har inte implementerats än.
+
+        \nBecause of the security policy in Android 6.0 and up, the
+        application requires permissions:
+        \n1. \"Access photos, media and files\". Allows reading and writing
+        files in the internal memory of the device - for storing the block lists.
+        \n2. \"Send and view SMS-messages\". Allows to display and block
+        incoming SMS-messages.
+        \n3. \"Make and manage phone calls\". Allows to block incoming calls.
+        \n4. \"Access contacts\". Allows to display the list of contacts.
+    </string>
+
+    <string name="Info_messaging">
+        This list displays SMS-chats, sorted by the time of the last message in
+        them. From here you can go to the reading, writing and sending SMS-messages.
+    </string>
+
+    <string name="Info_black_list">
+        This is the list of contacts with numbers, calls and SMS from which you
+        plan to block. Add a contact to the list by clicking the \"+\" toolbar
+        button and from the resulting menu choose one of the suggested ways to
+        add a contact. If you manually add a blocked contact, you can choose
+        one of the rules for comparing numbers: \"equals\", \"contains\",
+        \"starts with\", or \"ends with\".
+        To edit, delete, or move a contact to another list, make a long click
+        on its line. If you want to temporarily disable blocking contacts
+        from the Blacklist, you can do this in the Settings.</string>
+
+    <string name="Info_white_list">
+        This is the list of contacts with numbers, calls and SMS from which will
+        never be blocked. This list is useful for additional setting of exceptions
+        from blocking. It has a higher priority than other lists when resolving
+        conflicts between them.
+        Managing the contacts in the Whitelist is similar to the Blacklist.
+    </string>
+
+    <string name="Info_journal">
+        This is the list of records with info about the events of calls/SMS blocking.
+        Disabling logging of the events can be done in the Settings.
+    </string>
+
+    <string name="Info_settings">
+        In the Settings you can set the blocking of all calls and SMS from numbers
+        that are not in the list of contacts of your phone and (or) not included
+        in the list of phone numbers with which you exchanged SMS. These options can be
+        used in conjunction with the Black and White lists, or separately. You can
+        adjust the level of visual and audio notifications about the event of blocking.
+        You can set the light or dark theme of the application interface.
+        Here, you can also export and import application data, for example, to
+        transfer them from one device to another.
+    </string>
+
+    <string name="Licence">Licens</string>
+    <string name="Info_licence">
+        Copyright (&#169;) 2017 Anton Kaliturin.
+        The Blacklist Blocker application is a free software and is distributed under
+        the terms of the Apache License Version 2.0:
+        \n"https://www.apache.org/licenses/LICENSE-2.0"
+        \nThe application is distributed with the hope that it can be useful for someone,
+        but without any guarantees or conditions.
+        \nPrivacy policy of the application:
+        \n"https://github.com/kaliturin/blacklist/wiki/privacy-policy"
+        \nThe source code of the application:
+        \n"http://github.com/kaliturin/blacklist"
+    </string>
+
+    <string name="Author">Författare</string>
+    <string name="Info_author">
+        "Anton Kaliturin (kaliturin@gmail.com)"
+    </string>
+
+    <string-array name="phone_metadata">
+        <item>är lika med:</item>
+        <item>innehåller:</item>
+        <item>börjar med:</item>
+        <item>slutar med:</item>
+    </string-array>
+
+</resources>
