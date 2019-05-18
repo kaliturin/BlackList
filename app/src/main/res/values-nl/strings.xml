@@ -26,15 +26,15 @@
     <string name="Notify_in_status_bar_blocked_call">Melding tonen in statusbalk bij geblokkeerde oproep</string>
     <string name="Notify_with_sound_blocked_call">Geluidsmelding</string>
     <string name="Notify_with_vibration_blocked_call">Trilmelding</string>
-    <string name="Block_SMS_from_black_list">SMS'jes blokkeren van nummers op de zwarte lijst</string>
-    <string name="All_SMS">Alle SMS'jes</string>
-    <string name="Block_all_SMS">Alle SMS'jes blokkeren (behalve van nummers op de witte lijst)</string>
+    <string name="Block_SMS_from_black_list">SMS\'jes blokkeren van nummers op de zwarte lijst</string>
+    <string name="All_SMS">Alle SMS\'jes</string>
+    <string name="Block_all_SMS">Alle SMS\'jes blokkeren (behalve van nummers op de witte lijst)</string>
     <string name="Contacts_list">Contactpersoonlijst</string>
-    <string name="Block_SMS_not_from_contacts">Alle SMS'jes blokkeren van nummers die niet op de contactpersoonlijst staan</string>
+    <string name="Block_SMS_not_from_contacts">Alle SMS\'jes blokkeren van nummers die niet op de contactpersoonlijst staan</string>
     <string name="SMS_list">SMS-lijst</string>
-    <string name="Block_SMS_not_from_SMS_list">SMS'jes blokkeren van nummers die niet op de SMS-lijst staan</string>
+    <string name="Block_SMS_not_from_SMS_list">SMS\'jes blokkeren van nummers die niet op de SMS-lijst staan</string>
     <string name="Private_numbers">Privénummers</string>
-    <string name="Block_SMS_from_private">Alle SMS'jes van privénummers blokkeren</string>
+    <string name="Block_SMS_from_private">Alle SMS\'jes van privénummers blokkeren</string>
     <string name="Status_bar">Statusbalk</string>
     <string name="Notify_in_status_bar_blocked_SMS">Melding tonen in statusbalk bij geblokkeerde SMS</string>
     <string name="Notify_with_sound_received_SMS">Geluidsmelding</string>
@@ -104,7 +104,7 @@
     <string name="Move_to_white_list">Contactpersoon verplaatsen naar witte lijst</string>
     <string name="Move_to_black_list">Contactpersoon verplaatsen naar zwarte lijst</string>
     <string name="Default_SMS_app">Standaard SMS-app</string>
-    <string name="Set_as_default_SMS_app">Sinds Android 4.4 is het instellen als standaard SMS-app benodigd om SMS'jes te kunnen blokkeren.</string>
+    <string name="Set_as_default_SMS_app">Sinds Android 4.4 is het instellen als standaard SMS-app benodigd om SMS\'jes te kunnen blokkeren.</string>
     <string name="SMS_default_app">SMS-app</string>
     <string name="New_message">Nieuw bericht</string>
     <string name="needs_permission">machtiging vereist</string>
@@ -156,24 +156,24 @@
     <string name="About">Over</string>
     <string name="Info_about">
         Dit is een gratis app die je in staat stelt om eenvoudig oproep- en SMS-blokkadelijsten
-        in te stellen. Er is ondersteuning voor lichte en donkere thema's,
+        in te stellen. Er is ondersteuning voor lichte en donkere thema\'s,
         er zijn geen advertenties en de broncode wordt meegegeven.
     </string>
 
     <string name="Attention">Let op!</string>
     <string name="Info_attention">
         Vanwege het beveiligingsbeleid van Android 4.4 en hoger, moet de machtiging
-        \"Standaard SMS-applicatie\" middels de Instellingen worden gegeven om SMS'jes te
+        \"Standaard SMS-applicatie\" middels de Instellingen worden gegeven om SMS\'jes te
         kunnen blokkeren. Indien nodig kun je dit altijd terugdraaien en de vorige
         \"Standaard SMS-applicatie\" herstellen. SMS-blokkade is momenteel uitgeschakeld.
-        Momenteel ondersteunt de app alleen het blokkeren en uitwissele van SMS'jes; ondersteuning voor
-        MMS'jes is nog niet geïmplementeerd.
+        Momenteel ondersteunt de app alleen het blokkeren en uitwissele van SMS\'jes; ondersteuning voor
+        MMS\'jes is nog niet geïmplementeerd.
 
         \nVanwege het beveiligingsbeleid in Android 6.0 en hoger, vereist de
         app de volgende machtigingen:
-        \n1. \"Toegang tot foto's, media en bestanden\". Dit stelt de app in staat om
+        \n1. \"Toegang tot foto\'s, media en bestanden\". Dit stelt de app in staat om
         blokkadelijsten op te slaan op het interne geheugen en deze uit te lezen.
-        \n2. \"SMS-berichten lezen en versturen\". Dit stelt de app in staat om SMS'jes
+        \n2. \"SMS-berichten lezen en versturen\". Dit stelt de app in staat om SMS\'jes
         uit te lezen te blokkeren.
         \n3. \"Telefoonoproepen doen en beheren\". Dit stelt de app in staat om inkomende
         oproepen te blokkeren.
@@ -183,11 +183,11 @@
 
     <string name="Info_messaging">
         Deze lijst toont SMS-gesprekken, gesorteerd op de tijd van het laatst aangekomen bericht.
-        Vanuit hier kun je SMS'jes lezen, schrijven en versturen.
+        Vanuit hier kun je SMS\'jes lezen, schrijven en versturen.
     </string>
 
     <string name="Info_black_list">
-        Dit is de lijst van te blokkeren contactpersonen bij telefoonoproepen en SMS'jes.
+        Dit is de lijst van te blokkeren contactpersonen bij telefoonoproepen en SMS\'jes.
         Voeg een contactpersoon toe aan de lijst door te drukken op de \"+\"-knop in de werkbalk
         en vervolgens op één van de aanbevolen methodes. Als je een contactpersoon handmatig
         hebt geblokkeerd, dan is één van de regels voor het vergelijken van nummers: \"is gelijk aan\",
@@ -197,7 +197,7 @@
         dit doen middels de Instellingen.</string>
 
     <string name="Info_white_list">
-        Dit is de lijst van nooit te blokkeren contactpersonen bij telefoonoproepen en SMS'jes.
+        Dit is de lijst van nooit te blokkeren contactpersonen bij telefoonoproepen en SMS\'jes.
         Deze lijst is handig voor het instellen van uitzonderingen. Als er conflicten optreden,
         dan krijgt deze lijst een hogere prioriteit.
         Het beheren van contactpersonen op deze lijst is vergelijkbaar met het beheren op de Zwarte lijst.
@@ -209,7 +209,7 @@
     </string>
 
     <string name="Info_settings">
-        In de Instellingen kun je instellen dat alle oproepen en SMS'jes van nummers die niet in je
+        In de Instellingen kun je instellen dat alle oproepen en SMS\'jes van nummers die niet in je
         lijst met contactpersonen staan en/of je nooit berichten mee hebt uitgewisseld, geblokkeerd worden.
         Deze opties kunnen tegelijk worden gebruikt met de Zwarte en Witte lijsten, of onafhankelijk.
         Je kunt het niveau van visuele meldingen en audiomeldingen over blokkeringen aanpassen.
