@@ -16,6 +16,7 @@
 
 package com.kaliturin.blacklist.receivers;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -176,7 +177,7 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    @RequiresApi(api = Constants.PIE_API_VERSION)
+    @SuppressLint("NewApi")
     private void breakCallPieAndHigher(Context context) {
         Log.d(TAG, "Trying to break call for Pie and higher with TelecomManager.");
         TelecomManager telecomManager = (TelecomManager)
