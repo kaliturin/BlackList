@@ -19,13 +19,17 @@ package com.kaliturin.blacklist.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.android.internal.telephony.ITelephony;
 import com.kaliturin.blacklist.R;
 import com.kaliturin.blacklist.services.BlockEventProcessService;
+import com.kaliturin.blacklist.utils.Constants;
 import com.kaliturin.blacklist.utils.ContactsAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
@@ -55,8 +59,23 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        // get incoming call number
+        // From https://developer.android.com/reference/android/telephony/TelephonyManager:
+        // If the receiving app has Manifest.permission.READ_CALL_LOG and
+        // Manifest.permission.READ_PHONE_STATE permission, it will receive the broadcast twice;
+        // one with the EXTRA_INCOMING_NUMBER populated with the phone number, and another
+        // with it blank. Due to the nature of broadcasts, you cannot assume the order in which
+        // these broadcasts will arrive, however you are guaranteed to receive two in this case.
+        // Apps which are interested in the EXTRA_INCOMING_NUMBER can ignore the broadcasts where
+        // EXTRA_INCOMING_NUMBER is not present in the extras (e.g. where Intent#hasExtra(String)
+        // returns false).
+        if (!intent.hasExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)) {
+            Log.d(TAG, "Event had no incoming_number metadata. Letting it keep ringing...");
+            return;
+        }
+
+        // get incoming call number.
         String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+        Log.d(TAG, "Incoming number: " + number);
 
         // private number detected
         if (ContactsAccessHelper.isPrivatePhoneNumber(number)) {
@@ -140,13 +159,8 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    // Ends phone call
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private void breakCall(Context context) {
-        if (!Permissions.isGranted(context, Permissions.CALL_PHONE)) {
-            return;
-        }
-
+    private void breakCallNougatAndLower(Context context) {
+        Log.d(TAG, "Trying to break call for Nougat and lower with TelephonyManager.");
         TelephonyManager telephony = (TelephonyManager)
                 context.getSystemService(Context.TELEPHONY_SERVICE);
         try {
@@ -155,9 +169,39 @@ public class CallBroadcastReceiver extends BroadcastReceiver {
             m.setAccessible(true);
             ITelephony telephonyService = (ITelephony) m.invoke(telephony);
             telephonyService.endCall();
+            Log.d(TAG, "Invoked 'endCall' on TelephonyService.");
         } catch (Exception e) {
+            Log.e(TAG, "Could not end call. Check stdout for more info.");
             e.printStackTrace();
         }
+    }
+
+    @RequiresApi(api = Constants.PIE_API_VERSION)
+    private void breakCallPieAndHigher(Context context) {
+        Log.d(TAG, "Trying to break call for Pie and higher with TelecomManager.");
+        TelecomManager telecomManager = (TelecomManager)
+                context.getSystemService(Context.TELECOM_SERVICE);
+        try {
+            telecomManager.getClass().getMethod("endCall").invoke(telecomManager);
+            Log.d(TAG, "Invoked 'endCall' on TelecomManager.");
+        } catch (Exception e) {
+            Log.e(TAG, "Could not end call. Check stdout for more info.");
+            e.printStackTrace();
+        }
+    }
+
+    // Ends phone call
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void breakCall(Context context) {
+        if (!Permissions.isGranted(context, Permissions.CALL_PHONE)) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Constants.PIE_API_VERSION) {
+            breakCallPieAndHigher(context);
+        } else {
+            breakCallNougatAndLower(context);
+        }
+
     }
 
     // Finds contact by type

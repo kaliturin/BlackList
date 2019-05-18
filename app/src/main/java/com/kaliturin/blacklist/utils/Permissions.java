@@ -30,6 +30,8 @@ import android.widget.Toast;
 
 import com.kaliturin.blacklist.R;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +58,9 @@ public class Permissions {
     public static final String READ_CALL_LOG = "android.permission.READ_CALL_LOG";
     public static final String WRITE_CALL_LOG = "android.permission.WRITE_CALL_LOG";
     public static final String VIBRATE = "android.permission.VIBRATE";
+    public static final String ANSWER_PHONE_CALLS = "android.permission.ANSWER_PHONE_CALLS";
 
-    private static String[] PERMISSIONS = new String[]{
+    private static ArrayList<String> PERMISSIONS = new ArrayList<>(Arrays.asList(
             WRITE_EXTERNAL_STORAGE,
             RECEIVE_SMS,
             WRITE_SMS,
@@ -70,7 +73,14 @@ public class Permissions {
             READ_CALL_LOG,
             WRITE_CALL_LOG,
             VIBRATE
-    };
+    ));
+
+    static {
+        if (Build.VERSION.SDK_INT >= Constants.PIE_API_VERSION) {
+            Log.d(TAG, "Requesting extra permissions for PIE and higher.");
+            PERMISSIONS.add(ANSWER_PHONE_CALLS);
+        }
+    }
 
     /**
      * Checks for permission
