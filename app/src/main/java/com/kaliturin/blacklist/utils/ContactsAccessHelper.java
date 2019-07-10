@@ -16,10 +16,14 @@
 
 package com.kaliturin.blacklist.utils;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SyncAdapterType;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.MatrixCursor;
@@ -31,11 +35,15 @@ import android.provider.ContactsContract.Contacts;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.Pair;
 
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.Contact;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactNumber;
 import com.kaliturin.blacklist.utils.DatabaseAccessHelper.ContactSource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,11 +56,24 @@ import java.util.regex.Pattern;
  */
 public class ContactsAccessHelper {
     private static final String TAG = ContactsAccessHelper.class.getName();
+
+    private static final String SYNC_AUTHORITY = "com.android.contacts";
+    List<SyncAdapterType> okSyncs = new ArrayList<>();
+    SyncAdapterType[] syncTypes = ContentResolver.getSyncAdapterTypes();
+    AccountManager accountManager;
+    Account[] tempAccounts;
+    List<Account> allAccounts = new ArrayList<>();
     private static volatile ContactsAccessHelper sInstance = null;
-    private ContentResolver contentResolver = null;
+    private ContentResolver contentResolver;
+    private Context context;
+    private List<Pair<String, String>> foundAccounts = new ArrayList<>();
 
     private ContactsAccessHelper(Context context) {
         contentResolver = context.getApplicationContext().getContentResolver();
+        // TODO: try to get accounts here
+        this.context = context;
+        this.getAccountsFromSystem();
+
     }
 
     public static ContactsAccessHelper getInstance(Context context) {
@@ -64,6 +85,44 @@ public class ContactsAccessHelper {
             }
         }
         return sInstance;
+    }
+
+    private void getAccountsFromSystem() {
+        if (this.syncTypes.length > 0) {
+            for (int i = 0; i < syncTypes.length; i++) {
+                if (this.syncTypes[i].authority.equals(SYNC_AUTHORITY)) {
+                    okSyncs.add(syncTypes[i]);
+                }
+            }
+        }
+        if (okSyncs.size() > 0) {
+            accountManager = AccountManager.get(this.context);
+            for (int i = 0; i < okSyncs.size(); i++) {
+                tempAccounts = accountManager.getAccountsByType(okSyncs.get(i).accountType);
+                if (tempAccounts.length > 0) {
+                    for (int j = 0; j < tempAccounts.length; j++) {
+                        allAccounts.add(tempAccounts[j]);
+                    }
+                }
+            }
+        }
+        if (allAccounts.size() > 0) {
+            for (int i = 0; i < allAccounts.size(); i++) {
+                Log.d(TAG, "Adding account " + allAccounts.get(i).name + " of type " + allAccounts.get(i).type);
+                // I didn't found better way to determine synced accounts without messengers (like Signal or Telegram)
+                if (allAccounts.get(i).type.equals("com.google")) {
+                    this.foundAccounts.add(new Pair<>(allAccounts.get(i).type, allAccounts.get(i).name));
+                } else if (allAccounts.get(i).type.equals("at.bitfire.davdroid.address_book")) {
+                    this.foundAccounts.add(new Pair<>(allAccounts.get(i).type, allAccounts.get(i).name));
+                } else if (allAccounts.get(i).type.equals("com.deependhulla.opensync.address_book")) {
+                    this.foundAccounts.add(new Pair<>(allAccounts.get(i).type, allAccounts.get(i).name));
+                }
+            }
+        }
+    }
+
+    public List<Pair<String, String>> getAccounts() {
+        return foundAccounts;
     }
 
     private boolean validate(Cursor cursor) {
@@ -102,7 +161,7 @@ public class ContactsAccessHelper {
 
     // Returns contacts from specified source
     @Nullable
-    public Cursor getContacts(Context context, ContactSourceType sourceType, @Nullable String filter) {
+    public Cursor getContacts(Context context, ContactSourceType sourceType, @Nullable String filter, @Nullable String accountType, @Nullable String accountName) {
         // check permission
         final String permission = getPermission(sourceType);
         if (permission == null || !Permissions.isGranted(context, permission)) {
@@ -111,7 +170,7 @@ public class ContactsAccessHelper {
         // return contacts
         switch (sourceType) {
             case FROM_CONTACTS:
-                return getContacts(filter);
+                return getContacts(filter, accountName, accountType);
             case FROM_CALLS_LOG:
                 return getContactsFromCallsLog(filter);
             case FROM_SMS_LIST:
@@ -134,10 +193,18 @@ public class ContactsAccessHelper {
 
     // Selects contacts from contacts list
     @Nullable
-    private ContactCursorWrapper getContacts(@Nullable String filter) {
+    private ContactCursorWrapper getContacts(@Nullable String filter, @Nullable String accountName, @Nullable String accountType) {
         filter = (filter == null ? "%%" : "%" + filter + "%");
+        final Uri.Builder builder = Contacts.CONTENT_URI.buildUpon();
+        if (accountName != null) {
+            builder.appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_NAME, accountName);
+        }
+        if (accountType != null) {
+            builder.appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_TYPE, accountType);
+        }
+        Uri uri = builder.build();
         Cursor cursor = contentResolver.query(
-                Contacts.CONTENT_URI,
+                uri,
                 new String[]{Contacts._ID, Contacts.DISPLAY_NAME},
                 Contacts.IN_VISIBLE_GROUP + " != 0 AND " +
                         Contacts.HAS_PHONE_NUMBER + " != 0 AND " +
@@ -148,6 +215,7 @@ public class ContactsAccessHelper {
 
         return (validate(cursor) ? new ContactCursorWrapper(cursor) : null);
     }
+
 
     // Selects contact from contacts list by id
     @Nullable

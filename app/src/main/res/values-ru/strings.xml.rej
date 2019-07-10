@@ -1,0 +1,10 @@
+diff a/app/src/main/res/values-ru/strings.xml b/app/src/main/res/values-ru/strings.xml	(rejected hunks)
+@@ -249,8 +249,5 @@
+         <item>начинается на:</item>
+         <item>заканчивается на:</item>
+     </string-array>
+-    <string name="Select_address_book">Выберите адресную книгу</string>
+-    <string name="Filter_by_group">Фильтровать по группе</string>
+-    <string name="All">Все</string>
+ 
+ </resources>

@@ -242,5 +242,8 @@
         <item>begint met:</item>
         <item>eindigt op:</item>
     </string-array>
+    <string name="Select_address_book">Selecteer het adresboek</string>
+    <string name="Filter_by_group">Filtrer efter gruppe</string>
+    <string name="All">Alle</string>
 
 </resources>

@@ -56,7 +56,7 @@
     <string name="From_White_list">Från vitlista</string>
     <string name="Manually">Manuellt</string>
     <string name="List_of_contacts">Kontaktlista</string>
-    <string name="List_of_calls">Samtalslista/string>
+    <string name="List_of_calls">Samtalslista</string>
     <string name="List_of_SMS">SMS-lista</string>
     <string name="Black_list">Svartlista</string>
     <string name="White_list">Vitlista</string>
@@ -245,5 +245,8 @@
         <item>börjar med:</item>
         <item>slutar med:</item>
     </string-array>
+    <string name="Select_address_book">Välj adressbok</string>
+    <string name="Filter_by_group">Filtrera per grupp</string>
+    <string name="All">Allt</string>
 
 </resources>

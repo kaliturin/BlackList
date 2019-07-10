@@ -1,0 +1,14 @@
+diff a/app/src/main/res/menu/main.xml b/app/src/main/res/menu/main.xml	(rejected hunks)
+@@ -1,12 +1,6 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <menu xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto">
+-    <item
+-        android:id="@+id/action_filter_group"
+-        android:icon="@drawable/ic_group"
+-        android:title="@string/Filter_by_group"
+-        android:visible="false"
+-        app:showAsAction="ifRoom|collapseActionView" />
+     <item
+         android:id="@+id/action_search"
+         android:icon="@drawable/ic_search"
