@@ -3,6 +3,9 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+    lintOptions {
+        disable "ProtectedPermissions"
+    }
     defaultConfig {
         applicationId "com.kaliturin.blacklist"
         minSdkVersion 9
