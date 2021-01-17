@@ -31,6 +31,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +54,7 @@ import com.kaliturin.blacklist.utils.Permissions;
 import com.kaliturin.blacklist.utils.ProgressDialogHolder;
 import com.kaliturin.blacklist.utils.Utils;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -60,13 +62,20 @@ import java.util.List;
  * which one is adding to the black/white list
  */
 public class AddContactsFragment extends Fragment implements FragmentArguments {
+    private static final HashMap<String, String> ACCOUNT_TYPES = new HashMap<String, String>() {{
+        put("com.google", "Google");
+        put("at.bitfire.davdroid.address_book", "DAVDroid");
+        put("com.deependhulla.opensync.address_book", "Open Sync");
+    }};
     private ContactsCursorAdapter cursorAdapter = null;
     private ButtonsBar snackBar = null;
     private ContactSourceType sourceType = null;
     private int contactType = 0;
     private boolean singleNumberMode = false;
     private LongSparseArray<ContactNumber> singleContactNumbers = new LongSparseArray<>();
-
+    private String accountType = null;
+    private String accountName = null;
+    private String itemsFilter = null;
     public AddContactsFragment() {
         // Required empty public constructor
     }
@@ -157,7 +166,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         listView.setEmptyView(textEmptyView);
 
         // init and run the loader of contacts
-        getLoaderManager().initLoader(0, null, newLoaderCallbacks(null));
+        getLoaderManager().initLoader(0, null, newLoaderCallbacks(null, null, null));
     }
 
     @Override
@@ -173,6 +182,19 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         Utils.setMenuIconTint(getContext(), itemSearch, R.attr.colorAccent);
         itemSearch.setVisible(true);
 
+        MenuItem findByAccount = menu.findItem(R.id.action_filter_group);
+        Utils.setMenuIconTint(getContext(), findByAccount, R.attr.colorAccent);
+        findByAccount.setVisible(true);
+        findByAccount.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (menuItem.getTitle() == getResources().getString(R.string.Filter_by_group)) {
+                    showAccountsFilterDialog();
+                    return true;
+                }
+                return false;
+            }
+        });
         // get the view from search menu item
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(itemSearch);
         searchView.setQueryHint(getString(R.string.Search_action));
@@ -185,7 +207,8 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                reloadItems(newText);
+                itemsFilter = newText;
+                reloadItems();
                 return true;
             }
         });
@@ -201,7 +224,7 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
 
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
-                        reloadItems(null);
+                        reloadItems();
                         return true;
                     }
                 });
@@ -209,6 +232,38 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    private void showAccountsFilterDialog() {
+        ContactsAccessHelper dao = ContactsAccessHelper.getInstance(getContext());
+
+        final List<Pair<String, String>> accounts = dao.getAccounts();
+
+        DialogBuilder dialog = new DialogBuilder(getContext());
+        dialog.setTitle(R.string.Filter_by_group);
+        dialog.addItem(R.string.All, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                applyAccountFilter(null, null);
+            }
+        });
+        for (final Pair<String, String> pair: accounts) {
+            String name = ACCOUNT_TYPES.get(pair.first);
+            dialog.addItem(name + " " + pair.second, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    applyAccountFilter(pair.first, pair.second);
+                }
+            });
+        }
+        dialog.show();
+    }
+
+    private void applyAccountFilter(String accountType, String accountName) {
+        // assign accountType and accountName
+        this.accountType = accountType;
+        this.accountName = accountName;
+        // refresh the list
+        reloadItems();
+    }
 //-------------------------------------------------------------------
 
     // Opens menu dialog with list of contact's numbers to choose
@@ -260,38 +315,42 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
     }
 
     // Reloads items
-    private void reloadItems(String itemsFilter) {
+    private void reloadItems() {
         singleContactNumbers.clear();
         dismissSnackBar();
         if (isAdded()) {
-            getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter));
+            getLoaderManager().restartLoader(0, null, newLoaderCallbacks(itemsFilter, accountType, accountName));
         }
     }
 
     // Creates new contacts loader
-    private ContactsLoaderCallbacks newLoaderCallbacks(String itemsFilter) {
-        return new ContactsLoaderCallbacks(getContext(), sourceType, cursorAdapter, itemsFilter);
+    private ContactsLoaderCallbacks newLoaderCallbacks(String itemsFilter, String accountType, String accountName) {
+        return new ContactsLoaderCallbacks(getContext(), sourceType, cursorAdapter, itemsFilter, accountType, accountName);
     }
 
-//-------------------------------------------------------------------
 
     // Contact items loader
     private static class ContactsLoader extends CursorLoader {
         private ContactSourceType sourceType;
         private String itemsFilter;
-
+        private String accountType;
+        private String accountName;
         ContactsLoader(Context context,
                        ContactSourceType sourceType,
-                       String itemsFilter) {
+                       String itemsFilter,
+                       String accountType,
+                       String accountName) {
             super(context);
             this.sourceType = sourceType;
             this.itemsFilter = itemsFilter;
+            this.accountType = accountType;
+            this.accountName = accountName;
         }
 
         @Override
         public Cursor loadInBackground() {
             ContactsAccessHelper dao = ContactsAccessHelper.getInstance(getContext());
-            return dao.getContacts(getContext(), sourceType, itemsFilter);
+            return dao.getContacts(getContext(), sourceType, itemsFilter, accountType, accountName);
         }
     }
 
@@ -302,21 +361,29 @@ public class AddContactsFragment extends Fragment implements FragmentArguments {
         private ContactSourceType sourceType;
         private ContactsCursorAdapter cursorAdapter;
         private String itemsFilter;
+        private String accountType;
+        private String accountName;
 
         ContactsLoaderCallbacks(Context context,
                                 ContactSourceType sourceType,
                                 ContactsCursorAdapter cursorAdapter,
-                                String itemsFilter) {
+                                String itemsFilter,
+                                String accountType,
+                                String accountName) {
             this.context = context;
             this.sourceType = sourceType;
             this.cursorAdapter = cursorAdapter;
             this.itemsFilter = itemsFilter;
+            this.accountType = accountType;
+            this.accountName = accountName;
         }
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             progress.show(context, 0, R.string.Loading_);
-            return new ContactsLoader(context, sourceType, itemsFilter);
+            //TODO: investigate how to assign group to filter
+            int groupId = 0;
+            return new ContactsLoader(context, sourceType, itemsFilter, accountType, accountName);
         }
 
         @Override

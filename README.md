@@ -8,9 +8,11 @@
 
 Overview
 ---
-This is a free application that allows you to configure the blocking of unwanted calls and SMS
+This is a fork of free application that allows you to configure the blocking of unwanted calls and SMS
 in convenient way. It does not contain ads, supports light and dark interface themes and is
-supported by devices with Android 2.3 and up.
+supported by devices with Android 2.3 and up. As original Blacklist is not maintained anymore, I'll take care of it's fork.
+Forked version will introduce online sources syncing, and online repositories for blocking and sharing public blacklists
+using CardDAV servers, or even gists. I've also added contacts group support.
 
 Features
 ---
@@ -71,8 +73,17 @@ separately. You can adjust the level of visual and audio information about the e
 You can set the light or dark theme of the application interface. Here, you can also export and
 import application data, for example, to transfer them from one device to another.
 
-### License:
-
+### Fork License:
+    Copyright (C) 2019 Dmitrij Rysanow <thecyberd3m0n@gmail.com>
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not
+    use this file except in compliance with the License. You may obtain a copy of
+    the License at http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+### Original License:
     Copyright (C) 2017 Anton Kaliturin <kaliturin@gmail.com>
     Licensed under the Apache License, Version 2.0 (the "License"); you may not
     use this file except in compliance with the License. You may obtain a copy of

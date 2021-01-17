@@ -1,0 +1,10 @@
+diff a/app/src/main/res/values-nl/strings.xml b/app/src/main/res/values-nl/strings.xml	(rejected hunks)
+@@ -242,8 +242,5 @@
+         <item>begint met:</item>
+         <item>eindigt op:</item>
+     </string-array>
+-    <string name="Select_address_book">Selecteer het adresboek</string>
+-    <string name="Filter_by_group">Filtrer efter gruppe</string>
+-    <string name="All">Alle</string>
+ 
+ </resources>
